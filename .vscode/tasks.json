@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cargoBuild",
+            "command": "cargo build",
+            "args": [],
+            "type": "shell",
+            "problemMatcher": [
+                "$rustc"
+            ]
+        }
+    ]
+}
