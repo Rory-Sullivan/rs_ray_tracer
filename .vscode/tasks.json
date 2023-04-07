@@ -9,6 +9,15 @@
             "problemMatcher": [
                 "$rustc"
             ]
+        },
+        {
+            "label": "openResult",
+            "command": "&'C:\\Program Files\\LibreOffice\\program\\soffice.exe'",
+            "args": [
+                ".\\result.ppm"
+            ],
+            "type": "shell",
+            "problemMatcher": []
         }
     ]
 }

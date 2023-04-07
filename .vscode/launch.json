@@ -14,7 +14,8 @@
             "cwd": "${workspaceRoot}",
             "environment": [],
             "console": "integratedTerminal",
-            "preLaunchTask": "cargoBuild"
+            "preLaunchTask": "cargoBuild",
+            "postDebugTask": "openResult",
         },
     ]
 }
