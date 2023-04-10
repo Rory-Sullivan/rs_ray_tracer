@@ -1,13 +1,15 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+use crate::utilities::clamp;
+
 #[derive(Debug, Clone, Copy)]
 pub struct RGB(pub f64, pub f64, pub f64);
 
 impl RGB {
-    pub fn write_colour(self) -> String {
-        let ir = (255.999 * self.0) as usize;
-        let ig = (255.999 * self.1) as usize;
-        let ib = (255.999 * self.2) as usize;
+    pub fn write_colour(self, num_samples: usize) -> String {
+        let ir = (256.0 * clamp(self.0 / (num_samples as f64), 0.0, 0.99)) as usize;
+        let ig = (256.0 * clamp(self.1 / (num_samples as f64), 0.0, 0.99)) as usize;
+        let ib = (256.0 * clamp(self.2 / (num_samples as f64), 0.0, 0.99)) as usize;
 
         format!("{ir} {ig} {ib}\n")
     }
