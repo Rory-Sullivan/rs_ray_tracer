@@ -1,9 +1,10 @@
 use std::{fs::File, io::Write, time::Instant};
 
+use indicatif::ProgressBar;
 use rs_ray_tracer::{
     colour::RGB,
-    hittable::{HitRecord, Hittable, HittableList},
-    utilities::random,
+    hittable::{Hittable, HittableList},
+    utilities::{random, random_vec_in_hemisphere},
     Camera, Ray, Sphere, Vec3d,
 };
 
@@ -13,6 +14,7 @@ fn main() {
     const IMAGE_HEIGHT: usize = 225;
     const ASPECT_RATIO: f64 = (IMAGE_WIDTH as f64) / (IMAGE_HEIGHT as f64);
     const NUM_SAMPLES: usize = 100;
+    const MAX_DEPTH: usize = 50;
 
     const OUTPUT_FILE_NAME: &str = "result.ppm";
 
@@ -27,14 +29,16 @@ fn main() {
     // Render
     println!("Starting");
     let start_instant = Instant::now();
+    let progress_increments = 10;
+    let progress_bar = ProgressBar::new(IMAGE_HEIGHT as u64);
 
     let mut image_string: String = format!("P3\n{IMAGE_WIDTH} {IMAGE_HEIGHT}\n255\n").to_string();
 
     // Bottom -> top
     for j in (0..IMAGE_HEIGHT).rev() {
         // Print dot for progress
-        if j % 10 == 0 {
-            print!(".");
+        if j < IMAGE_HEIGHT && j % progress_increments == 0 {
+            progress_bar.inc(progress_increments as u64);
         }
 
         // Left -> right
@@ -46,8 +50,7 @@ fn main() {
 
                 let ray = camera.get_ray(u, v);
 
-                let hit = scene.hit(&ray, 0.0, f64::MAX);
-                let new_colour = ray_colour(&ray, &hit);
+                let new_colour = ray_colour(&ray, &scene, MAX_DEPTH);
                 colour = RGB(
                     colour.0 + new_colour.0,
                     colour.1 + new_colour.1,
@@ -57,6 +60,7 @@ fn main() {
             image_string.push_str(&colour.write_colour(NUM_SAMPLES));
         }
     }
+    progress_bar.finish();
     print!("\n");
 
     let mut output_file = File::create(OUTPUT_FILE_NAME).unwrap();
@@ -66,11 +70,20 @@ fn main() {
     println!("DONE, time taken: {duration:?}");
 }
 
-fn ray_colour(ray: &Ray, hit: &Option<HitRecord>) -> RGB {
+fn ray_colour<TScene>(ray: &Ray, scene: &TScene, max_depth: usize) -> RGB
+where
+    TScene: Hittable,
+{
+    if max_depth <= 0 {
+        return RGB(0.0, 0.0, 0.0);
+    }
+
+    let hit = scene.hit(&ray, 0.001, f64::MAX);
     match hit {
         Some(hr) => {
-            let n = hr.normal;
-            0.5 * RGB(n.x + 1.0, n.y + 1.0, n.z + 1.0)
+            let target = hr.point + hr.normal + random_vec_in_hemisphere(&hr.normal);
+            let target_ray = Ray::new(hr.point, target - hr.point);
+            0.5 * ray_colour(&target_ray, scene, max_depth - 1)
         }
         None => {
             let unit_direction = ray.direction.unit_vector();

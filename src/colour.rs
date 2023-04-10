@@ -7,9 +7,20 @@ pub struct RGB(pub f64, pub f64, pub f64);
 
 impl RGB {
     pub fn write_colour(self, num_samples: usize) -> String {
-        let ir = (256.0 * clamp(self.0 / (num_samples as f64), 0.0, 0.99)) as usize;
-        let ig = (256.0 * clamp(self.1 / (num_samples as f64), 0.0, 0.99)) as usize;
-        let ib = (256.0 * clamp(self.2 / (num_samples as f64), 0.0, 0.99)) as usize;
+        // Divide by number of samples to average value
+        let mut r = self.0 / num_samples as f64;
+        let mut g = self.1 / num_samples as f64;
+        let mut b = self.2 / num_samples as f64;
+
+        // Take square root to gamma-correct for gamma = 2.0
+        r = r.sqrt();
+        g = g.sqrt();
+        b = b.sqrt();
+
+        // Convert ot int
+        let ir = (256.0 * clamp(r, 0.0, 0.999)) as usize;
+        let ig = (256.0 * clamp(g, 0.0, 0.999)) as usize;
+        let ib = (256.0 * clamp(b, 0.0, 0.999)) as usize;
 
         format!("{ir} {ig} {ib}\n")
     }
