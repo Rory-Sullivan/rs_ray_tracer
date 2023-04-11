@@ -60,6 +60,14 @@ pub fn reflect_vec(vec_in: &Vec3d, normal: &Vec3d) -> Vec3d {
     *vec_in - 2.0 * vec_in.dot(normal) * *normal
 }
 
+pub fn refract_vec(vec_in: &Vec3d, normal: &Vec3d, refraction_index: f64) -> Vec3d {
+    let cos_theta = f64::min(-vec_in.dot(normal), 1.0);
+    let vec_out_perpendicular = refraction_index * (*vec_in + cos_theta * *normal);
+    let vec_out_parallel =
+        -1.0 * (1.0 - vec_out_perpendicular.len_squared()).abs().sqrt() * *normal;
+    vec_out_perpendicular + vec_out_parallel
+}
+
 pub fn clamp(num: f64, min: f64, max: f64) -> f64 {
     if num < min {
         return min;
