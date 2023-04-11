@@ -1,21 +1,37 @@
 use crate::{
     hittable::{HitRecord, Hittable},
+    material::Material,
     Point3d, Ray,
 };
 
-#[derive(Debug, Clone, Copy)]
-pub struct Sphere {
+pub struct Sphere<'a, TMaterial>
+where
+    TMaterial: Material,
+{
     center: Point3d,
     radius: f64,
+    material: &'a TMaterial,
 }
 
-impl Sphere {
-    pub fn new(center: Point3d, radius: f64) -> Self {
-        Self { center, radius }
+impl<'a, TMaterial> Sphere<'a, TMaterial>
+where
+    TMaterial: Material,
+    TMaterial: Copy,
+{
+    pub fn new(center: Point3d, radius: f64, material: &'a TMaterial) -> Self {
+        Self {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
-impl Hittable for Sphere {
+impl<'a, TMaterial> Hittable for Sphere<'a, TMaterial>
+where
+    TMaterial: Material + 'static,
+    TMaterial: Copy,
+{
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.len_squared();
@@ -44,6 +60,13 @@ impl Hittable for Sphere {
         } else {
             -1.0 * outward_normal
         };
-        Some(HitRecord::new(point, normal, root, front_face))
+
+        Some(HitRecord::new(
+            point,
+            normal,
+            Box::new(*self.material),
+            root,
+            front_face,
+        ))
     }
 }

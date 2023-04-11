@@ -56,6 +56,10 @@ pub fn random_vec_in_hemisphere(normal: &Vec3d) -> Vec3d {
     -1.0 * r
 }
 
+pub fn reflect_vec(vec_in: &Vec3d, normal: &Vec3d) -> Vec3d {
+    *vec_in - 2.0 * vec_in.dot(normal) * *normal
+}
+
 pub fn clamp(num: f64, min: f64, max: f64) -> f64 {
     if num < min {
         return min;

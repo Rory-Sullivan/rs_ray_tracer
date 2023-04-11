@@ -4,7 +4,8 @@ use indicatif::ProgressBar;
 use rs_ray_tracer::{
     colour::RGB,
     hittable::{Hittable, HittableList},
-    utilities::{random, random_vec_in_hemisphere},
+    material::{Diffuse, Metal},
+    utilities::random,
     Camera, Ray, Sphere, Vec3d,
 };
 
@@ -22,9 +23,21 @@ fn main() {
     let camera = Camera::new(ASPECT_RATIO);
 
     // Scene
-    let mut scene = HittableList::<Sphere>::new();
-    scene.add(Sphere::new(Vec3d::new(0.0, 0.0, -1.0), 0.5));
-    scene.add(Sphere::new(Vec3d::new(0.0, -100.5, -1.0), 100.0));
+    let material_ground = Diffuse::new(RGB(0.8, 0.8, 0.0));
+    let material_center = Diffuse::new(RGB(0.7, 0.3, 0.3));
+    let material_left = Metal::new(RGB(0.8, 0.8, 0.8));
+    let material_right = Metal::new(RGB(0.8, 0.6, 0.2));
+
+    let ground_sphere = Sphere::new(Vec3d::new(0.0, -100.5, -1.0), 100.0, &material_ground);
+    let center_sphere = Sphere::new(Vec3d::new(0.0, 0.0, -1.0), 0.5, &material_center);
+    let left_sphere = Sphere::new(Vec3d::new(-1.0, 0.0, -1.0), 0.5, &material_left);
+    let right_sphere = Sphere::new(Vec3d::new(1.0, 0.0, -1.0), 0.5, &material_right);
+
+    let mut scene = HittableList::new();
+    scene.add(Box::new(ground_sphere));
+    scene.add(Box::new(center_sphere));
+    scene.add(Box::new(left_sphere));
+    scene.add(Box::new(right_sphere));
 
     // Render
     println!("Starting");
@@ -50,12 +63,7 @@ fn main() {
 
                 let ray = camera.get_ray(u, v);
 
-                let new_colour = ray_colour(&ray, &scene, MAX_DEPTH);
-                colour = RGB(
-                    colour.0 + new_colour.0,
-                    colour.1 + new_colour.1,
-                    colour.2 + new_colour.2,
-                );
+                colour = colour + ray_colour(&ray, &scene, MAX_DEPTH)
             }
             image_string.push_str(&colour.write_colour(NUM_SAMPLES));
         }
@@ -70,21 +78,17 @@ fn main() {
     println!("DONE, time taken: {duration:?}");
 }
 
-fn ray_colour<TScene>(ray: &Ray, scene: &TScene, max_depth: usize) -> RGB
-where
-    TScene: Hittable,
-{
+fn ray_colour(ray: &Ray, scene: &HittableList, max_depth: usize) -> RGB {
     if max_depth <= 0 {
         return RGB(0.0, 0.0, 0.0);
     }
 
     let hit = scene.hit(&ray, 0.001, f64::MAX);
     match hit {
-        Some(hr) => {
-            let target = hr.point + hr.normal + random_vec_in_hemisphere(&hr.normal);
-            let target_ray = Ray::new(hr.point, target - hr.point);
-            0.5 * ray_colour(&target_ray, scene, max_depth - 1)
-        }
+        Some(hr) => match hr.material.scatter(ray, &hr) {
+            Some((ray_out, hit_colour)) => hit_colour * ray_colour(&ray_out, scene, max_depth - 1),
+            None => RGB(0.0, 0.0, 0.0),
+        },
         None => {
             let unit_direction = ray.direction.unit_vector();
             let t = 0.5 * (unit_direction.y + 1.0);

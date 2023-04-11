@@ -1,5 +1,6 @@
 pub mod colour;
 pub mod hittable;
+pub mod material;
 pub mod utilities;
 
 mod camera;

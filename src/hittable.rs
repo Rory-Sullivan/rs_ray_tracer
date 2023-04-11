@@ -1,48 +1,45 @@
-use crate::{Point3d, Ray, Vec3d};
+use crate::{material::Material, Point3d, Ray, Vec3d};
 
 pub trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub point: Point3d,
     pub normal: Vec3d,
+    pub material: Box<dyn Material + 'a>,
     pub t: f64,
     pub front_face: bool,
 }
 
-impl HitRecord {
-    pub fn new(point: Point3d, normal: Vec3d, t: f64, front_face: bool) -> HitRecord {
+impl HitRecord<'_> {
+    pub fn new(
+        point: Point3d,
+        normal: Vec3d,
+        material: Box<dyn Material + '_>,
+        t: f64,
+        front_face: bool,
+    ) -> HitRecord<'_> {
         HitRecord {
             point,
             normal,
+            material,
             t,
             front_face,
         }
     }
 }
 
-#[derive(Debug)]
-pub struct HittableList<T>
-where
-    T: Hittable,
-{
-    items: Vec<T>,
+pub struct HittableList<'a> {
+    items: Vec<Box<dyn Hittable + 'a>>,
 }
 
-impl<T> HittableList<T>
-where
-    T: Hittable,
-{
+impl<'a> HittableList<'a> {
     pub fn new() -> Self {
         Self { items: Vec::new() }
     }
 
-    pub fn from_vec(items: Vec<T>) -> Self {
-        Self { items }
-    }
-
-    pub fn add(&mut self, item: T) {
+    pub fn add(&mut self, item: Box<dyn Hittable + 'a>) {
         self.items.push(item);
     }
 
@@ -51,10 +48,7 @@ where
     }
 }
 
-impl<T> Hittable for HittableList<T>
-where
-    T: Hittable,
-{
+impl Hittable for HittableList<'_> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;

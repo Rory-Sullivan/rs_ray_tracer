@@ -35,6 +35,12 @@ impl Vec3d {
             z: (self.x * rhs.y) - (self.y * rhs.x),
         }
     }
+
+    /// Returns true if the vector is close to zero in all directions
+    pub fn near_zero(&self) -> bool {
+        const THRESHOLD: f64 = 1e-8;
+        self.x.abs() < THRESHOLD && self.y.abs() < THRESHOLD && self.z.abs() < THRESHOLD
+    }
 }
 
 impl Add for Vec3d {

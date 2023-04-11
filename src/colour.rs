@@ -105,3 +105,15 @@ impl DivAssign<f64> for RGB {
         self.2 /= rhs;
     }
 }
+
+impl Mul for RGB {
+    type Output = RGB;
+
+    fn mul(self, rhs: RGB) -> Self::Output {
+        RGB {
+            0: self.0 * rhs.0,
+            1: self.1 * rhs.1,
+            2: self.2 * rhs.2,
+        }
+    }
+}
