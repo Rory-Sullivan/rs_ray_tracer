@@ -4,21 +4,21 @@ use crate::{
     Point3d, Ray,
 };
 
-pub struct Sphere<'a, TMaterial>
+pub struct Sphere<TMaterial>
 where
     TMaterial: Material,
 {
     center: Point3d,
     radius: f64,
-    material: &'a TMaterial,
+    material: TMaterial,
 }
 
-impl<'a, TMaterial> Sphere<'a, TMaterial>
+impl<TMaterial> Sphere<TMaterial>
 where
     TMaterial: Material,
     TMaterial: Copy,
 {
-    pub fn new(center: Point3d, radius: f64, material: &'a TMaterial) -> Self {
+    pub fn new(center: Point3d, radius: f64, material: TMaterial) -> Self {
         Self {
             center,
             radius,
@@ -27,7 +27,7 @@ where
     }
 }
 
-impl<'a, TMaterial> Hittable for Sphere<'a, TMaterial>
+impl<TMaterial> Hittable for Sphere<TMaterial>
 where
     TMaterial: Material + 'static,
     TMaterial: Copy,
@@ -64,7 +64,7 @@ where
         Some(HitRecord::new(
             point,
             normal,
-            Box::new(*self.material),
+            Box::new(self.material),
             root,
             front_face,
         ))

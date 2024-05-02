@@ -1,7 +1,7 @@
 use rand::Rng;
 use std::f64::consts::PI;
 
-use crate::Vec3d;
+use crate::{colour::RGB, Vec3d};
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0
@@ -56,6 +56,15 @@ pub fn random_vec_in_hemisphere(normal: &Vec3d) -> Vec3d {
     -1.0 * r
 }
 
+pub fn random_vec_in_unit_disc() -> Vec3d {
+    loop {
+        let v = Vec3d::new(random_rng(-1.0, 1.0), random_rng(-1.0, 1.0), 0.0);
+        if v.len_squared() < 1.0 {
+            return v;
+        }
+    }
+}
+
 pub fn reflect_vec(vec_in: &Vec3d, normal: &Vec3d) -> Vec3d {
     *vec_in - 2.0 * vec_in.dot(normal) * *normal
 }
@@ -76,4 +85,8 @@ pub fn clamp(num: f64, min: f64, max: f64) -> f64 {
         return max;
     }
     num
+}
+
+pub fn random_rgb() -> RGB {
+    RGB(random(), random(), random())
 }
