@@ -8,9 +8,9 @@ use crate::{
 };
 
 pub fn render_scene<F>(
-    camera: Camera,
-    scene: HittableList,
-    resolution: Resolution,
+    camera: &Camera,
+    scene: &HittableList,
+    resolution: &Resolution,
     report_progress: F,
 ) -> Vec<RGB>
 where

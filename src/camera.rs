@@ -15,7 +15,9 @@ pub struct Camera {
 }
 
 impl Camera {
-    /// vertical_fov is the vertical field of view in degrees
+    /// - vertical_fov is the vertical field of view in degrees
+    /// - view_up is the "up" direction for the camera, used to control the
+    ///   roll/sideways tilt of the camera
     pub fn new(
         look_from: Point3d,
         look_at: Point3d,

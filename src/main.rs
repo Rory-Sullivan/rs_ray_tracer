@@ -1,4 +1,4 @@
-use std::{time::Instant, usize};
+use std::{fs::create_dir_all, time::Instant, usize};
 
 use indicatif::ProgressBar;
 use rs_ray_tracer::{
@@ -6,86 +6,103 @@ use rs_ray_tracer::{
     hittable::HittableList,
     material::{Dielectric, Diffuse, Metal},
     render::render_scene,
-    utilities::{random, random_rgb, random_rng, save_as_png, save_as_ppm},
+    utilities::{random, random_rgb, random_rng, save_as_png},
     Camera, Point3d, Resolution, Sphere, Vec3d,
 };
 
 fn main() {
-    // High res image
-    // const IMAGE_WIDTH: usize = 1200;
-    // const IMAGE_HEIGHT: usize = 800;
-    // const NUM_SAMPLES: usize = 500;
-    // const MAX_DEPTH: usize = 50;
-
-    // Low res image
-    const IMAGE_WIDTH: usize = 600;
-    const IMAGE_HEIGHT: usize = 400;
-    const NUM_SAMPLES: usize = 100;
-    const MAX_DEPTH: usize = 50;
-
-    const FOV: f64 = 20.0; // degrees
-    let look_from: Point3d = Point3d::new(13.0, 2.0, 3.0);
-    let look_at: Point3d = Point3d::new(0.0, 0.0, 0.0);
-    // view_up is the "up" direction for the camera, used to control the
-    // roll/sideways tilt of the camera
-    let view_up: Vec3d = Vec3d::new(0.0, 1.0, 0.0);
-    const APERTURE: f64 = 0.1;
-    let focus_dist: f64 = 10.0;
-
-    const OUTPUT_FILE_NAME_PPM: &str = "result.ppm";
-    const OUTPUT_FILE_NAME_PNG: &str = "result.png";
+    const OUTPUT_FOLDER: &str = "results";
+    const OUTPUT_FILE_NAME: &str = "result";
 
     // Resolution
-    let resolution = Resolution::new(IMAGE_WIDTH, IMAGE_HEIGHT, NUM_SAMPLES, MAX_DEPTH);
+    // Low res
+    let resolution = Resolution::new(
+        600, // Image width
+        400, // Image height
+        100, // Num samples
+        50,  // Max depth
+    );
+    // High res
+    // let resolution = Resolution::new(
+    //     1200, // Image width
+    //     800,  // Image height
+    //     500,  // Num samples
+    //     50,   // Max depth
+    // );
+    // Screen res
+    // let resolution = Resolution::new(
+    //     1920, // Image width
+    //     1080, // Image height
+    //     500,  // Num samples
+    //     50,   // Max depth
+    // );
 
     // Camera
-    let camera = Camera::new(
-        look_from,
-        look_at,
-        view_up,
-        FOV,
-        resolution.get_aspect_ratio(),
-        APERTURE,
-        focus_dist,
-    );
+    const FOV: f64 = 20.0; // degrees
+    const APERTURE: f64 = 0.1;
+    let cameras = [
+        Camera::new(
+            Point3d::new(13.0, 2.0, 3.0),  // Look from
+            Point3d::new(0.0, 0.0, 0.0),   // Look at
+            Vec3d::new(0.0, 1.0, 0.0),     // View up
+            FOV,                           // Vertical field of view
+            resolution.get_aspect_ratio(), // Aspect ratio
+            APERTURE,                      // Aperture
+            10.0,                          // Focus distance
+        ),
+        Camera::new(
+            Point3d::new(5.0, 5.0, 13.0),  // Look from
+            Point3d::new(0.0, 0.0, 0.0),   // Look at
+            Vec3d::new(0.0, 1.0, 0.0),     // View up
+            FOV,                           // Vertical field of view
+            resolution.get_aspect_ratio(), // Aspect ratio
+            APERTURE,                      // Aperture
+            13.3,                          // Focus distance
+        ),
+        Camera::new(
+            Point3d::new(-6.0, 1.0, -10.0), // Look from
+            Point3d::new(4.0, 0.0, 0.0),    // Look at
+            Vec3d::new(0.0, 1.0, 0.0),      // View up
+            FOV,                            // Vertical field of view
+            resolution.get_aspect_ratio(),  // Aspect ratio
+            APERTURE,                       // Aperture
+            16.0,                           // Focus distance
+        ),
+    ];
 
     // Scene
     // let scene = generate_basic_scene();
     let scene = generate_random_complex_scene();
 
     // Render
-    println!("Starting");
     let start_instant = Instant::now();
-    let progress_increments = 10;
-    let progress_bar = ProgressBar::new(IMAGE_HEIGHT as u64);
+    let num_cameras = cameras.len();
+    for (i, camera) in cameras.iter().enumerate() {
+        println!("Rendering camera {0}/{1} ", i + 1, num_cameras);
+        let progress_increments = 10;
+        let progress_bar = ProgressBar::new(resolution.image_height as u64);
 
-    let increment_progress_bar = |row_number: usize| {
-        if (row_number < IMAGE_HEIGHT) && (row_number % progress_increments == 0) {
-            progress_bar.inc(progress_increments as u64);
-        }
-    };
-    let image = render_scene(camera, scene, resolution, increment_progress_bar);
+        let increment_progress_bar = |row_number: usize| {
+            if (row_number < resolution.image_height) && (row_number % progress_increments == 0) {
+                progress_bar.inc(progress_increments as u64);
+            }
+        };
+        let image = render_scene(&camera, &scene, &resolution, increment_progress_bar);
 
-    progress_bar.finish();
-    print!("\n");
+        progress_bar.finish();
+        print!("\n");
 
-    println!("Saving PNG");
-    save_as_png(
-        OUTPUT_FILE_NAME_PNG,
-        IMAGE_WIDTH,
-        IMAGE_HEIGHT,
-        &image,
-        NUM_SAMPLES,
-    );
-
-    println!("Saving PPM");
-    save_as_ppm(
-        OUTPUT_FILE_NAME_PPM,
-        IMAGE_WIDTH,
-        IMAGE_HEIGHT,
-        &image,
-        NUM_SAMPLES,
-    );
+        println!("Saving PNG");
+        create_dir_all(OUTPUT_FOLDER).unwrap();
+        let file_name_png = format!("{0}/{1}_{2}.png", OUTPUT_FOLDER, OUTPUT_FILE_NAME, i + 1);
+        save_as_png(
+            &file_name_png,
+            resolution.image_width,
+            resolution.image_height,
+            &image,
+            resolution.num_samples,
+        );
+    }
 
     let duration = start_instant.elapsed();
     let duration_secs = duration.as_secs();
