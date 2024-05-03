@@ -33,7 +33,7 @@ fn main() {
     // let resolution = Resolution::new(
     //     1920, // Image width
     //     1080, // Image height
-    //     500,  // Num samples
+    //     800,  // Num samples
     //     50,   // Max depth
     // );
 
