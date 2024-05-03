@@ -6,7 +6,7 @@ use crate::utilities::clamp;
 pub struct RGB(pub f64, pub f64, pub f64);
 
 impl RGB {
-    pub fn write_colour(self, num_samples: usize) -> String {
+    pub fn to_integers(self, num_samples: usize) -> (usize, usize, usize) {
         // Divide by number of samples to average value
         let mut r = self.0 / num_samples as f64;
         let mut g = self.1 / num_samples as f64;
@@ -22,6 +22,11 @@ impl RGB {
         let ig = (256.0 * clamp(g, 0.0, 0.999)) as usize;
         let ib = (256.0 * clamp(b, 0.0, 0.999)) as usize;
 
+        (ir, ig, ib)
+    }
+
+    pub fn write_colour(self, num_samples: usize) -> String {
+        let (ir, ig, ib) = self.to_integers(num_samples);
         format!("{ir} {ig} {ib}\n")
     }
 }

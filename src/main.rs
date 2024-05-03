@@ -1,22 +1,29 @@
 use rayon::prelude::*;
-use std::{fs::File, io::Write, time::Instant};
+use std::time::Instant;
 
 use indicatif::ProgressBar;
 use rs_ray_tracer::{
     colour::RGB,
     hittable::{Hittable, HittableList},
     material::{Dielectric, Diffuse, Metal},
-    utilities::{random, random_rgb, random_rng},
+    utilities::{random, random_rgb, random_rng, save_as_png, save_as_ppm},
     Camera, Point3d, Ray, Sphere, Vec3d,
 };
 
 fn main() {
-    // Image
-    const IMAGE_WIDTH: usize = 1200;
-    const IMAGE_HEIGHT: usize = 800;
-    const ASPECT_RATIO: f64 = (IMAGE_WIDTH as f64) / (IMAGE_HEIGHT as f64);
-    const NUM_SAMPLES: usize = 500;
+    // High res image
+    // const IMAGE_WIDTH: usize = 1200;
+    // const IMAGE_HEIGHT: usize = 800;
+    // const NUM_SAMPLES: usize = 500;
+    // const MAX_DEPTH: usize = 50;
+
+    // Low res image
+    const IMAGE_WIDTH: usize = 600;
+    const IMAGE_HEIGHT: usize = 400;
+    const NUM_SAMPLES: usize = 100;
     const MAX_DEPTH: usize = 50;
+
+    const ASPECT_RATIO: f64 = (IMAGE_WIDTH as f64) / (IMAGE_HEIGHT as f64);
 
     const FOV: f64 = 20.0; // degrees
     let look_from: Point3d = Point3d::new(13.0, 2.0, 3.0);
@@ -25,7 +32,8 @@ fn main() {
     const APERTURE: f64 = 0.1;
     let focus_dist: f64 = 10.0;
 
-    const OUTPUT_FILE_NAME: &str = "result.ppm";
+    const OUTPUT_FILE_NAME_PPM: &str = "result.ppm";
+    const OUTPUT_FILE_NAME_PNG: &str = "result.png";
 
     // Camera
     let camera = Camera::new(
@@ -77,16 +85,24 @@ fn main() {
         })
         .collect();
 
-    let mut image_string: String = format!("P3\n{IMAGE_WIDTH} {IMAGE_HEIGHT}\n255\n").to_string();
-    for colour in image {
-        image_string.push_str(&colour.write_colour(NUM_SAMPLES));
-    }
-
     progress_bar.finish();
     print!("\n");
 
-    let mut output_file = File::create(OUTPUT_FILE_NAME).unwrap();
-    output_file.write_all(image_string.as_bytes()).unwrap();
+    save_as_png(
+        OUTPUT_FILE_NAME_PNG,
+        IMAGE_WIDTH,
+        IMAGE_HEIGHT,
+        &image,
+        NUM_SAMPLES,
+    );
+
+    save_as_ppm(
+        OUTPUT_FILE_NAME_PPM,
+        IMAGE_WIDTH,
+        IMAGE_HEIGHT,
+        &image,
+        NUM_SAMPLES,
+    );
 
     let duration = start_instant.elapsed();
     println!("DONE, time taken: {duration:?}");

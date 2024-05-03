@@ -1,5 +1,6 @@
+use image::{ImageBuffer, RgbImage};
 use rand::Rng;
-use std::f64::consts::PI;
+use std::{f64::consts::PI, fs::File, io::Write};
 
 use crate::{colour::RGB, Vec3d};
 
@@ -89,4 +90,37 @@ pub fn clamp(num: f64, min: f64, max: f64) -> f64 {
 
 pub fn random_rgb() -> RGB {
     RGB(random(), random(), random())
+}
+
+pub fn save_as_ppm(
+    file_name: &str,
+    image_width: usize,
+    image_height: usize,
+    image: &Vec<RGB>,
+    num_samples: usize,
+) {
+    let mut image_string: String = format!("P3\n{image_width} {image_height}\n255\n").to_string();
+    for colour in image {
+        image_string.push_str(&colour.write_colour(num_samples));
+    }
+
+    let mut output_file = File::create(file_name).unwrap();
+    output_file.write_all(image_string.as_bytes()).unwrap();
+}
+
+pub fn save_as_png(
+    file_name: &str,
+    image_width: usize,
+    image_height: usize,
+    image: &Vec<RGB>,
+    num_samples: usize,
+) {
+    let mut image_buffer: RgbImage = ImageBuffer::new(image_width as u32, image_height as u32);
+    for (x, y, colour) in image_buffer.enumerate_pixels_mut() {
+        let i = (y as usize * image_width) + x as usize;
+        let pixel = image[i];
+        let (ir, ig, ib) = pixel.to_integers(num_samples);
+        colour.0 = [ir as u8, ig as u8, ib as u8];
+    }
+    image_buffer.save(file_name).unwrap();
 }
