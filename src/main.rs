@@ -1,13 +1,13 @@
-use rayon::prelude::*;
-use std::time::Instant;
+use std::{time::Instant, usize};
 
 use indicatif::ProgressBar;
 use rs_ray_tracer::{
     colour::RGB,
-    hittable::{Hittable, HittableList},
+    hittable::HittableList,
     material::{Dielectric, Diffuse, Metal},
+    render::render_scene,
     utilities::{random, random_rgb, random_rng, save_as_png, save_as_ppm},
-    Camera, Point3d, Ray, Sphere, Vec3d,
+    Camera, Point3d, Resolution, Sphere, Vec3d,
 };
 
 fn main() {
@@ -23,7 +23,6 @@ fn main() {
     const NUM_SAMPLES: usize = 100;
     const MAX_DEPTH: usize = 50;
 
-    const ASPECT_RATIO: f64 = (IMAGE_WIDTH as f64) / (IMAGE_HEIGHT as f64);
     const FOV: f64 = 20.0; // degrees
     let look_from: Point3d = Point3d::new(13.0, 2.0, 3.0);
     let look_at: Point3d = Point3d::new(0.0, 0.0, 0.0);
@@ -36,13 +35,16 @@ fn main() {
     const OUTPUT_FILE_NAME_PPM: &str = "result.ppm";
     const OUTPUT_FILE_NAME_PNG: &str = "result.png";
 
+    // Resolution
+    let resolution = Resolution::new(IMAGE_WIDTH, IMAGE_HEIGHT, NUM_SAMPLES, MAX_DEPTH);
+
     // Camera
     let camera = Camera::new(
         look_from,
         look_at,
         view_up,
         FOV,
-        ASPECT_RATIO,
+        resolution.get_aspect_ratio(),
         APERTURE,
         focus_dist,
     );
@@ -57,34 +59,12 @@ fn main() {
     let progress_increments = 10;
     let progress_bar = ProgressBar::new(IMAGE_HEIGHT as u64);
 
-    let mut pixels: Vec<(usize, usize)> = Vec::with_capacity(IMAGE_HEIGHT * IMAGE_WIDTH);
-    // Bottom -> top
-    for j in (0..IMAGE_HEIGHT).rev() {
-        // Left -> right
-        for i in 0..IMAGE_WIDTH {
-            pixels.push((i, j))
+    let increment_progress_bar = |row_number: usize| {
+        if (row_number < IMAGE_HEIGHT) && (row_number % progress_increments == 0) {
+            progress_bar.inc(progress_increments as u64);
         }
-    }
-
-    let image: Vec<RGB> = pixels
-        .par_iter() // Parallel iteration
-        .map(|pixel| {
-            let mut colour = RGB(0.0, 0.0, 0.0);
-            for _ in 0..NUM_SAMPLES {
-                let u = ((pixel.0 as f64) + random()) / ((IMAGE_WIDTH - 1) as f64);
-                let v = ((pixel.1 as f64) + random()) / ((IMAGE_HEIGHT - 1) as f64);
-
-                let ray = camera.get_ray(u, v);
-
-                colour = colour + ray_colour(&ray, &scene, MAX_DEPTH)
-            }
-
-            if (pixel.1 < IMAGE_HEIGHT) && (pixel.1 % progress_increments == 0) && (pixel.0 == 0) {
-                progress_bar.inc(progress_increments as u64);
-            }
-            colour
-        })
-        .collect();
+    };
+    let image = render_scene(camera, scene, resolution, increment_progress_bar);
 
     progress_bar.finish();
     print!("\n");
@@ -112,25 +92,6 @@ fn main() {
     let duration_mins = duration_secs / 60;
     let remaining_secs = duration_secs % 60;
     println!("DONE, time taken: {duration_mins}m {remaining_secs}s ({duration_secs}s)");
-}
-
-fn ray_colour(ray: &Ray, scene: &HittableList, max_depth: usize) -> RGB {
-    if max_depth <= 0 {
-        return RGB(0.0, 0.0, 0.0);
-    }
-
-    let hit = scene.hit(&ray, 0.001, f64::MAX);
-    match hit {
-        Some(hr) => match hr.material.scatter(ray, &hr) {
-            Some((ray_out, hit_colour)) => hit_colour * ray_colour(&ray_out, scene, max_depth - 1),
-            None => RGB(0.0, 0.0, 0.0),
-        },
-        None => {
-            let unit_direction = ray.direction.unit_vector();
-            let t = 0.5 * (unit_direction.y + 1.0);
-            (1.0 - t) * RGB(1.0, 1.0, 1.0) + t * RGB(0.5, 0.7, 1.0)
-        }
-    }
 }
 
 fn generate_basic_scene<'a>() -> HittableList<'a> {
