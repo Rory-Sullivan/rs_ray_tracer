@@ -24,10 +24,11 @@ fn main() {
     const MAX_DEPTH: usize = 50;
 
     const ASPECT_RATIO: f64 = (IMAGE_WIDTH as f64) / (IMAGE_HEIGHT as f64);
-
     const FOV: f64 = 20.0; // degrees
     let look_from: Point3d = Point3d::new(13.0, 2.0, 3.0);
     let look_at: Point3d = Point3d::new(0.0, 0.0, 0.0);
+    // view_up is the "up" direction for the camera, used to control the
+    // roll/sideways tilt of the camera
     let view_up: Vec3d = Vec3d::new(0.0, 1.0, 0.0);
     const APERTURE: f64 = 0.1;
     let focus_dist: f64 = 10.0;
@@ -45,8 +46,8 @@ fn main() {
         APERTURE,
         focus_dist,
     );
-    // Scene
 
+    // Scene
     // let scene = generate_basic_scene();
     let scene = generate_random_complex_scene();
 
@@ -66,7 +67,7 @@ fn main() {
     }
 
     let image: Vec<RGB> = pixels
-        .par_iter()
+        .par_iter() // Parallel iteration
         .map(|pixel| {
             let mut colour = RGB(0.0, 0.0, 0.0);
             for _ in 0..NUM_SAMPLES {
@@ -88,6 +89,7 @@ fn main() {
     progress_bar.finish();
     print!("\n");
 
+    println!("Saving PNG");
     save_as_png(
         OUTPUT_FILE_NAME_PNG,
         IMAGE_WIDTH,
@@ -96,6 +98,7 @@ fn main() {
         NUM_SAMPLES,
     );
 
+    println!("Saving PPM");
     save_as_ppm(
         OUTPUT_FILE_NAME_PPM,
         IMAGE_WIDTH,
@@ -105,7 +108,10 @@ fn main() {
     );
 
     let duration = start_instant.elapsed();
-    println!("DONE, time taken: {duration:?}");
+    let duration_secs = duration.as_secs();
+    let duration_mins = duration_secs / 60;
+    let remaining_secs = duration_secs % 60;
+    println!("DONE, time taken: {duration_mins}m {remaining_secs}s ({duration_secs}s)");
 }
 
 fn ray_colour(ray: &Ray, scene: &HittableList, max_depth: usize) -> RGB {
