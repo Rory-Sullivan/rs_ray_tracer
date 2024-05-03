@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::{fs::File, io::Write, time::Instant};
 
 use indicatif::ProgressBar;
@@ -47,29 +48,40 @@ fn main() {
     let progress_increments = 10;
     let progress_bar = ProgressBar::new(IMAGE_HEIGHT as u64);
 
-    let mut image_string: String = format!("P3\n{IMAGE_WIDTH} {IMAGE_HEIGHT}\n255\n").to_string();
-
+    let mut pixels: Vec<(usize, usize)> = Vec::with_capacity(IMAGE_HEIGHT * IMAGE_WIDTH);
     // Bottom -> top
     for j in (0..IMAGE_HEIGHT).rev() {
-        // Print dot for progress
-        if j < IMAGE_HEIGHT && j % progress_increments == 0 {
-            progress_bar.inc(progress_increments as u64);
-        }
-
         // Left -> right
         for i in 0..IMAGE_WIDTH {
+            pixels.push((i, j))
+        }
+    }
+
+    let image: Vec<RGB> = pixels
+        .par_iter()
+        .map(|pixel| {
             let mut colour = RGB(0.0, 0.0, 0.0);
             for _ in 0..NUM_SAMPLES {
-                let u = ((i as f64) + random()) / ((IMAGE_WIDTH - 1) as f64);
-                let v = ((j as f64) + random()) / ((IMAGE_HEIGHT - 1) as f64);
+                let u = ((pixel.0 as f64) + random()) / ((IMAGE_WIDTH - 1) as f64);
+                let v = ((pixel.1 as f64) + random()) / ((IMAGE_HEIGHT - 1) as f64);
 
                 let ray = camera.get_ray(u, v);
 
                 colour = colour + ray_colour(&ray, &scene, MAX_DEPTH)
             }
-            image_string.push_str(&colour.write_colour(NUM_SAMPLES));
-        }
+
+            if (pixel.1 < IMAGE_HEIGHT) && (pixel.1 % progress_increments == 0) && (pixel.0 == 0) {
+                progress_bar.inc(progress_increments as u64);
+            }
+            colour
+        })
+        .collect();
+
+    let mut image_string: String = format!("P3\n{IMAGE_WIDTH} {IMAGE_HEIGHT}\n255\n").to_string();
+    for colour in image {
+        image_string.push_str(&colour.write_colour(NUM_SAMPLES));
     }
+
     progress_bar.finish();
     print!("\n");
 

@@ -31,7 +31,7 @@ impl HitRecord<'_> {
 }
 
 pub struct HittableList<'a> {
-    items: Vec<Box<dyn Hittable + 'a>>,
+    items: Vec<Box<dyn Hittable + Sync + 'a>>,
 }
 
 impl<'a> HittableList<'a> {
@@ -39,7 +39,7 @@ impl<'a> HittableList<'a> {
         Self { items: Vec::new() }
     }
 
-    pub fn add(&mut self, item: Box<dyn Hittable + 'a>) {
+    pub fn add(&mut self, item: Box<dyn Hittable + Sync + 'a>) {
         self.items.push(item);
     }
 
