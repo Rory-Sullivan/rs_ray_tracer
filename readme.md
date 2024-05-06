@@ -9,7 +9,7 @@ the book is written in C++ so a large portion of the work involved here was
 translating this into Rust.
 
 Above is a look at the latest render from the project, other renders can be
-found in the [/historic_renders](/historic_renders) folder.
+found in the [/historic_results](/historic_results) folder.
 
 I have always been interested in the mathematics behind ray tracing and studied
 some of the basic principles in college. This was a fun project to explore some
