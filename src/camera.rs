@@ -10,6 +10,7 @@ pub struct Camera {
     lower_left_corner: Point3d,
     u: Vec3d,
     v: Vec3d,
+    #[allow(dead_code)]
     w: Vec3d,
     lens_radius: f64,
 }

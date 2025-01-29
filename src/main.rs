@@ -50,24 +50,24 @@ fn main() {
             APERTURE,                      // Aperture
             10.0,                          // Focus distance
         ),
-        Camera::new(
-            Point3d::new(5.0, 5.0, 13.0),  // Look from
-            Point3d::new(0.0, 0.0, 0.0),   // Look at
-            Vec3d::new(0.0, 1.0, 0.0),     // View up
-            FOV,                           // Vertical field of view
-            resolution.get_aspect_ratio(), // Aspect ratio
-            APERTURE,                      // Aperture
-            13.3,                          // Focus distance
-        ),
-        Camera::new(
-            Point3d::new(-6.0, 1.0, -10.0), // Look from
-            Point3d::new(4.0, 0.0, 0.0),    // Look at
-            Vec3d::new(0.0, 1.0, 0.0),      // View up
-            FOV,                            // Vertical field of view
-            resolution.get_aspect_ratio(),  // Aspect ratio
-            APERTURE,                       // Aperture
-            16.0,                           // Focus distance
-        ),
+        // Camera::new(
+        //     Point3d::new(5.0, 5.0, 13.0),  // Look from
+        //     Point3d::new(0.0, 0.0, 0.0),   // Look at
+        //     Vec3d::new(0.0, 1.0, 0.0),     // View up
+        //     FOV,                           // Vertical field of view
+        //     resolution.get_aspect_ratio(), // Aspect ratio
+        //     APERTURE,                      // Aperture
+        //     13.3,                          // Focus distance
+        // ),
+        // Camera::new(
+        //     Point3d::new(-6.0, 1.0, -10.0), // Look from
+        //     Point3d::new(4.0, 0.0, 0.0),    // Look at
+        //     Vec3d::new(0.0, 1.0, 0.0),      // View up
+        //     FOV,                            // Vertical field of view
+        //     resolution.get_aspect_ratio(),  // Aspect ratio
+        //     APERTURE,                       // Aperture
+        //     16.0,                           // Focus distance
+        // ),
     ];
 
     // Scene
@@ -111,6 +111,7 @@ fn main() {
     println!("DONE, time taken: {duration_mins}m {remaining_secs}s ({duration_secs}s)");
 }
 
+#[allow(dead_code)]
 fn generate_basic_scene<'a>() -> HittableList<'a> {
     // Basic scene
     let material_ground = Diffuse::new(RGB(0.8, 0.8, 0.0));
@@ -134,6 +135,7 @@ fn generate_basic_scene<'a>() -> HittableList<'a> {
     scene
 }
 
+#[allow(dead_code)]
 fn generate_random_complex_scene<'a>() -> HittableList<'a> {
     let mut scene = HittableList::new();
     let material_ground = Diffuse::new(RGB(0.5, 0.5, 0.5));
