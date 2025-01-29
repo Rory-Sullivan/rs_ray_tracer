@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
+            "name": "run debug",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceRoot}/target/debug/rs_ray_tracer.exe",
@@ -14,8 +14,21 @@
             "cwd": "${workspaceRoot}",
             "environment": [],
             "console": "integratedTerminal",
-            "preLaunchTask": "cargoBuild",
-            "postDebugTask": "openResult",
+            "preLaunchTask": "cargo build",
+            "postDebugTask": "open result",
+        },
+        {
+            "name": "run release",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/target/release/rs_ray_tracer.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "cargo build release",
+            "postDebugTask": "open result",
         },
     ]
 }

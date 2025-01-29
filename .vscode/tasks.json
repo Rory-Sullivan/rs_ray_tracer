@@ -2,22 +2,28 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "cargoBuild",
-            "command": "cargo build",
-            "args": [],
+            "label": "cargo build",
             "type": "shell",
+            "command": "cargo build",
+            "group": "build",
             "problemMatcher": [
                 "$rustc"
             ]
         },
         {
-            "label": "openResult",
-            "command": "&'C:\\Program Files\\LibreOffice\\program\\soffice.exe'",
-            "args": [
-                ".\\result.ppm"
-            ],
+            "label": "cargo build release",
             "type": "shell",
-            "problemMatcher": []
-        }
+            "command": "cargo build --release",
+            "group": "build",
+            "problemMatcher": [
+                "$rustc"
+            ]
+        },
+        {
+            "label": "open result",
+            "type": "shell",
+            "command": "start ./results/result_1.png",
+            "group": "build",
+        },
     ]
 }
