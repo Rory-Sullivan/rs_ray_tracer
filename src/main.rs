@@ -7,7 +7,7 @@ use rs_ray_tracer::{
     material::{Dielectric, Diffuse, Metal},
     render::render_scene,
     utilities::{random, random_rgb, random_rng, save_as_png},
-    Camera, Point3d, Resolution, Sphere, Vec3d,
+    Camera, MovingSphere, Point3d, Resolution, Sphere, Vec3d,
 };
 
 fn main() {
@@ -49,6 +49,8 @@ fn main() {
             resolution.get_aspect_ratio(), // Aspect ratio
             APERTURE,                      // Aperture
             10.0,                          // Focus distance
+            0.0,                           // Start time
+            1.0,                           // End time
         ),
         // Camera::new(
         //     Point3d::new(5.0, 5.0, 13.0),  // Look from
@@ -72,7 +74,8 @@ fn main() {
 
     // Scene
     // let scene = generate_basic_scene();
-    let scene = generate_random_complex_scene();
+    // let scene = generate_random_complex_scene();
+    let scene = generate_random_complex_scene_moving_spheres();
 
     // Render
     let start_instant = Instant::now();
@@ -187,6 +190,89 @@ fn generate_random_complex_scene<'a>() -> HittableList<'a> {
                         // Glass
                         let sphere_material = Dielectric::new(1.5);
                         scene.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    }
+                };
+            }
+        }
+    }
+
+    scene
+}
+
+#[allow(dead_code)]
+fn generate_random_complex_scene_moving_spheres<'a>() -> HittableList<'a> {
+    let mut scene = HittableList::new();
+    let material_ground = Diffuse::new(RGB(0.5, 0.5, 0.5));
+    let ground = Sphere::new(Point3d::new(0.0, -1000.0, 0.0), 1000.0, material_ground);
+    scene.add(Box::new(ground));
+
+    // Add three large spheres
+    let material1 = Dielectric::new(1.5);
+    scene.add(Box::new(Sphere::new(
+        Point3d::new(0.0, 1.0, 0.0),
+        1.0,
+        material1,
+    )));
+    let material2 = Diffuse::new(RGB(0.4, 0.2, 0.1));
+    scene.add(Box::new(Sphere::new(
+        Point3d::new(-4.0, 1.0, 0.0),
+        1.0,
+        material2,
+    )));
+    let material3 = Metal::new(RGB(0.7, 0.6, 0.5), 0.0);
+    scene.add(Box::new(Sphere::new(
+        Point3d::new(4.0, 1.0, 0.0),
+        1.0,
+        material3,
+    )));
+
+    // Add several random spheres
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random();
+            let center0 = Point3d::new(a as f64 + 0.9 * random(), 0.2, b as f64 + 0.9 * random());
+            let center1 = center0 + Vec3d::new(0.0, random_rng(0.0, 0.5), 0.0);
+
+            if (center0 - Point3d::new(4.0, 0.2, 0.0)).len() > 0.9 {
+                match choose_mat {
+                    x if x < 0.8 => {
+                        // Diffuse
+                        let albedo = random_rgb() * random_rgb();
+                        let sphere_material = Diffuse::new(albedo);
+                        scene.add(Box::new(MovingSphere::new(
+                            center0,
+                            center1,
+                            0.0,
+                            1.0,
+                            0.2,
+                            sphere_material,
+                        )));
+                    }
+                    x if x < 0.95 => {
+                        // Metal
+                        let albedo = random_rgb();
+                        let fuzz = random_rng(0.0, 0.5);
+                        let sphere_material = Metal::new(albedo, fuzz);
+                        scene.add(Box::new(MovingSphere::new(
+                            center0,
+                            center1,
+                            0.0,
+                            1.0,
+                            0.2,
+                            sphere_material,
+                        )));
+                    }
+                    _ => {
+                        // Glass
+                        let sphere_material = Dielectric::new(1.5);
+                        scene.add(Box::new(MovingSphere::new(
+                            center0,
+                            center1,
+                            0.0,
+                            1.0,
+                            0.2,
+                            sphere_material,
+                        )));
                     }
                 };
             }

@@ -5,12 +5,14 @@ pub mod render;
 pub mod utilities;
 
 mod camera;
+mod moving_sphere;
 mod ray;
 mod resolution;
 mod sphere;
 mod vec3d;
 
 pub use camera::Camera;
+pub use moving_sphere::MovingSphere;
 pub use ray::Ray;
 pub use resolution::Resolution;
 pub use sphere::Sphere;

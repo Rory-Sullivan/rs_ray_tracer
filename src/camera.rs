@@ -1,5 +1,5 @@
 use crate::{
-    utilities::{degrees_to_radians, random_vec_in_unit_disc},
+    utilities::{degrees_to_radians, random_rng, random_vec_in_unit_disc},
     Point3d, Ray, Vec3d,
 };
 
@@ -13,12 +13,16 @@ pub struct Camera {
     #[allow(dead_code)]
     w: Vec3d,
     lens_radius: f64,
+    time0: f64, // shutter open time
+    time1: f64, // shutter close time
 }
 
 impl Camera {
     /// - vertical_fov is the vertical field of view in degrees
     /// - view_up is the "up" direction for the camera, used to control the
     ///   roll/sideways tilt of the camera
+    /// - time0 is the shutter open time
+    /// - time1 is the shutter close time
     pub fn new(
         look_from: Point3d,
         look_at: Point3d,
@@ -27,6 +31,8 @@ impl Camera {
         aspect_ratio: f64,
         aperture: f64,
         focus_dist: f64,
+        time0: f64,
+        time1: f64,
     ) -> Self {
         let theta = degrees_to_radians(vertical_fov);
         let h = (theta / 2.0).tan();
@@ -53,6 +59,8 @@ impl Camera {
             v,
             w,
             lens_radius,
+            time0,
+            time1,
         }
     }
 
@@ -65,6 +73,7 @@ impl Camera {
             direction: self.lower_left_corner + s * self.horizontal + t * self.vertical
                 - self.origin
                 - offset,
+            time: random_rng(self.time0, self.time1),
         }
     }
 }

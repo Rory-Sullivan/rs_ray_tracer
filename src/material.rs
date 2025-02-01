@@ -22,12 +22,12 @@ impl Diffuse {
 }
 
 impl Material for Diffuse {
-    fn scatter(&self, _ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, RGB)> {
+    fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, RGB)> {
         let mut scatter_direction = hit_record.normal + random_unit_vec();
         if scatter_direction.near_zero() {
             scatter_direction = hit_record.normal
         }
-        let ray_out = Ray::new(hit_record.point, scatter_direction);
+        let ray_out = Ray::new(hit_record.point, scatter_direction, ray_in.time);
         return Some((ray_out, self.albedo));
     }
 }
@@ -48,7 +48,7 @@ impl Material for Metal {
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, RGB)> {
         let reflected_direction = reflect_vec(&ray_in.direction.unit_vector(), &hit_record.normal)
             + self.fuzz * random_vec_in_unit_sphere();
-        let reflected_ray = Ray::new(hit_record.point, reflected_direction);
+        let reflected_ray = Ray::new(hit_record.point, reflected_direction, ray_in.time);
         if reflected_ray.direction.dot(&hit_record.normal) > 0.0 {
             return Some((reflected_ray, self.albedo));
         }
@@ -96,7 +96,7 @@ impl Material for Dielectric {
             };
 
         Some((
-            Ray::new(hit_record.point, new_direction),
+            Ray::new(hit_record.point, new_direction, ray_in.time),
             RGB(1.0, 1.0, 1.0),
         ))
     }
