@@ -1,7 +1,34 @@
-use crate::{material::Material, Point3d, Ray, Vec3d};
+use crate::{material::Material, utilities::surrounding_box, BoundingBox, Point3d, Ray, Vec3d};
 
-pub trait Hittable {
+/// Trait for all objects that can be hit by a ray.
+pub trait Hittable: DynClone {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox>;
+}
+
+/// Helper trait to make Box<dyn Hittable + Sync + '_> types clone-able. This is
+/// necessary for clones that happen in the Bvh::build function.
+///
+/// Read more here https://quinedot.github.io/rust-learning/dyn-trait-clone.html
+pub trait DynClone {
+    fn dyn_clone<'a>(&self) -> Box<dyn Hittable + Sync + 'a>
+    where
+        Self: 'a;
+}
+
+impl<T: Clone + Hittable + Sync> DynClone for T {
+    fn dyn_clone<'a>(&self) -> Box<dyn Hittable + Sync + 'a>
+    where
+        Self: 'a,
+    {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn Hittable + Sync + '_> {
+    fn clone(&self) -> Self {
+        (**self).dyn_clone()
+    }
 }
 
 pub struct HitRecord<'a> {
@@ -30,8 +57,9 @@ impl HitRecord<'_> {
     }
 }
 
+#[derive(Clone)]
 pub struct HittableList<'a> {
-    items: Vec<Box<dyn Hittable + Sync + 'a>>,
+    pub items: Vec<Box<dyn Hittable + Sync + 'a>>,
 }
 
 impl<'a> HittableList<'a> {
@@ -64,5 +92,27 @@ impl Hittable for HittableList<'_> {
         }
 
         hit_record
+    }
+
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox> {
+        if self.items.is_empty() {
+            return None;
+        }
+
+        let mut temp_box = self.items[0].bounding_box(time0, time1);
+        let mut output_box = match temp_box {
+            None => return None,
+            Some(x) => x,
+        };
+
+        for object in self.items[1..].iter() {
+            temp_box = object.bounding_box(time0, time1);
+            if temp_box.is_none() {
+                return None;
+            }
+            output_box = surrounding_box(output_box, temp_box.unwrap());
+        }
+
+        Some(output_box)
     }
 }

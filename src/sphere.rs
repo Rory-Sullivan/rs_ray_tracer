@@ -1,9 +1,10 @@
 use crate::{
     hittable::{HitRecord, Hittable},
     material::Material,
-    Point3d, Ray,
+    BoundingBox, Point3d, Ray, Vec3d,
 };
 
+#[derive(Debug, Clone, Copy)]
 pub struct Sphere<TMaterial>
 where
     TMaterial: Material,
@@ -29,7 +30,7 @@ where
 
 impl<TMaterial> Hittable for Sphere<TMaterial>
 where
-    TMaterial: Material + 'static,
+    TMaterial: Material + Sync + 'static,
     TMaterial: Copy,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -67,6 +68,13 @@ where
             Box::new(self.material),
             root,
             front_face,
+        ))
+    }
+
+    fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<BoundingBox> {
+        Some(BoundingBox::new(
+            self.center - Vec3d::new(self.radius, self.radius, self.radius),
+            self.center + Vec3d::new(self.radius, self.radius, self.radius),
         ))
     }
 }

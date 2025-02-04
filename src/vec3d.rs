@@ -36,6 +36,22 @@ impl Vec3d {
         }
     }
 
+    /// Returns the value of a given axis;
+    ///
+    /// - 0 is x-axis
+    /// - 1 is y-axis
+    /// - 2 is z-axis
+    ///
+    /// Any other value will cause the function to panic.
+    pub fn get_axis(&self, axis: usize) -> f64 {
+        match axis {
+            0 => self.x,
+            1 => self.y,
+            2 => self.z,
+            _ => panic!("Index out of bounds; index: {axis}"),
+        }
+    }
+
     /// Returns true if the vector is close to zero in all directions
     pub fn near_zero(&self) -> bool {
         const THRESHOLD: f64 = 1e-8;

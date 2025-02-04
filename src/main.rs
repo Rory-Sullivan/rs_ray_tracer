@@ -7,7 +7,7 @@ use rs_ray_tracer::{
     material::{Dielectric, Diffuse, Metal},
     render::render_scene,
     utilities::{random, random_rgb, random_rng, save_as_png},
-    Camera, MovingSphere, Point3d, Resolution, Sphere, Vec3d,
+    Bvh, Camera, MovingSphere, Point3d, Resolution, Sphere, Vec3d,
 };
 
 fn main() {
@@ -22,14 +22,14 @@ fn main() {
         100, // Num samples
         50,  // Max depth
     );
-    // High res
+    // Med res
     // let resolution = Resolution::new(
     //     1200, // Image width
     //     800,  // Image height
     //     500,  // Num samples
     //     50,   // Max depth
     // );
-    // Screen res
+    // High res (screen res)
     // let resolution = Resolution::new(
     //     1920, // Image width
     //     1080, // Image height
@@ -40,6 +40,8 @@ fn main() {
     // Camera
     const FOV: f64 = 20.0; // degrees
     const APERTURE: f64 = 0.1;
+    const TIME0: f64 = 0.0; // Start time
+    const TIME1: f64 = 1.0; // End time
     let cameras = [
         Camera::new(
             Point3d::new(13.0, 2.0, 3.0),  // Look from
@@ -49,8 +51,8 @@ fn main() {
             resolution.get_aspect_ratio(), // Aspect ratio
             APERTURE,                      // Aperture
             10.0,                          // Focus distance
-            0.0,                           // Start time
-            1.0,                           // End time
+            TIME0,                         // Start time
+            TIME1,                         // End time
         ),
         // Camera::new(
         //     Point3d::new(5.0, 5.0, 13.0),  // Look from
@@ -72,13 +74,18 @@ fn main() {
         // ),
     ];
 
+    let start_instant = Instant::now();
+
     // Scene
     // let scene = generate_basic_scene();
     // let scene = generate_random_complex_scene();
-    let scene = generate_random_complex_scene_moving_spheres();
+    let mut scene = generate_random_complex_scene_moving_spheres();
+    let start_bvh_build_instant = Instant::now();
+    let bvh = Bvh::build(scene.items.as_mut_slice(), TIME0, TIME1);
+    print_time_taken("Done building BVH", start_bvh_build_instant);
 
     // Render
-    let start_instant = Instant::now();
+    let start_render_instant = Instant::now();
     let num_cameras = cameras.len();
     for (i, camera) in cameras.iter().enumerate() {
         println!("Rendering camera {0}/{1} ", i + 1, num_cameras);
@@ -90,7 +97,7 @@ fn main() {
                 progress_bar.inc(progress_increments as u64);
             }
         };
-        let image = render_scene(&camera, &scene, &resolution, increment_progress_bar);
+        let image = render_scene(&camera, &bvh, &resolution, increment_progress_bar);
 
         progress_bar.finish();
         print!("\n");
@@ -107,11 +114,15 @@ fn main() {
         );
     }
 
-    let duration = start_instant.elapsed();
-    let duration_secs = duration.as_secs();
+    print_time_taken("Done rendering", start_render_instant);
+    print_time_taken("DONE", start_instant);
+}
+
+fn print_time_taken(message: &str, start_instant: Instant) {
+    let duration_secs = start_instant.elapsed().as_secs();
     let duration_mins = duration_secs / 60;
     let remaining_secs = duration_secs % 60;
-    println!("DONE, time taken: {duration_mins}m {remaining_secs}s ({duration_secs}s)");
+    println!("{message}, time taken: {duration_mins}m {remaining_secs}s ({duration_secs}s)");
 }
 
 #[allow(dead_code)]

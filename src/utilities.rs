@@ -1,8 +1,13 @@
 use image::{ImageBuffer, RgbImage};
 use rand::Rng;
-use std::{f64::consts::PI, fs::File, io::Write};
+use std::{
+    cmp::{max_by, min_by},
+    f64::consts::PI,
+    fs::File,
+    io::Write,
+};
 
-use crate::{colour::RGB, Vec3d};
+use crate::{colour::RGB, BoundingBox, Vec3d};
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0
@@ -16,6 +21,12 @@ pub fn random() -> f64 {
 
 /// Returns a random number in [min, max)
 pub fn random_rng(min: f64, max: f64) -> f64 {
+    let mut rng = rand::thread_rng();
+    rng.gen_range(min..max)
+}
+
+/// Returns a random integer in [min, max)
+pub fn random_rng_int(min: usize, max: usize) -> usize {
     let mut rng = rand::thread_rng();
     rng.gen_range(min..max)
 }
@@ -66,6 +77,10 @@ pub fn random_vec_in_unit_disc() -> Vec3d {
     }
 }
 
+pub fn random_rgb() -> RGB {
+    RGB(random(), random(), random())
+}
+
 pub fn reflect_vec(vec_in: &Vec3d, normal: &Vec3d) -> Vec3d {
     *vec_in - 2.0 * vec_in.dot(normal) * *normal
 }
@@ -88,8 +103,12 @@ pub fn clamp(num: f64, min: f64, max: f64) -> f64 {
     num
 }
 
-pub fn random_rgb() -> RGB {
-    RGB(random(), random(), random())
+pub fn min(a: f64, b: f64) -> f64 {
+    min_by(a, b, |a, b| a.partial_cmp(b).unwrap())
+}
+
+pub fn max(a: f64, b: f64) -> f64 {
+    max_by(a, b, |a, b| a.partial_cmp(b).unwrap())
 }
 
 pub fn save_as_ppm(
@@ -123,4 +142,19 @@ pub fn save_as_png(
         colour.0 = [ir as u8, ig as u8, ib as u8];
     }
     image_buffer.save(file_name).unwrap();
+}
+
+pub fn surrounding_box(box0: BoundingBox, box1: BoundingBox) -> BoundingBox {
+    let min = Vec3d::new(
+        min(box0.min.x, box1.min.x),
+        min(box0.min.y, box1.min.y),
+        min(box0.min.z, box1.min.z),
+    );
+    let max = Vec3d::new(
+        max(box0.max.x, box1.max.x),
+        max(box0.max.y, box1.max.y),
+        max(box0.max.z, box1.max.z),
+    );
+
+    BoundingBox::new(min, max)
 }

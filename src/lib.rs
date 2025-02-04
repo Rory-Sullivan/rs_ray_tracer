@@ -4,6 +4,8 @@ pub mod material;
 pub mod render;
 pub mod utilities;
 
+mod bounding_box;
+mod bvh;
 mod camera;
 mod moving_sphere;
 mod ray;
@@ -11,6 +13,8 @@ mod resolution;
 mod sphere;
 mod vec3d;
 
+pub use bounding_box::BoundingBox;
+pub use bvh::Bvh;
 pub use camera::Camera;
 pub use moving_sphere::MovingSphere;
 pub use ray::Ray;

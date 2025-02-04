@@ -1,15 +1,10 @@
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::{
-    colour::RGB,
-    hittable::{Hittable, HittableList},
-    utilities::random,
-    Camera, Ray, Resolution,
-};
+use crate::{colour::RGB, hittable::Hittable, utilities::random, Bvh, Camera, Ray, Resolution};
 
 pub fn render_scene<F>(
     camera: &Camera,
-    scene: &HittableList,
+    bvh: &Bvh,
     resolution: &Resolution,
     report_progress: F,
 ) -> Vec<RGB>
@@ -36,7 +31,7 @@ where
 
                 let ray = camera.get_ray(u, v);
 
-                colour = colour + ray_colour(&ray, &scene, resolution.max_depth)
+                colour = colour + ray_colour(&ray, &bvh, resolution.max_depth)
             }
 
             if pixel.0 == (resolution.image_width - 1) {
@@ -50,18 +45,19 @@ where
     image
 }
 
-fn ray_colour(ray: &Ray, scene: &HittableList, max_depth: usize) -> RGB {
+fn ray_colour(ray: &Ray, bvh: &Bvh, max_depth: usize) -> RGB {
     if max_depth <= 0 {
         return RGB(0.0, 0.0, 0.0);
     }
 
-    let hit = scene.hit(&ray, 0.001, f64::MAX);
+    let hit = bvh.hit(&ray, 0.001, f64::MAX);
     match hit {
         Some(hr) => match hr.material.scatter(ray, &hr) {
-            Some((ray_out, hit_colour)) => hit_colour * ray_colour(&ray_out, scene, max_depth - 1),
+            Some((ray_out, hit_colour)) => hit_colour * ray_colour(&ray_out, bvh, max_depth - 1),
             None => RGB(0.0, 0.0, 0.0),
         },
         None => {
+            // This is the sky colour
             let unit_direction = ray.direction.unit_vector();
             let t = 0.5 * (unit_direction.y + 1.0);
             (1.0 - t) * RGB(1.0, 1.0, 1.0) + t * RGB(0.5, 0.7, 1.0)
