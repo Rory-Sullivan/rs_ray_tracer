@@ -4,8 +4,9 @@ use indicatif::ProgressBar;
 use rs_ray_tracer::{
     colour::RGB,
     hittable::HittableList,
-    material::{Dielectric, Diffuse, Metal},
+    material::{Dielectric, Diffuse, Lambertian, Metal},
     render::render_scene,
+    texture::{CheckerTexture, SolidColour},
     utilities::{random, random_rgb, random_rng, save_as_png},
     Bvh, Camera, MovingSphere, Point3d, Resolution, Sphere, Vec3d,
 };
@@ -213,8 +214,18 @@ fn generate_random_complex_scene<'a>() -> HittableList<'a> {
 #[allow(dead_code)]
 fn generate_random_complex_scene_moving_spheres<'a>() -> HittableList<'a> {
     let mut scene = HittableList::new();
-    let material_ground = Diffuse::new(RGB(0.5, 0.5, 0.5));
-    let ground = Sphere::new(Point3d::new(0.0, -1000.0, 0.0), 1000.0, material_ground);
+
+    // Use a checkered texture for the ground
+    let checker_texture = CheckerTexture::new(
+        Box::new(SolidColour::new(RGB(0.2, 0.3, 0.1))),
+        Box::new(SolidColour::new(RGB(0.9, 0.9, 0.9))),
+    );
+    let material_ground = Lambertian::new(Box::new(checker_texture));
+    let ground = Sphere::new(
+        Point3d::new(0.0, -1000.0, 0.0),
+        1000.0,
+        material_ground.clone(),
+    );
     scene.add(Box::new(ground));
 
     // Add three large spheres

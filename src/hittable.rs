@@ -36,22 +36,28 @@ pub struct HitRecord<'a> {
     pub normal: Vec3d,
     pub material: Box<dyn Material + 'a>,
     pub t: f64,
+    pub u: f64, // value in [0, 1) representing the angle around the y-axis from x=-1 on unit sphere where hit occurs
+    pub v: f64, // value in [0, 1) representing the angle from y=-1 to y=+1 on unit sphere where hit occurs
     pub front_face: bool,
 }
 
-impl HitRecord<'_> {
+impl<'a> HitRecord<'a> {
     pub fn new(
         point: Point3d,
         normal: Vec3d,
-        material: Box<dyn Material + '_>,
+        material: Box<dyn Material + 'a>,
         t: f64,
+        u: f64,
+        v: f64,
         front_face: bool,
-    ) -> HitRecord<'_> {
-        HitRecord {
+    ) -> Self {
+        Self {
             point,
             normal,
             material,
             t,
+            u,
+            v,
             front_face,
         }
     }

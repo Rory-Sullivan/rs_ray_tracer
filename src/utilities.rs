@@ -158,3 +158,66 @@ pub fn surrounding_box(box0: BoundingBox, box1: BoundingBox) -> BoundingBox {
 
     BoundingBox::new(min, max)
 }
+
+/// Given a point on the unit sphere returns the coordinates of that point in
+/// the form (u, v) where;
+///
+/// - u is a value in [0, 1) representing the angle around the y-axis from x=-1
+/// - v is a value in [0, 1) representing the angle from y=-1 to y=+1
+pub fn get_sphere_uv(point: Vec3d) -> (f64, f64) {
+    let theta = (-point.y).acos();
+    let phi = (-point.z).atan2(point.x) + PI;
+
+    (phi / (2.0 * PI), theta / PI)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod get_sphere_uv_tests {
+        use super::*;
+
+        // (1, 0, 0) yields (0.50, 0.50)
+        #[test]
+        fn test_1() {
+            let result = get_sphere_uv(Vec3d::new(1.0, 0.0, 0.0));
+            assert_eq!(result, (0.5, 0.5));
+        }
+
+        // (-1, 0, 0) yields (0.00, 0.50)
+        #[test]
+        fn test_2() {
+            let result = get_sphere_uv(Vec3d::new(-1.0, 0.0, 0.0));
+            assert_eq!(result, (0.0, 0.5));
+        }
+
+        // (0, 1, 0) yields (0.50, 1.00)
+        #[test]
+        fn test_3() {
+            let result = get_sphere_uv(Vec3d::new(0.0, 1.0, 0.0));
+            assert_eq!(result, (0.5, 1.0));
+        }
+
+        // (0, -1, 0) yields (0.50, 0.00)
+        #[test]
+        fn test_4() {
+            let result = get_sphere_uv(Vec3d::new(0.0, -1.0, 0.0));
+            assert_eq!(result, (0.5, 0.0));
+        }
+
+        // (0, 0, 1) yields (0.25, 0.50)
+        #[test]
+        fn test_5() {
+            let result = get_sphere_uv(Vec3d::new(0.0, 0.0, 1.0));
+            assert_eq!(result, (0.25, 0.5));
+        }
+
+        // (0, 0, -1) yields (0.75, 0.50)
+        #[test]
+        fn test_6() {
+            let result = get_sphere_uv(Vec3d::new(0.0, 0.0, -1.0));
+            assert_eq!(result, (0.75, 0.5));
+        }
+    }
+}

@@ -2,6 +2,7 @@ pub mod colour;
 pub mod hittable;
 pub mod material;
 pub mod render;
+pub mod texture;
 pub mod utilities;
 
 mod bounding_box;

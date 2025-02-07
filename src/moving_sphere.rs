@@ -1,7 +1,7 @@
 use crate::{
     hittable::{HitRecord, Hittable},
     material::Material,
-    utilities::surrounding_box,
+    utilities::{get_sphere_uv, surrounding_box},
     BoundingBox, Point3d, Ray, Vec3d,
 };
 
@@ -74,6 +74,7 @@ where
 
         let point = ray.at(root);
         let outward_normal = (point - self.center(ray.time)) / self.radius;
+        let (u, v) = get_sphere_uv(point);
         let front_face = ray.direction.dot(&outward_normal) < 0.0;
         let normal = if front_face {
             outward_normal
@@ -86,6 +87,8 @@ where
             normal,
             Box::new(self.material),
             root,
+            u,
+            v,
             front_face,
         ))
     }

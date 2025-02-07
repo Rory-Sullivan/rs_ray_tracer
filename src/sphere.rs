@@ -1,6 +1,7 @@
 use crate::{
     hittable::{HitRecord, Hittable},
     material::Material,
+    utilities::get_sphere_uv,
     BoundingBox, Point3d, Ray, Vec3d,
 };
 
@@ -17,7 +18,7 @@ where
 impl<TMaterial> Sphere<TMaterial>
 where
     TMaterial: Material,
-    TMaterial: Copy,
+    TMaterial: Clone,
 {
     pub fn new(center: Point3d, radius: f64, material: TMaterial) -> Self {
         Self {
@@ -31,7 +32,7 @@ where
 impl<TMaterial> Hittable for Sphere<TMaterial>
 where
     TMaterial: Material + Sync + 'static,
-    TMaterial: Copy,
+    TMaterial: Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
@@ -55,6 +56,7 @@ where
 
         let point = ray.at(root);
         let outward_normal = (point - self.center) / self.radius;
+        let (u, v) = get_sphere_uv(point);
         let front_face = ray.direction.dot(&outward_normal) < 0.0;
         let normal = if front_face {
             outward_normal
@@ -65,8 +67,10 @@ where
         Some(HitRecord::new(
             point,
             normal,
-            Box::new(self.material),
+            Box::new(self.material.clone()),
             root,
+            u,
+            v,
             front_face,
         ))
     }
