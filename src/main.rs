@@ -78,9 +78,10 @@ fn main() {
     let start_instant = Instant::now();
 
     // Scene
-    // let scene = generate_basic_scene();
-    // let scene = generate_random_complex_scene();
-    let mut scene = generate_random_complex_scene_moving_spheres();
+    // let mut scene = generate_basic_scene();
+    // let mut scene = generate_random_complex_scene();
+    // let mut scene = generate_random_complex_scene_moving_spheres();
+    let mut scene = generate_two_checkered_spheres();
     let start_bvh_build_instant = Instant::now();
     let bvh = Bvh::build(scene.items.as_mut_slice(), TIME0, TIME1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
@@ -300,6 +301,24 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> HittableList<'a> {
             }
         }
     }
+
+    scene
+}
+
+#[allow(dead_code)]
+fn generate_two_checkered_spheres<'a>() -> HittableList<'a> {
+    let checker_texture = CheckerTexture::new(
+        Box::new(SolidColour::new(RGB(0.2, 0.3, 0.1))),
+        Box::new(SolidColour::new(RGB(0.9, 0.9, 0.9))),
+    );
+    let material_checker = Lambertian::new(Box::new(checker_texture));
+
+    let sphere0 = Sphere::new(Vec3d::new(0.0, -10.0, 0.0), 10.0, material_checker.clone());
+    let sphere1 = Sphere::new(Vec3d::new(0.0, 10.0, 0.0), 10.0, material_checker);
+
+    let mut scene = HittableList::new();
+    scene.add(Box::new(sphere0));
+    scene.add(Box::new(sphere1));
 
     scene
 }
