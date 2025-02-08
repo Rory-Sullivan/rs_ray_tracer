@@ -1,7 +1,7 @@
 # Notes to self
 
 - Finished book 1
-- Currently on book 2: 4. Solid Textures
+- Currently on book 2: 5. Perlin Noise
 
 ## Performance
 

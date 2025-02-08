@@ -5,8 +5,9 @@ use rs_ray_tracer::{
     colour::RGB,
     hittable::HittableList,
     material::{Dielectric, Diffuse, Lambertian, Metal},
+    perlin::Perlin,
     render::render_scene,
-    texture::{CheckerTexture, SolidColour},
+    texture::{CheckerTexture, NoiseTexture, SolidColour},
     utilities::{random, random_rgb, random_rng, save_as_png},
     Bvh, Camera, MovingSphere, Point3d, Resolution, Sphere, Vec3d,
 };
@@ -81,7 +82,8 @@ fn main() {
     // let mut scene = generate_basic_scene();
     // let mut scene = generate_random_complex_scene();
     // let mut scene = generate_random_complex_scene_moving_spheres();
-    let mut scene = generate_two_checkered_spheres();
+    // let mut scene = generate_two_checkered_spheres();
+    let mut scene = generate_two_perlin_noise_spheres();
     let start_bvh_build_instant = Instant::now();
     let bvh = Bvh::build(scene.items.as_mut_slice(), TIME0, TIME1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
@@ -315,6 +317,25 @@ fn generate_two_checkered_spheres<'a>() -> HittableList<'a> {
 
     let sphere0 = Sphere::new(Vec3d::new(0.0, -10.0, 0.0), 10.0, material_checker.clone());
     let sphere1 = Sphere::new(Vec3d::new(0.0, 10.0, 0.0), 10.0, material_checker);
+
+    let mut scene = HittableList::new();
+    scene.add(Box::new(sphere0));
+    scene.add(Box::new(sphere1));
+
+    scene
+}
+
+#[allow(dead_code)]
+fn generate_two_perlin_noise_spheres<'a>() -> HittableList<'a> {
+    let noise_texture = NoiseTexture::new(Perlin::build_random(), 4.0);
+    let noise_material = Lambertian::new(Box::new(noise_texture));
+
+    let sphere0 = Sphere::new(
+        Vec3d::new(0.0, -1000.0, 0.0),
+        1000.0,
+        noise_material.clone(),
+    );
+    let sphere1 = Sphere::new(Vec3d::new(0.0, 2.0, 0.0), 2.0, noise_material);
 
     let mut scene = HittableList::new();
     scene.add(Box::new(sphere0));
