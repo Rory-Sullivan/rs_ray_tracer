@@ -61,6 +61,21 @@ impl Perlin {
         Self::perlin_interpolate(&c, u, v, w)
     }
 
+    pub fn turbulence(&self, p: Point3d, depth: Option<usize>) -> f64 {
+        let actual_depth = depth.unwrap_or(7); // Set default depth
+        let mut accumulator = 0.0;
+        let mut temp_p = p;
+        let mut weight = 1.0;
+
+        for _ in 0..actual_depth {
+            accumulator += weight * self.noise(temp_p);
+            weight *= 0.5;
+            temp_p *= 2.0;
+        }
+
+        accumulator.abs()
+    }
+
     fn generate_perm() -> Vec<usize> {
         let mut p: Vec<usize> = (0..POINT_COUNT).collect();
         Self::permute(&mut p, POINT_COUNT);
