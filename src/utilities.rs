@@ -1,4 +1,4 @@
-use image::{ImageBuffer, RgbImage};
+use image::{ImageBuffer, ImageReader, RgbImage};
 use rand::Rng;
 use std::{
     cmp::{max_by, min_by},
@@ -142,6 +142,26 @@ pub fn save_as_png(
         colour.0 = [ir as u8, ig as u8, ib as u8];
     }
     image_buffer.save(file_name).unwrap();
+}
+
+pub fn read_image_file(file_name: &str) -> (usize, usize, Vec<RGB>) {
+    let img = ImageReader::open(file_name)
+        .unwrap()
+        .decode()
+        .unwrap()
+        .into_rgb8();
+    let width = img.width() as usize;
+    let height = img.height() as usize;
+    let mut pixels = Vec::<RGB>::with_capacity(width * height);
+    for pixel in img.pixels() {
+        pixels.push(RGB(
+            (pixel.0[0] as f64) / 255.0,
+            (pixel.0[1] as f64) / 255.0,
+            (pixel.0[2] as f64) / 255.0,
+        ));
+    }
+
+    (width, height, pixels)
 }
 
 pub fn surrounding_box(box0: BoundingBox, box1: BoundingBox) -> BoundingBox {

@@ -7,7 +7,7 @@ use rs_ray_tracer::{
     material::{Dielectric, Diffuse, Lambertian, Metal},
     perlin::Perlin,
     render::render_scene,
-    texture::{CheckerTexture, NoiseTexture, SolidColour, TurbulenceTexture},
+    texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColour, TurbulenceTexture},
     utilities::{random, random_rgb, random_rng, save_as_png},
     Bvh, Camera, MovingSphere, Point3d, Resolution, Sphere, Vec3d,
 };
@@ -84,7 +84,8 @@ fn main() {
     // let mut scene = generate_random_complex_scene_moving_spheres();
     // let mut scene = generate_two_checkered_spheres();
     // let mut scene = generate_two_perlin_noise_spheres();
-    let mut scene = generate_two_perlin_noise_turbulence_spheres();
+    // let mut scene = generate_two_perlin_noise_turbulence_spheres();
+    let mut scene = generate_earth_scene();
     let start_bvh_build_instant = Instant::now();
     let bvh = Bvh::build(scene.items.as_mut_slice(), TIME0, TIME1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
@@ -360,6 +361,19 @@ fn generate_two_perlin_noise_turbulence_spheres<'a>() -> HittableList<'a> {
     let mut scene = HittableList::new();
     scene.add(Box::new(sphere0));
     scene.add(Box::new(sphere1));
+
+    scene
+}
+
+#[allow(dead_code)]
+fn generate_earth_scene<'a>() -> HittableList<'a> {
+    let earth_texture = ImageTexture::build("images\\earthmap.jpg");
+    let earth_material = Lambertian::new(Box::new(earth_texture));
+
+    let earth = Sphere::new(Vec3d::new(0.0, 0.0, 0.0), 2.0, earth_material);
+
+    let mut scene = HittableList::new();
+    scene.add(Box::new(earth));
 
     scene
 }

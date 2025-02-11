@@ -1,7 +1,7 @@
 # Notes to self
 
 - Finished book 1
-- Currently on book 2: 5. Perlin Noise
+- Currently on book 2: 6. Image Texture Mapping
 
 ## Performance
 
