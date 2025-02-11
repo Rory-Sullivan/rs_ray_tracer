@@ -74,7 +74,7 @@ where
 
         let point = ray.at(root);
         let outward_normal = (point - self.center(ray.time)) / self.radius;
-        let (u, v) = get_sphere_uv(point);
+        let (u, v) = get_sphere_uv(outward_normal);
         let front_face = ray.direction.dot(&outward_normal) < 0.0;
         let normal = if front_face {
             outward_normal
