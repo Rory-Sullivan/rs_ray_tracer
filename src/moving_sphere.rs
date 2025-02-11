@@ -21,7 +21,7 @@ where
 impl<TMaterial> MovingSphere<TMaterial>
 where
     TMaterial: Material,
-    TMaterial: Copy,
+    TMaterial: Clone,
 {
     pub fn new(
         center0: Point3d,
@@ -50,7 +50,7 @@ where
 impl<TMaterial> Hittable for MovingSphere<TMaterial>
 where
     TMaterial: Material + Sync + 'static,
-    TMaterial: Copy,
+    TMaterial: Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center(ray.time);
@@ -85,7 +85,7 @@ where
         Some(HitRecord::new(
             point,
             normal,
-            Box::new(self.material),
+            &self.material,
             root,
             u,
             v,

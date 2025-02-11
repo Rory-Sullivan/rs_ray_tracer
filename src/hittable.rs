@@ -34,7 +34,7 @@ impl Clone for Box<dyn Hittable + Sync + '_> {
 pub struct HitRecord<'a> {
     pub point: Point3d,
     pub normal: Vec3d,
-    pub material: Box<dyn Material + 'a>,
+    pub material: &'a dyn Material,
     pub t: f64,
     pub u: f64, // value in [0, 1) representing the angle around the y-axis from x=-1 on unit sphere where hit occurs
     pub v: f64, // value in [0, 1) representing the angle from y=-1 to y=+1 on unit sphere where hit occurs
@@ -45,7 +45,7 @@ impl<'a> HitRecord<'a> {
     pub fn new(
         point: Point3d,
         normal: Vec3d,
-        material: Box<dyn Material + 'a>,
+        material: &'a dyn Material,
         t: f64,
         u: f64,
         v: f64,

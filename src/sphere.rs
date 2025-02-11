@@ -67,7 +67,7 @@ where
         Some(HitRecord::new(
             point,
             normal,
-            Box::new(self.material.clone()),
+            &self.material,
             root,
             u,
             v,
