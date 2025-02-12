@@ -3,12 +3,18 @@ use crate::{
     hittable::HitRecord,
     texture::Texture,
     utilities::{random, random_unit_vec, random_vec_in_unit_sphere, reflect_vec, refract_vec},
-    Ray,
+    Point3d, Ray,
 };
 
 pub trait Material {
-    // Returns scattered ray and an attenuation colour
+    /// Returns scattered ray and an attenuation colour
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, RGB)>;
+
+    /// Return the colour of emitted light. Defaults to black for non-emissive
+    /// materials.
+    fn emitted(&self, _u: f64, _v: f64, _p: Point3d) -> RGB {
+        RGB(0.0, 0.0, 0.0)
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -129,5 +135,26 @@ impl Material for Lambertian {
             .albedo
             .value(hit_record.u, hit_record.v, &hit_record.point);
         return Some((ray_out, attenuation));
+    }
+}
+
+#[derive(Clone)]
+pub struct DiffuseLight {
+    pub emit: Box<dyn Texture + Sync>,
+}
+
+impl DiffuseLight {
+    pub fn new(emit: Box<dyn Texture + Sync>) -> Self {
+        DiffuseLight { emit }
+    }
+}
+
+impl Material for DiffuseLight {
+    fn scatter(&self, _ray_in: &Ray, _hit_record: &HitRecord) -> Option<(Ray, RGB)> {
+        None
+    }
+
+    fn emitted(&self, u: f64, v: f64, p: Point3d) -> RGB {
+        self.emit.value(u, v, &p)
     }
 }

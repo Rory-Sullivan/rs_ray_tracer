@@ -79,6 +79,7 @@ fn main() {
     let start_instant = Instant::now();
 
     // Scene
+    let use_sky_background = false;
     // let mut scene = generate_basic_scene();
     // let mut scene = generate_random_complex_scene();
     // let mut scene = generate_random_complex_scene_moving_spheres();
@@ -103,7 +104,13 @@ fn main() {
                 progress_bar.inc(progress_increments as u64);
             }
         };
-        let image = render_scene(&camera, &bvh, &resolution, increment_progress_bar);
+        let image = render_scene(
+            &camera,
+            &bvh,
+            &resolution,
+            increment_progress_bar,
+            use_sky_background,
+        );
 
         progress_bar.finish();
         print!("\n");
