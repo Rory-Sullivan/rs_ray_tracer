@@ -4,8 +4,9 @@ use indicatif::ProgressBar;
 use rs_ray_tracer::{
     colour::RGB,
     hittable::HittableList,
-    material::{Dielectric, Diffuse, Lambertian, Metal},
+    material::{Dielectric, Diffuse, DiffuseLight, Lambertian, Metal},
     perlin::Perlin,
+    rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     render::render_scene,
     texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColour, TurbulenceTexture},
     utilities::{random, random_rgb, random_rng, save_as_png},
@@ -16,79 +17,20 @@ fn main() {
     const OUTPUT_FOLDER: &str = "results";
     const OUTPUT_FILE_NAME: &str = "result";
 
-    // Resolution
-    // Low res
-    let resolution = Resolution::new(
-        600, // Image width
-        400, // Image height
-        100, // Num samples
-        50,  // Max depth
-    );
-    // Med res
-    // let resolution = Resolution::new(
-    //     1200, // Image width
-    //     800,  // Image height
-    //     500,  // Num samples
-    //     50,   // Max depth
-    // );
-    // High res (screen res)
-    // let resolution = Resolution::new(
-    //     1920, // Image width
-    //     1080, // Image height
-    //     800,  // Num samples
-    //     50,   // Max depth
-    // );
-
-    // Camera
-    const FOV: f64 = 20.0; // degrees
-    const APERTURE: f64 = 0.1;
-    const TIME0: f64 = 0.0; // Start time
-    const TIME1: f64 = 1.0; // End time
-    let cameras = [
-        Camera::new(
-            Point3d::new(13.0, 2.0, 3.0),  // Look from
-            Point3d::new(0.0, 0.0, 0.0),   // Look at
-            Vec3d::new(0.0, 1.0, 0.0),     // View up
-            FOV,                           // Vertical field of view
-            resolution.get_aspect_ratio(), // Aspect ratio
-            APERTURE,                      // Aperture
-            10.0,                          // Focus distance
-            TIME0,                         // Start time
-            TIME1,                         // End time
-        ),
-        // Camera::new(
-        //     Point3d::new(5.0, 5.0, 13.0),  // Look from
-        //     Point3d::new(0.0, 0.0, 0.0),   // Look at
-        //     Vec3d::new(0.0, 1.0, 0.0),     // View up
-        //     FOV,                           // Vertical field of view
-        //     resolution.get_aspect_ratio(), // Aspect ratio
-        //     APERTURE,                      // Aperture
-        //     13.3,                          // Focus distance
-        // ),
-        // Camera::new(
-        //     Point3d::new(-6.0, 1.0, -10.0), // Look from
-        //     Point3d::new(4.0, 0.0, 0.0),    // Look at
-        //     Vec3d::new(0.0, 1.0, 0.0),      // View up
-        //     FOV,                            // Vertical field of view
-        //     resolution.get_aspect_ratio(),  // Aspect ratio
-        //     APERTURE,                       // Aperture
-        //     16.0,                           // Focus distance
-        // ),
-    ];
-
     let start_instant = Instant::now();
 
+    // Resolution
+    let resolution = get_high_resolution();
+
+    // Cameras
+    let t0 = 0.0; // Start time
+    let t1 = 1.0; // Start time
+    let cameras = get_cornell_box_camera(&resolution, t0, t1);
+
     // Scene
-    let use_sky_background = false;
-    // let mut scene = generate_basic_scene();
-    // let mut scene = generate_random_complex_scene();
-    // let mut scene = generate_random_complex_scene_moving_spheres();
-    // let mut scene = generate_two_checkered_spheres();
-    // let mut scene = generate_two_perlin_noise_spheres();
-    // let mut scene = generate_two_perlin_noise_turbulence_spheres();
-    let mut scene = generate_earth_scene();
+    let (mut scene, use_sky_background) = generate_cornell_box();
     let start_bvh_build_instant = Instant::now();
-    let bvh = Bvh::build(scene.items.as_mut_slice(), TIME0, TIME1);
+    let bvh = Bvh::build(scene.items.as_mut_slice(), t0, t1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
 
     // Render
@@ -138,8 +80,113 @@ fn print_time_taken(message: &str, start_instant: Instant) {
     println!("{message}, time taken: {duration_mins}m {remaining_secs}s ({duration_secs}s)");
 }
 
+// Resolutions
 #[allow(dead_code)]
-fn generate_basic_scene<'a>() -> HittableList<'a> {
+fn get_low_resolution() -> Resolution {
+    Resolution::new(
+        600, // Image width
+        400, // Image height
+        100, // Num samples
+        50,  // Max depth
+    )
+}
+
+#[allow(dead_code)]
+fn get_medium_resolution() -> Resolution {
+    Resolution::new(
+        1200, // Image width
+        800,  // Image height
+        500,  // Num samples
+        50,   // Max depth
+    )
+}
+
+#[allow(dead_code)]
+fn get_high_resolution() -> Resolution {
+    Resolution::new(
+        1920, // Image width
+        1080, // Image height
+        800,  // Num samples
+        50,   // Max depth
+    )
+}
+
+// Camera setups
+#[allow(dead_code)]
+fn get_standard_camera(resolution: &Resolution, t0: f64, t1: f64) -> Vec<Camera> {
+    vec![Camera::new(
+        Point3d::new(13.0, 2.0, 3.0),  // Look from
+        Point3d::new(0.0, 0.0, 0.0),   // Look at
+        Vec3d::new(0.0, 1.0, 0.0),     // View up (the up direction of the camera)
+        20.0,                          // Vertical field of view in degrees
+        resolution.get_aspect_ratio(), // Aspect ratio
+        0.1,                           // Aperture
+        10.0,                          // Focus distance
+        t0,                            // Start time
+        t1,                            // End time
+    )]
+}
+
+#[allow(dead_code)]
+fn get_standard_multi_cameras(resolution: &Resolution, t0: f64, t1: f64) -> Vec<Camera> {
+    // Camera
+    const FOV: f64 = 20.0; // degrees
+    const APERTURE: f64 = 0.1;
+
+    vec![
+        Camera::new(
+            Point3d::new(13.0, 2.0, 3.0),  // Look from
+            Point3d::new(0.0, 0.0, 0.0),   // Look at
+            Vec3d::new(0.0, 1.0, 0.0),     // View up
+            FOV,                           // Vertical field of view
+            resolution.get_aspect_ratio(), // Aspect ratio
+            APERTURE,                      // Aperture
+            10.0,                          // Focus distance
+            t0,                            // Start time
+            t1,                            // End time
+        ),
+        Camera::new(
+            Point3d::new(5.0, 5.0, 13.0),  // Look from
+            Point3d::new(0.0, 0.0, 0.0),   // Look at
+            Vec3d::new(0.0, 1.0, 0.0),     // View up
+            FOV,                           // Vertical field of view
+            resolution.get_aspect_ratio(), // Aspect ratio
+            APERTURE,                      // Aperture
+            13.3,                          // Focus distance
+            t0,                            // Start time
+            t1,                            // End time
+        ),
+        Camera::new(
+            Point3d::new(-6.0, 1.0, -10.0), // Look from
+            Point3d::new(4.0, 0.0, 0.0),    // Look at
+            Vec3d::new(0.0, 1.0, 0.0),      // View up
+            FOV,                            // Vertical field of view
+            resolution.get_aspect_ratio(),  // Aspect ratio
+            APERTURE,                       // Aperture
+            16.0,                           // Focus distance
+            t0,                             // Start time
+            t1,                             // End time
+        ),
+    ]
+}
+
+fn get_cornell_box_camera(resolution: &Resolution, t0: f64, t1: f64) -> Vec<Camera> {
+    vec![Camera::new(
+        Point3d::new(278.0, 278.0, -800.0), // Look from
+        Point3d::new(278.0, 278.0, 0.0),    // Look at
+        Vec3d::new(0.0, 1.0, 0.0),          // View up (the up direction of the camera)
+        40.0,                               // Vertical field of view in degrees
+        resolution.get_aspect_ratio(),      // Aspect ratio
+        0.0,                                // Aperture
+        10.0,                               // Focus distance
+        t0,                                 // Start time
+        t1,                                 // End time
+    )]
+}
+
+// Scenes
+#[allow(dead_code)]
+fn generate_basic_scene<'a>() -> (HittableList<'a>, bool) {
     // Basic scene
     let material_ground = Diffuse::new(RGB(0.8, 0.8, 0.0));
     let material_centre = Diffuse::new(RGB(0.1, 0.2, 0.5));
@@ -159,11 +206,13 @@ fn generate_basic_scene<'a>() -> HittableList<'a> {
     scene.add(Box::new(left_inner_sphere));
     scene.add(Box::new(right_sphere));
 
-    scene
+    let use_sky_background = true;
+
+    (scene, use_sky_background)
 }
 
 #[allow(dead_code)]
-fn generate_random_complex_scene<'a>() -> HittableList<'a> {
+fn generate_random_complex_scene<'a>() -> (HittableList<'a>, bool) {
     let mut scene = HittableList::new();
     let material_ground = Diffuse::new(RGB(0.5, 0.5, 0.5));
     let ground = Sphere::new(Point3d::new(0.0, -1000.0, 0.0), 1000.0, material_ground);
@@ -220,11 +269,13 @@ fn generate_random_complex_scene<'a>() -> HittableList<'a> {
         }
     }
 
-    scene
+    let use_sky_background = true;
+
+    (scene, use_sky_background)
 }
 
 #[allow(dead_code)]
-fn generate_random_complex_scene_moving_spheres<'a>() -> HittableList<'a> {
+fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableList<'a>, bool) {
     let mut scene = HittableList::new();
 
     // Use a checkered texture for the ground
@@ -313,11 +364,13 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> HittableList<'a> {
         }
     }
 
-    scene
+    let use_sky_background = true;
+
+    (scene, use_sky_background)
 }
 
 #[allow(dead_code)]
-fn generate_two_checkered_spheres<'a>() -> HittableList<'a> {
+fn generate_two_checkered_spheres<'a>() -> (HittableList<'a>, bool) {
     let checker_texture = CheckerTexture::new(
         Box::new(SolidColour::new(RGB(0.2, 0.3, 0.1))),
         Box::new(SolidColour::new(RGB(0.9, 0.9, 0.9))),
@@ -331,11 +384,13 @@ fn generate_two_checkered_spheres<'a>() -> HittableList<'a> {
     scene.add(Box::new(sphere0));
     scene.add(Box::new(sphere1));
 
-    scene
+    let use_sky_background = true;
+
+    (scene, use_sky_background)
 }
 
 #[allow(dead_code)]
-fn generate_two_perlin_noise_spheres<'a>() -> HittableList<'a> {
+fn generate_two_perlin_noise_spheres<'a>() -> (HittableList<'a>, bool) {
     let noise_texture = NoiseTexture::new(Perlin::build_random(), 4.0);
     let noise_material = Lambertian::new(Box::new(noise_texture));
 
@@ -350,11 +405,13 @@ fn generate_two_perlin_noise_spheres<'a>() -> HittableList<'a> {
     scene.add(Box::new(sphere0));
     scene.add(Box::new(sphere1));
 
-    scene
+    let use_sky_background = true;
+
+    (scene, use_sky_background)
 }
 
 #[allow(dead_code)]
-fn generate_two_perlin_noise_turbulence_spheres<'a>() -> HittableList<'a> {
+fn generate_two_perlin_noise_turbulence_spheres<'a>() -> (HittableList<'a>, bool) {
     let turbulence_texture = TurbulenceTexture::new(Perlin::build_random(), 4.0);
     let turbulence_material = Lambertian::new(Box::new(turbulence_texture));
 
@@ -369,11 +426,13 @@ fn generate_two_perlin_noise_turbulence_spheres<'a>() -> HittableList<'a> {
     scene.add(Box::new(sphere0));
     scene.add(Box::new(sphere1));
 
-    scene
+    let use_sky_background = true;
+
+    (scene, use_sky_background)
 }
 
 #[allow(dead_code)]
-fn generate_earth_scene<'a>() -> HittableList<'a> {
+fn generate_earth_scene<'a>() -> (HittableList<'a>, bool) {
     let earth_texture = ImageTexture::build("images\\earthmap.jpg");
     let earth_material = Lambertian::new(Box::new(earth_texture));
 
@@ -382,5 +441,63 @@ fn generate_earth_scene<'a>() -> HittableList<'a> {
     let mut scene = HittableList::new();
     scene.add(Box::new(earth));
 
-    scene
+    let use_sky_background = true;
+
+    (scene, use_sky_background)
+}
+
+#[allow(dead_code)]
+fn generate_simple_light<'a>() -> (HittableList<'a>, bool) {
+    let turbulence_texture = TurbulenceTexture::new(Perlin::build_random(), 4.0);
+    let turbulence_material = Lambertian::new(Box::new(turbulence_texture));
+
+    let sphere0 = Sphere::new(
+        Vec3d::new(-8.0, -1003.0, 0.0),
+        1000.0,
+        turbulence_material.clone(),
+    );
+    let sphere1 = Sphere::new(Vec3d::new(-8.0, -1.0, 0.0), 2.0, turbulence_material);
+
+    // Note the light is brighter than (1, 1, 1) this allows it to light other
+    // things.
+    let diff_light = DiffuseLight::build_from_colour(RGB(4.0, 4.0, 4.0));
+    let light_rect = RectangleXY::new(-5.0, -3.0, -2.0, 1.0, -2.0, diff_light.clone());
+    let light_sphere = Sphere::new(Vec3d::new(-8.0, 3.0, 0.0), 1.0, diff_light);
+
+    let mut scene = HittableList::new();
+    scene.add(Box::new(sphere0));
+    scene.add(Box::new(sphere1));
+    scene.add(Box::new(light_rect));
+    scene.add(Box::new(light_sphere));
+
+    let use_sky_background = false;
+
+    (scene, use_sky_background)
+}
+
+#[allow(dead_code)]
+fn generate_cornell_box<'a>() -> (HittableList<'a>, bool) {
+    let red = Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05));
+    let green = Lambertian::build_from_colour(RGB(0.12, 0.45, 0.15));
+    let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
+    let diffuse_light = DiffuseLight::build_from_colour(RGB(15.0, 15.0, 15.0));
+
+    let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red);
+    let green_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 555.0, green);
+    let light = RectangleXZ::new(213.0, 343.0, 227.0, 332.0, 554.0, diffuse_light);
+    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
+    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
+
+    let mut scene = HittableList::new();
+    scene.add(Box::new(red_wall));
+    scene.add(Box::new(green_wall));
+    scene.add(Box::new(light));
+    scene.add(Box::new(white_wall0));
+    scene.add(Box::new(white_wall1));
+    scene.add(Box::new(white_wall2));
+
+    let use_sky_background = false;
+
+    (scene, use_sky_background)
 }
