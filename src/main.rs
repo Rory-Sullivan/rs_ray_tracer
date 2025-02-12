@@ -20,7 +20,7 @@ fn main() {
     let start_instant = Instant::now();
 
     // Resolution
-    let resolution = get_high_resolution();
+    let resolution = get_low_resolution();
 
     // Cameras
     let t0 = 0.0; // Start time
