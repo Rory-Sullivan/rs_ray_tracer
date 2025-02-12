@@ -1,7 +1,7 @@
 use crate::{
     colour::RGB,
     hittable::HitRecord,
-    texture::Texture,
+    texture::{SolidColour, Texture},
     utilities::{random, random_unit_vec, random_vec_in_unit_sphere, reflect_vec, refract_vec},
     Point3d, Ray,
 };
@@ -122,6 +122,10 @@ impl Lambertian {
     pub fn new(albedo: Box<dyn Texture + Sync>) -> Self {
         Lambertian { albedo }
     }
+
+    pub fn build_from_colour(colour: RGB) -> Self {
+        Lambertian::new(Box::new(SolidColour::new(colour)))
+    }
 }
 
 impl Material for Lambertian {
@@ -146,6 +150,10 @@ pub struct DiffuseLight {
 impl DiffuseLight {
     pub fn new(emit: Box<dyn Texture + Sync>) -> Self {
         DiffuseLight { emit }
+    }
+
+    pub fn build_from_colour(colour: RGB) -> Self {
+        DiffuseLight::new(Box::new(SolidColour::new(colour)))
     }
 }
 
