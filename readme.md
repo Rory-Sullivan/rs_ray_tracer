@@ -1,6 +1,6 @@
 # Rust Ray Tracer
 
-![render 7](historic_results/result_7.png)
+![render 7](historic_results/result_07.png)
 
 This is a simple CPU ray tracing implementation written in Rust. The
 implementation is based on the book "Ray Tracing In One Weekend" by P. Shirley,
