@@ -4,7 +4,7 @@ use indicatif::ProgressBar;
 use rs_ray_tracer::{
     box_obj::BoxObj,
     colour::RGB,
-    hittable::HittableList,
+    hittable::{HittableList, RotateY, Translate},
     material::{Dielectric, Diffuse, DiffuseLight, Lambertian, Metal},
     perlin::Perlin,
     rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
@@ -87,7 +87,7 @@ fn get_low_resolution() -> Resolution {
     Resolution::new(
         600, // Image width
         400, // Image height
-        100, // Num samples
+        500, // Num samples
         50,  // Max depth
     )
 }
@@ -478,6 +478,9 @@ fn generate_simple_light<'a>() -> (HittableList<'a>, bool) {
 
 #[allow(dead_code)]
 fn generate_cornell_box<'a>() -> (HittableList<'a>, bool) {
+    let time0 = 0.0;
+    let time1 = 0.0;
+
     let red = Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05));
     let green = Lambertian::build_from_colour(RGB(0.12, 0.45, 0.15));
     let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
@@ -491,15 +494,19 @@ fn generate_cornell_box<'a>() -> (HittableList<'a>, bool) {
     let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
 
     let box0 = BoxObj::new(
-        Point3d::new(130.0, 0.0, 65.0),
-        Point3d::new(295.0, 165.0, 230.0),
+        Point3d::new(0.0, 0.0, 0.0),
+        Point3d::new(165.0, 330.0, 165.0),
         white.clone(),
     );
+    let box0 = RotateY::new(15.0, Box::new(box0), time0, time1);
+    let box0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), Box::new(box0));
     let box1 = BoxObj::new(
-        Point3d::new(265.0, 0.0, 295.0),
-        Point3d::new(430.0, 330.0, 460.0),
+        Point3d::new(0.0, 0.0, 0.0),
+        Point3d::new(165.0, 165.0, 165.0),
         white,
     );
+    let box1 = RotateY::new(-18.0, Box::new(box1), time0, time1);
+    let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(box1));
 
     let mut scene = HittableList::new();
     scene.add(Box::new(red_wall));
