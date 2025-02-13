@@ -1,3 +1,4 @@
+pub mod box_obj;
 pub mod colour;
 pub mod hittable;
 pub mod material;

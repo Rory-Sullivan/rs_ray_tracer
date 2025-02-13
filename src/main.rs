@@ -2,6 +2,7 @@ use std::{fs::create_dir_all, time::Instant, usize};
 
 use indicatif::ProgressBar;
 use rs_ray_tracer::{
+    box_obj::BoxObj,
     colour::RGB,
     hittable::HittableList,
     material::{Dielectric, Diffuse, DiffuseLight, Lambertian, Metal},
@@ -487,7 +488,18 @@ fn generate_cornell_box<'a>() -> (HittableList<'a>, bool) {
     let light = RectangleXZ::new(213.0, 343.0, 227.0, 332.0, 554.0, diffuse_light);
     let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
     let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
-    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+
+    let box0 = BoxObj::new(
+        Point3d::new(130.0, 0.0, 65.0),
+        Point3d::new(295.0, 165.0, 230.0),
+        white.clone(),
+    );
+    let box1 = BoxObj::new(
+        Point3d::new(265.0, 0.0, 295.0),
+        Point3d::new(430.0, 330.0, 460.0),
+        white,
+    );
 
     let mut scene = HittableList::new();
     scene.add(Box::new(red_wall));
@@ -496,6 +508,8 @@ fn generate_cornell_box<'a>() -> (HittableList<'a>, bool) {
     scene.add(Box::new(white_wall0));
     scene.add(Box::new(white_wall1));
     scene.add(Box::new(white_wall2));
+    scene.add(Box::new(box0));
+    scene.add(Box::new(box1));
 
     let use_sky_background = false;
 
