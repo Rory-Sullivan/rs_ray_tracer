@@ -171,6 +171,7 @@ fn get_standard_multi_cameras(resolution: &Resolution, t0: f64, t1: f64) -> Vec<
     ]
 }
 
+#[allow(dead_code)]
 fn get_cornell_box_camera(resolution: &Resolution, t0: f64, t1: f64) -> Vec<Camera> {
     vec![Camera::new(
         Point3d::new(278.0, 278.0, -800.0), // Look from
