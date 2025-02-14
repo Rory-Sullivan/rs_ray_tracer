@@ -28,7 +28,7 @@ impl<'a> Bvh<'a> {
     }
 
     /// Builds a BVH from scene data.
-    pub fn build(objects: &'a mut [Box<dyn Hittable + Sync>], time0: f64, time1: f64) -> Self {
+    pub fn build(mut objects: Vec<Box<dyn Hittable + Sync>>, time0: f64, time1: f64) -> Self {
         // Pick a random axis along which to split the objects
         let axis = random_rng_int(0, 3);
         let compare_fn = match axis {
@@ -66,10 +66,10 @@ impl<'a> Bvh<'a> {
                     // Recursively call build function with split parts
                     let mid = num_objects / 2;
                     let (half0, half1) = objects.split_at_mut(mid);
-                    let left =
-                        Box::new(Self::build(half0, time0, time1)) as Box<dyn Hittable + Sync>;
-                    let right =
-                        Box::new(Self::build(half1, time0, time1)) as Box<dyn Hittable + Sync>;
+                    let left = Box::new(Self::build(half0.to_vec(), time0, time1))
+                        as Box<dyn Hittable + Sync>;
+                    let right = Box::new(Self::build(half1.to_vec(), time0, time1))
+                        as Box<dyn Hittable + Sync>;
                     (left, right)
                 }
             };
