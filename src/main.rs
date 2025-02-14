@@ -4,6 +4,7 @@ use indicatif::ProgressBar;
 use rs_ray_tracer::{
     box_obj::BoxObj,
     colour::RGB,
+    constant_medium::ConstantMedium,
     hittable::{HittableList, RotateY, Translate},
     material::{Dielectric, Diffuse, DiffuseLight, Lambertian, Metal},
     perlin::Perlin,
@@ -29,7 +30,7 @@ fn main() {
     let cameras = get_cornell_box_camera(&resolution, t0, t1);
 
     // Scene
-    let (mut scene, use_sky_background) = generate_cornell_box();
+    let (mut scene, use_sky_background) = generate_cornell_box_with_smoke_boxes();
     let start_bvh_build_instant = Instant::now();
     let bvh = Bvh::build(scene.items.as_mut_slice(), t0, t1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
@@ -508,6 +509,56 @@ fn generate_cornell_box<'a>() -> (HittableList<'a>, bool) {
     );
     let box1 = RotateY::new(-18.0, Box::new(box1), time0, time1);
     let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(box1));
+
+    let mut scene = HittableList::new();
+    scene.add(Box::new(red_wall));
+    scene.add(Box::new(green_wall));
+    scene.add(Box::new(light));
+    scene.add(Box::new(white_wall0));
+    scene.add(Box::new(white_wall1));
+    scene.add(Box::new(white_wall2));
+    scene.add(Box::new(box0));
+    scene.add(Box::new(box1));
+
+    let use_sky_background = false;
+
+    (scene, use_sky_background)
+}
+
+#[allow(dead_code)]
+fn generate_cornell_box_with_smoke_boxes<'a>() -> (HittableList<'a>, bool) {
+    let time0 = 0.0;
+    let time1 = 0.0;
+
+    let red = Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05));
+    let green = Lambertian::build_from_colour(RGB(0.12, 0.45, 0.15));
+    let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
+    let diffuse_light = DiffuseLight::build_from_colour(RGB(7.0, 7.0, 7.0));
+
+    let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red);
+    let green_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 555.0, green);
+    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
+    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let light = RectangleXZ::new(113.0, 443.0, 127.0, 432.0, 554.0, diffuse_light); // larger dimmer light than standard Cornell
+
+    let box0 = BoxObj::new(
+        Point3d::new(0.0, 0.0, 0.0),
+        Point3d::new(165.0, 330.0, 165.0),
+        white.clone(),
+    );
+    let box0 = RotateY::new(15.0, Box::new(box0), time0, time1);
+    let box0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), Box::new(box0));
+    let box0 = ConstantMedium::build_from_colour(box0, RGB(0.0, 0.0, 0.0), 0.01); // light smoke box
+
+    let box1 = BoxObj::new(
+        Point3d::new(0.0, 0.0, 0.0),
+        Point3d::new(165.0, 165.0, 165.0),
+        white,
+    );
+    let box1 = RotateY::new(-18.0, Box::new(box1), time0, time1);
+    let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(box1));
+    let box1 = ConstantMedium::build_from_colour(box1, RGB(1.0, 1.0, 1.0), 0.01); // dark smoke box
 
     let mut scene = HittableList::new();
     scene.add(Box::new(red_wall));

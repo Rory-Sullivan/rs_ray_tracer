@@ -1,5 +1,6 @@
 pub mod box_obj;
 pub mod colour;
+pub mod constant_medium;
 pub mod hittable;
 pub mod material;
 pub mod perlin;
