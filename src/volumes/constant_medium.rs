@@ -1,7 +1,7 @@
 use core::f64;
 
 use crate::{
-    bounding_box::BoundingBox,
+    bvh::bounding_box::BoundingBox,
     colour::RGB,
     hittable::{HitRecord, Hittable},
     materials::isotropic::Isotropic,

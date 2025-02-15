@@ -1,5 +1,5 @@
 use crate::{
-    bounding_box::BoundingBox,
+    bvh::bounding_box::BoundingBox,
     materials::material::Material,
     ray::Ray,
     utilities::{degrees_to_radians, surrounding_box},

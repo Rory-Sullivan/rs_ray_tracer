@@ -1,7 +1,7 @@
+use super::bounding_box::BoundingBox;
 use std::cmp::Ordering;
 
 use crate::{
-    bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable},
     ray::Ray,
     utilities::{random_rng_int, surrounding_box},

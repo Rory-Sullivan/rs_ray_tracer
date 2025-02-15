@@ -7,7 +7,7 @@ use std::{
     io::Write,
 };
 
-use crate::{bounding_box::BoundingBox, colour::RGB, vec3d::Vec3d};
+use crate::{bvh::bounding_box::BoundingBox, colour::RGB, vec3d::Vec3d};
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0

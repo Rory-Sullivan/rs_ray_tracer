@@ -2,7 +2,7 @@ use std::{fs::create_dir_all, time::Instant};
 
 use indicatif::ProgressBar;
 use rs_ray_tracer::{
-    bvh::Bvh,
+    bvh::bvh::Bvh,
     camera::Camera,
     colour::RGB,
     hittable::{HittableList, RotateY, Translate},

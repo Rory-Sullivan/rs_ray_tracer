@@ -1,7 +1,7 @@
 # Notes to self
 
 - Finished book 1
-- Currently on book 2: 9. Volumes
+- Finished book 2
 
 ## Performance
 

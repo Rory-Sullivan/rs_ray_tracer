@@ -1,5 +1,5 @@
 use crate::{
-    bounding_box::BoundingBox,
+    bvh::bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable},
     materials::material::Material,
     ray::Ray,

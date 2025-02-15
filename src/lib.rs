@@ -1,4 +1,3 @@
-pub mod bounding_box;
 pub mod bvh;
 pub mod camera;
 pub mod colour;
