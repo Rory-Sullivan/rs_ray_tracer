@@ -1,4 +1,4 @@
-use crate::{Point3d, Vec3d};
+use crate::vec3d::{Point3d, Vec3d};
 
 pub struct Ray {
     pub origin: Point3d,

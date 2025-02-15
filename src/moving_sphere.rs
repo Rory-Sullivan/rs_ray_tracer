@@ -1,8 +1,11 @@
 use crate::{
+    bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable},
     material::Material,
+    ray::Ray,
     utilities::{get_sphere_uv, surrounding_box},
-    BoundingBox, Point3d, Ray, Vec3d,
+    vec3d::Point3d,
+    vec3d::Vec3d,
 };
 
 #[derive(Debug, Clone, Copy)]

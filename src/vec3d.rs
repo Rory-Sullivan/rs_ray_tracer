@@ -138,3 +138,5 @@ impl DivAssign<f64> for Vec3d {
         self.z /= rhs;
     }
 }
+
+pub type Point3d = Vec3d;

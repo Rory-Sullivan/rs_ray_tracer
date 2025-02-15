@@ -3,16 +3,22 @@ use std::{fs::create_dir_all, time::Instant, usize};
 use indicatif::ProgressBar;
 use rs_ray_tracer::{
     box_obj::BoxObj,
+    bvh::Bvh,
+    camera::Camera,
     colour::RGB,
     constant_medium::ConstantMedium,
     hittable::{HittableList, RotateY, Translate},
     material::{Dielectric, Diffuse, DiffuseLight, Lambertian, Metal},
+    moving_sphere::MovingSphere,
     perlin::Perlin,
     rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     render::render_scene,
+    resolution::Resolution,
+    sphere::Sphere,
     texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColour, TurbulenceTexture},
     utilities::{random, random_rgb, random_rng, random_vec_rng, save_as_png},
-    Bvh, Camera, MovingSphere, Point3d, Resolution, Sphere, Vec3d,
+    vec3d::Point3d,
+    vec3d::Vec3d,
 };
 
 fn main() {

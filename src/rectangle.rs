@@ -1,7 +1,10 @@
 use crate::{
+    bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable},
     material::Material,
-    BoundingBox, Point3d, Ray, Vec3d,
+    ray::Ray,
+    vec3d::Point3d,
+    vec3d::Vec3d,
 };
 
 /// Axis-aligned rectangle for X-Y plane

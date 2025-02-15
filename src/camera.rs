@@ -1,6 +1,8 @@
 use crate::{
+    ray::Ray,
     utilities::{degrees_to_radians, random_rng, random_vec_in_unit_disc},
-    Point3d, Ray, Vec3d,
+    vec3d::Point3d,
+    vec3d::Vec3d,
 };
 
 pub struct Camera {

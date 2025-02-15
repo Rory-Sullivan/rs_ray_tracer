@@ -1,6 +1,9 @@
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
-use crate::{colour::RGB, hittable::Hittable, utilities::random, Bvh, Camera, Ray, Resolution};
+use crate::{
+    bvh::Bvh, camera::Camera, colour::RGB, hittable::Hittable, ray::Ray, resolution::Resolution,
+    utilities::random,
+};
 
 pub fn render_scene<F>(
     camera: &Camera,

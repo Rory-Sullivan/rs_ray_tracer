@@ -1,8 +1,10 @@
 use crate::{
+    bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable, HittableList},
     material::Material,
+    ray::Ray,
     rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
-    BoundingBox, Point3d, Ray,
+    vec3d::Point3d,
 };
 
 /// And axis-aligned box made of 6 rectangles.

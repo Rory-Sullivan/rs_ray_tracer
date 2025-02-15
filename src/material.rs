@@ -1,9 +1,10 @@
 use crate::{
     colour::RGB,
     hittable::HitRecord,
+    ray::Ray,
     texture::{SolidColour, Texture},
     utilities::{random, random_unit_vec, random_vec_in_unit_sphere, reflect_vec, refract_vec},
-    Point3d, Ray,
+    vec3d::Point3d,
 };
 
 pub trait Material {

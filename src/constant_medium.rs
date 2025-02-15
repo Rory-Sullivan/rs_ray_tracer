@@ -1,12 +1,14 @@
 use core::f64;
 
 use crate::{
+    bounding_box::BoundingBox,
     colour::RGB,
     hittable::{HitRecord, Hittable},
     material::Isotropic,
+    ray::Ray,
     texture::Texture,
     utilities::random,
-    Vec3d,
+    vec3d::Vec3d,
 };
 
 #[derive(Clone)]
@@ -55,7 +57,7 @@ where
 }
 
 impl<THittable: Hittable + Clone + Sync> Hittable for ConstantMedium<THittable> {
-    fn hit(&self, ray: &crate::Ray, t_min: f64, t_max: f64) -> Option<crate::hittable::HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         // Check if the ray hits the boundary anywhere on it's length
         let hr1 = self.boundary.hit(ray, f64::NEG_INFINITY, f64::INFINITY);
         if hr1.is_none() {
@@ -112,7 +114,7 @@ impl<THittable: Hittable + Clone + Sync> Hittable for ConstantMedium<THittable> 
         ))
     }
 
-    fn bounding_box(&self, time0: f64, time1: f64) -> Option<crate::BoundingBox> {
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox> {
         self.boundary.bounding_box(time0, time1)
     }
 }

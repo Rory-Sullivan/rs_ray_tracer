@@ -2,7 +2,7 @@ use crate::{
     colour::RGB,
     perlin::Perlin,
     utilities::{clamp, read_image_file},
-    Point3d,
+    vec3d::Point3d,
 };
 
 pub trait Texture: DynClone {

@@ -1,7 +1,10 @@
 use crate::{
+    bounding_box::BoundingBox,
     material::Material,
+    ray::Ray,
     utilities::{degrees_to_radians, surrounding_box},
-    BoundingBox, Point3d, Ray, Vec3d,
+    vec3d::Point3d,
+    vec3d::Vec3d,
 };
 
 /// Trait for all objects that can be hit by a ray.

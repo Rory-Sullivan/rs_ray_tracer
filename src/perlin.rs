@@ -1,6 +1,7 @@
 use crate::{
     utilities::{random_rng_int, random_vec_rng},
-    Point3d, Vec3d,
+    vec3d::Point3d,
+    vec3d::Vec3d,
 };
 
 const POINT_COUNT: usize = 256;

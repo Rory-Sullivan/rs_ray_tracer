@@ -1,4 +1,4 @@
-use crate::{Point3d, Ray};
+use crate::{ray::Ray, vec3d::Point3d};
 
 /// Axis-aligned bounding box
 #[derive(Debug, Clone, Copy)]
@@ -37,7 +37,7 @@ impl BoundingBox {
 mod bounding_box_tests {
     use std::f64;
 
-    use crate::Vec3d;
+    use crate::vec3d::Vec3d;
 
     use super::*;
 
