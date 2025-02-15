@@ -669,7 +669,7 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
     scene.add(Box::new(earth_sphere));
 
     // Add a perlin noise sphere
-    let perlin_texture = TurbulenceTexture::new(Perlin::build_random(), 0.1);
+    let perlin_texture = TurbulenceTexture::new(Perlin::build_random(), 0.001);
     let perlin_material = Lambertian::new(Box::new(perlin_texture));
     let perlin_sphere = Sphere::new(Point3d::new(220.0, 280.0, 300.0), 80.0, perlin_material);
     scene.add(Box::new(perlin_sphere));
