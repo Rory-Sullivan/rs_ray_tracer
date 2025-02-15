@@ -2,8 +2,8 @@ use crate::{
     bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable, HittableList},
     material::Material,
+    objects::rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     ray::Ray,
-    rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     vec3d::Point3d,
 };
 
