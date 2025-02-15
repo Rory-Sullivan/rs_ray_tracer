@@ -1,6 +1,6 @@
 use crate::{
     bounding_box::BoundingBox,
-    material::Material,
+    materials::material::Material,
     ray::Ray,
     utilities::{degrees_to_radians, surrounding_box},
     vec3d::Point3d,

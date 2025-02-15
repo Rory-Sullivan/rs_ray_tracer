@@ -6,7 +6,10 @@ use rs_ray_tracer::{
     camera::Camera,
     colour::RGB,
     hittable::{HittableList, RotateY, Translate},
-    material::{Dielectric, Diffuse, DiffuseLight, Lambertian, Metal},
+    materials::{
+        dielectric::Dielectric, diffuse::Diffuse, diffuse_light::DiffuseLight,
+        lambertian::Lambertian, metal::Metal,
+    },
     objects::{
         box_obj::BoxObj,
         moving_sphere::MovingSphere,

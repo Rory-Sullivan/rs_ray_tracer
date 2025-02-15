@@ -1,7 +1,7 @@
 use crate::{
     bounding_box::BoundingBox,
     hittable::{HitRecord, Hittable, HittableList},
-    material::Material,
+    materials::material::Material,
     objects::rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     ray::Ray,
     vec3d::Point3d,

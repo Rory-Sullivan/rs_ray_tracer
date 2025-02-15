@@ -4,7 +4,7 @@ use crate::{
     bounding_box::BoundingBox,
     colour::RGB,
     hittable::{HitRecord, Hittable},
-    material::Isotropic,
+    materials::isotropic::Isotropic,
     ray::Ray,
     textures::texture::Texture,
     utilities::random,
