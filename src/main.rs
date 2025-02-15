@@ -5,7 +5,6 @@ use rs_ray_tracer::{
     bvh::Bvh,
     camera::Camera,
     colour::RGB,
-    constant_medium::ConstantMedium,
     hittable::{HittableList, RotateY, Translate},
     material::{Dielectric, Diffuse, DiffuseLight, Lambertian, Metal},
     objects::{
@@ -20,6 +19,7 @@ use rs_ray_tracer::{
     texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColour, TurbulenceTexture},
     utilities::{random, random_rgb, random_rng, random_vec_rng, save_as_png},
     vec3d::{Point3d, Vec3d},
+    volumes::constant_medium::ConstantMedium,
 };
 
 fn main() {
