@@ -6,7 +6,7 @@ use crate::{
     hittable::{HitRecord, Hittable},
     material::Isotropic,
     ray::Ray,
-    texture::Texture,
+    textures::texture::Texture,
     utilities::random,
     vec3d::Vec3d,
 };
