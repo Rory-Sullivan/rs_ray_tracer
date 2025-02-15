@@ -13,6 +13,7 @@ use rs_ray_tracer::{
     objects::{
         box_obj::BoxObj,
         moving_sphere::MovingSphere,
+        pyramid::Pyramid,
         rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
         sphere::Sphere,
     },
@@ -41,10 +42,10 @@ fn main() {
     // Cameras
     let t0 = 0.0; // Start time
     let t1 = 1.0; // Start time
-    let cameras = get_final_scene_book2_camera(&resolution, t0, t1);
+    let cameras = get_cornell_box_camera(&resolution, t0, t1);
 
     // Scene
-    let (scene, use_sky_background) = generate_final_scene_book2();
+    let (scene, use_sky_background) = generate_cornell_box_with_triangles();
     let start_bvh_build_instant = Instant::now();
     let bvh = Bvh::build(scene.items, t0, t1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
@@ -703,6 +704,61 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
         )),
     );
     scene.add(Box::new(translated_rotated_bvh_of_spheres));
+
+    (scene, use_sky_background)
+}
+
+#[allow(dead_code)]
+fn generate_cornell_box_with_triangles<'a>() -> (HittableList<'a>, bool) {
+    let time0 = 0.0;
+    let time1 = 0.0;
+
+    let red = Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05));
+    let green = Lambertian::build_from_colour(RGB(0.12, 0.45, 0.15));
+    let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
+    let diffuse_light = DiffuseLight::build_from_colour(RGB(12.0, 12.0, 12.0));
+
+    let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red);
+    let green_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 555.0, green);
+    let light = RectangleXZ::new(163.0, 393.0, 177.0, 382.0, 554.0, diffuse_light);
+    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
+    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+
+    let pyr0 = Pyramid::build(
+        (
+            Point3d::new(0.0, 0.0, 0.0),
+            Point3d::new(200.0, 0.0, 0.0),
+            Point3d::new(0.0, 0.0, 200.0),
+        ),
+        330.0,
+        white.clone(),
+    );
+    let pyr0 = RotateY::new(15.0, Box::new(pyr0), time0, time1);
+    let pyr0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), Box::new(pyr0));
+    let pyr1 = Pyramid::build(
+        (
+            Point3d::new(0.0, 0.0, 0.0),
+            Point3d::new(200.0, 0.0, 0.0),
+            Point3d::new(0.0, 0.0, 200.0),
+        ),
+        165.0,
+        white.clone(),
+    );
+    let pyr1 = RotateY::new(-18.0, Box::new(pyr1), time0, time1);
+    let pyr1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(pyr1));
+
+    let mut scene = HittableList::new();
+    scene.add(Box::new(red_wall));
+    scene.add(Box::new(green_wall));
+    scene.add(Box::new(light));
+    scene.add(Box::new(white_wall0));
+    scene.add(Box::new(white_wall1));
+    scene.add(Box::new(white_wall2));
+    scene.add(Box::new(pyr0));
+    scene.add(Box::new(pyr1));
+
+    let use_sky_background = false;
 
     (scene, use_sky_background)
 }

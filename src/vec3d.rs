@@ -1,6 +1,6 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Vec3d {
     pub x: f64,
     pub y: f64,
@@ -20,6 +20,7 @@ impl Vec3d {
         self.len_squared().sqrt()
     }
 
+    /// Returns the normalised unit vector
     pub fn unit_vector(&self) -> Vec3d {
         *self / self.len()
     }
