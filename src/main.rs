@@ -42,10 +42,10 @@ fn main() {
     // Cameras
     let t0 = 0.0; // Start time
     let t1 = 1.0; // Start time
-    let cameras = get_cornell_box_camera(&resolution, t0, t1);
+    let cameras = get_final_scene_book2_camera(&resolution, t0, t1);
 
     // Scene
-    let (scene, use_sky_background) = generate_cornell_box_with_triangles();
+    let (scene, use_sky_background) = generate_final_scene();
     let start_bvh_build_instant = Instant::now();
     let bvh = Bvh::build(scene.items, t0, t1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
@@ -709,7 +709,7 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
 }
 
 #[allow(dead_code)]
-fn generate_cornell_box_with_triangles<'a>() -> (HittableList<'a>, bool) {
+fn generate_cornell_box_with_pyramids<'a>() -> (HittableList<'a>, bool) {
     let time0 = 0.0;
     let time1 = 0.0;
 
@@ -759,6 +759,145 @@ fn generate_cornell_box_with_triangles<'a>() -> (HittableList<'a>, bool) {
     scene.add(Box::new(pyr1));
 
     let use_sky_background = false;
+
+    (scene, use_sky_background)
+}
+
+#[allow(dead_code)]
+fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
+    let time0 = 0.0;
+    let time1 = 1.0;
+    let use_sky_background = false;
+    let mut scene = HittableList::new();
+
+    // Make the ground a 20x20 grid of random height boxes
+    let mut ground_boxes = HittableList::new();
+    let ground = Lambertian::build_from_colour(RGB(0.48, 0.83, 0.53));
+    for i in 0..20 {
+        for j in 0..20 {
+            let width = 100.0;
+            let x0 = -1000.0 + (i as f64) * width;
+            let y0 = 0.0;
+            let z0 = -1000.0 + (j as f64) * width;
+            let x1 = x0 + width;
+            let y1 = random_rng(1.0, 101.0);
+            let z1 = z0 + width;
+
+            ground_boxes.add(Box::new(BoxObj::new(
+                Point3d::new(x0, y0, z0),
+                Point3d::new(x1, y1, z1),
+                ground.clone(),
+            )));
+        }
+    }
+    scene.add(Box::new(Bvh::build(ground_boxes.items, time0, time1)));
+
+    // Make a light
+    let diffuse_light = DiffuseLight::build_from_colour(RGB(7.0, 7.0, 7.0));
+    let light = RectangleXZ::new(123.0, 423.0, 147.0, 412.0, 554.0, diffuse_light);
+    scene.add(Box::new(light));
+
+    // Make a moving sphere
+    let center0 = Point3d::new(400.0, 400.0, 200.0);
+    let center1 = center0 + Vec3d::new(30.0, 0.0, 0.0);
+    let moving_sphere_material = Lambertian::build_from_colour(RGB(0.7, 0.3, 0.1));
+    let moving_sphere =
+        MovingSphere::new(center0, center1, time0, time1, 50.0, moving_sphere_material);
+    scene.add(Box::new(moving_sphere));
+
+    // Add a dielectric (glass) sphere
+    let sphere0 = Sphere::new(Point3d::new(260.0, 150.0, 45.0), 50.0, Dielectric::new(1.5));
+    scene.add(Box::new(sphere0));
+
+    // Add a metal sphere
+    let sphere1 = Sphere::new(
+        Point3d::new(0.0, 150.0, 145.0),
+        50.0,
+        Metal::new(RGB(0.8, 0.8, 0.9), 1.0),
+    );
+    scene.add(Box::new(sphere1));
+
+    // Add a blue subsurface reflection sphere by putting a volume inside a
+    // dielectric sphere.
+    let boundary0 = Sphere::new(
+        Point3d::new(360.0, 150.0, 145.0),
+        70.0,
+        Dielectric::new(1.5),
+    );
+    let smoke_sphere0 = ConstantMedium::build_from_colour(boundary0, RGB(0.2, 0.4, 0.9), 0.2);
+    scene.add(Box::new(boundary0));
+    scene.add(Box::new(smoke_sphere0));
+
+    // Fill the whole scene with a faint mist
+    let boundary1 = Sphere::new(Point3d::new(0.0, 0.0, 0.0), 5000.0, Dielectric::new(1.5));
+    let smoke_sphere1 = ConstantMedium::build_from_colour(boundary0, RGB(1.0, 1.0, 1.0), 0.0001);
+    scene.add(Box::new(boundary1));
+    scene.add(Box::new(smoke_sphere1));
+
+    // Add an Earth sphere
+    let earth_material = Lambertian::new(Box::new(ImageTexture::build("images\\earthmap.jpg")));
+    let earth_sphere = Sphere::new(Vec3d::new(400.0, 200.0, 400.0), 100.0, earth_material);
+    scene.add(Box::new(earth_sphere));
+
+    // Add a perlin noise sphere
+    let perlin_texture = TurbulenceTexture::new(Perlin::build_random(), 0.001);
+    let perlin_material = Lambertian::new(Box::new(perlin_texture));
+    let perlin_sphere = Sphere::new(Point3d::new(220.0, 280.0, 300.0), 80.0, perlin_material);
+    scene.add(Box::new(perlin_sphere));
+
+    // Add a random assortment of white spheres in a translated rotated box
+    let mut spheres = HittableList::new();
+    let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
+    for _ in 0..1000 {
+        let sphere = Sphere::new(random_vec_rng(0.0, 165.0), 10.0, white.clone());
+        spheres.add(Box::new(sphere));
+    }
+    let translated_rotated_bvh_of_spheres = Translate::new(
+        Point3d::new(-100.0, 270.0, 395.0),
+        Box::new(RotateY::new(
+            15.0,
+            Box::new(Bvh::build(spheres.items, time0, time1)),
+            time0,
+            time1,
+        )),
+    );
+    scene.add(Box::new(translated_rotated_bvh_of_spheres));
+
+    // Add a pyramid
+    let pyr0 = Pyramid::build(
+        (
+            Point3d::new(0.0, 0.0, 0.0),
+            Point3d::new(100.0, 0.0, 0.0),
+            Point3d::new(0.0, 0.0, 100.0),
+        ),
+        100.0,
+        Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05)),
+    );
+    let pyr0 = RotateY::new(38.0, Box::new(pyr0), time0, time1);
+    let pyr0 = Translate::new(Vec3d::new(24.0, 100.0, 280.0), Box::new(pyr0)); // Point3d::new(0.0, 150.0, 145.0),
+    scene.add(Box::new(pyr0));
+
+    // Add coordinate spheres for debugging positions
+    // let sphere_origin = Sphere::new(
+    //     Point3d::new(0.0, 100.0, 0.0),
+    //     20.0,
+    //     Diffuse::new(RGB(0.73, 0.73, 0.73)), // white
+    // );
+    // scene.add(Box::new(sphere_origin));
+
+    // let sphere_x = Sphere::new(
+    //     Point3d::new(200.0, 100.0, 0.0),
+    //     20.0,
+    //     Diffuse::new(RGB(0.73, 0.05, 0.05)), // red
+    // );
+    // scene.add(Box::new(sphere_x));
+
+    // let sphere_z = Sphere::new(
+    //     Point3d::new(0.0, 100.0, 200.0),
+    //     20.0,
+    //     Diffuse::new(RGB(0.05, 0.73, 0.05)), // green
+    // );
+    // scene.add(Box::new(sphere_z));
 
     (scene, use_sky_background)
 }
