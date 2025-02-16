@@ -78,7 +78,7 @@ fn get_pyramid_vertices(
 
     let e1 = b1 - b0;
     let e2 = b3 - b0;
-    let b_normal = -1.0 * e1.cross(&e2).unit_vector();
+    let b_normal = e1.cross(&e2).unit_vector();
 
     let p = b_center + (height * b_normal);
 
@@ -93,17 +93,17 @@ mod get_pyramid_vertices_tests {
     fn should_return_correct_vertices_for_simple_case() {
         let tri_base = (
             Point3d::new(0.0, 0.0, 0.0),
-            Point3d::new(10.0, 0.0, 0.0),
             Point3d::new(0.0, 0.0, 10.0),
+            Point3d::new(10.0, 0.0, 0.0),
         );
         let height = 10.0;
 
         let result = get_pyramid_vertices(tri_base, height);
 
         assert_eq!(result.0, Point3d::new(0.0, 0.0, 0.0));
-        assert_eq!(result.1, Point3d::new(10.0, 0.0, 0.0));
+        assert_eq!(result.1, Point3d::new(0.0, 0.0, 10.0));
         assert_eq!(result.2, Point3d::new(10.0, 0.0, 10.0));
-        assert_eq!(result.3, Point3d::new(0.0, 0.0, 10.0));
+        assert_eq!(result.3, Point3d::new(10.0, 0.0, 0.0));
         assert_eq!(result.4, Point3d::new(5.0, 10.0, 5.0));
     }
 }

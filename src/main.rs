@@ -867,8 +867,8 @@ fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
     let pyr0 = Pyramid::build(
         (
             Point3d::new(0.0, 0.0, 0.0),
-            Point3d::new(100.0, 0.0, 0.0),
             Point3d::new(0.0, 0.0, 100.0),
+            Point3d::new(100.0, 0.0, 0.0),
         ),
         100.0,
         Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05)),
