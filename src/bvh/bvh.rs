@@ -7,7 +7,8 @@ use crate::{
     utilities::{random_rng_int, surrounding_box},
 };
 
-/// Bounding Volume Hierarchy
+/// Bounding Volume Hierarchy. Used to store hittable objects in a tree like
+/// structure to make finding a hit more efficient.
 #[derive(Clone)]
 pub struct Bvh<'a> {
     left: Box<dyn Hittable + Sync + 'a>,
@@ -101,9 +102,10 @@ impl<'a> Hittable for Bvh<'a> {
             }
             None => {}
         }
-        match self.right.hit(ray, t_min, closest_so_far) {
-            Some(hr) => {
-                hit_record = Some(hr);
+        let hit_right = self.right.hit(ray, t_min, closest_so_far);
+        match hit_right {
+            Some(_) => {
+                hit_record = hit_right;
             }
             None => {}
         }
