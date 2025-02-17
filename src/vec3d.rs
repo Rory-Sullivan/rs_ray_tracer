@@ -58,6 +58,12 @@ impl Vec3d {
         const THRESHOLD: f64 = 1e-8;
         self.x.abs() < THRESHOLD && self.y.abs() < THRESHOLD && self.z.abs() < THRESHOLD
     }
+
+    /// Scales the vector by the given amount for each axis. Returns a scaled
+    /// copy.
+    pub fn scale(&self, x: f64, y: f64, z: f64) -> Self {
+        Self::new(self.x * x, self.y * y, self.z * z)
+    }
 }
 
 impl Add for Vec3d {
