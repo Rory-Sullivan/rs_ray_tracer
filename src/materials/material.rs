@@ -1,4 +1,4 @@
-use crate::{colour::RGB, hittable::HitRecord, ray::Ray, vec3d::Point3d};
+use crate::{colour::RGB, hittable::hit_record::HitRecord, ray::Ray, vec3d::Point3d};
 
 pub trait Material {
     /// Returns scattered ray and an attenuation colour

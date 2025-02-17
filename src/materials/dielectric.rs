@@ -1,6 +1,6 @@
 use crate::{
     colour::RGB,
-    hittable::HitRecord,
+    hittable::hit_record::HitRecord,
     ray::Ray,
     utilities::{random, reflect_vec, refract_vec},
 };

@@ -2,7 +2,7 @@ use super::bounding_box::BoundingBox;
 use std::cmp::Ordering;
 
 use crate::{
-    hittable::{HitRecord, Hittable, HittableList},
+    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list::HittableList},
     ray::Ray,
     utilities::surrounding_box,
 };

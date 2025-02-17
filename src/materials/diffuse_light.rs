@@ -1,6 +1,6 @@
 use crate::{
     colour::RGB,
-    hittable::HitRecord,
+    hittable::hit_record::HitRecord,
     ray::Ray,
     textures::{solid_colour::SolidColour, texture::Texture},
     vec3d::Point3d,

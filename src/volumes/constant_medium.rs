@@ -3,7 +3,7 @@ use core::f64;
 use crate::{
     bvh::bounding_box::BoundingBox,
     colour::RGB,
-    hittable::{HitRecord, Hittable},
+    hittable::{hit_record::HitRecord, hittable::Hittable},
     materials::isotropic::Isotropic,
     ray::Ray,
     textures::texture::Texture,

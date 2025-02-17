@@ -1,7 +1,7 @@
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::{
-    bvh::bvh::Bvh, camera::Camera, colour::RGB, hittable::Hittable, ray::Ray,
+    bvh::bvh::Bvh, camera::Camera, colour::RGB, hittable::hittable::Hittable, ray::Ray,
     resolution::Resolution, utilities::random,
 };
 

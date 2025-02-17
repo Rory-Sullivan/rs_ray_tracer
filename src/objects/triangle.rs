@@ -1,6 +1,6 @@
 use crate::{
     bvh::bounding_box::BoundingBox,
-    hittable::{HitRecord, Hittable},
+    hittable::{hit_record::HitRecord, hittable::Hittable},
     materials::material::Material,
     ray::Ray,
     utilities::{max, min},

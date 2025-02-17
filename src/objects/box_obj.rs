@@ -1,6 +1,6 @@
 use crate::{
     bvh::bounding_box::BoundingBox,
-    hittable::{HitRecord, Hittable, HittableList},
+    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list::HittableList},
     materials::material::Material,
     objects::rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     ray::Ray,

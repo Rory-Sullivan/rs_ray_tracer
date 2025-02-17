@@ -1,4 +1,4 @@
-use crate::{colour::RGB, hittable::HitRecord, ray::Ray, utilities::random_unit_vec};
+use crate::{colour::RGB, hittable::hit_record::HitRecord, ray::Ray, utilities::random_unit_vec};
 
 use super::material::Material;
 

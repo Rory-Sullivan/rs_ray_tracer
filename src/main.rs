@@ -5,7 +5,8 @@ use rs_ray_tracer::{
     bvh::bvh::Bvh,
     camera::Camera,
     colour::RGB,
-    hittable::{HittableList, RotateY, Translate},
+    hittable::hittable_list::HittableList,
+    instances::{rotate_y::RotateY, translate::Translate},
     materials::{
         dielectric::Dielectric, diffuse::Diffuse, diffuse_light::DiffuseLight,
         lambertian::Lambertian, metal::Metal,
