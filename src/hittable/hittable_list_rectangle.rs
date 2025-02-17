@@ -8,7 +8,7 @@ use super::hit_record::HitRecord;
 #[derive(Clone)]
 pub struct HittableListRectangle<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     time0: f64,
     time1: f64,
@@ -18,7 +18,7 @@ where
 
 impl<TMaterial> HittableListRectangle<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     pub fn new(time0: f64, time1: f64) -> Self {
         Self {
@@ -56,7 +56,7 @@ where
 
 impl<TMaterial> Hittable for HittableListRectangle<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;

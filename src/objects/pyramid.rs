@@ -14,7 +14,7 @@ use super::triangle::Triangle;
 #[derive(Clone)]
 pub struct Pyramid<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     sides: HittableListTriangle<TMaterial>,
     bounding_box: Option<BoundingBox>,
@@ -22,7 +22,7 @@ where
 
 impl<TMaterial> Pyramid<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     pub fn new(sides: HittableListTriangle<TMaterial>, bounding_box: Option<BoundingBox>) -> Self {
         Self {
@@ -60,7 +60,7 @@ where
 
 impl<TMaterial> Hittable for Pyramid<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.sides.hit(ray, t_min, t_max)

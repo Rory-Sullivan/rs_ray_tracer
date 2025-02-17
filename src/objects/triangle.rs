@@ -11,7 +11,7 @@ use crate::{
 #[derive(Debug, Clone, Copy)]
 pub struct Triangle<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     a: Point3d,
     b: Point3d,
@@ -24,7 +24,7 @@ where
 
 impl<TMaterial> Triangle<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     pub fn new(a: Vec3d, b: Vec3d, c: Vec3d, material: TMaterial) -> Triangle<TMaterial> {
         let e1 = b - a;
@@ -45,7 +45,7 @@ where
 
 impl<TMaterial> Hittable for Triangle<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match moller_trumbore_triangle_intersection(ray, self, t_min, t_max) {
@@ -124,7 +124,7 @@ fn moller_trumbore_triangle_intersection<TMaterial>(
     t_max: f64,
 ) -> Option<(f64, f64, f64, Point3d, Vec3d)>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     let ray_cross_e2 = ray.direction.cross(&triangle.e2);
     let det = triangle.e1.dot(&ray_cross_e2);

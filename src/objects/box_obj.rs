@@ -15,7 +15,7 @@ use super::rectangle::Rectangle;
 #[derive(Clone)]
 pub struct BoxObj<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     box_min: Point3d,
     box_max: Point3d,
@@ -24,7 +24,7 @@ where
 
 impl<TMaterial> BoxObj<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     pub fn new(box_min: Point3d, box_max: Point3d, material: TMaterial) -> Self {
         let mut sides = HittableListRectangle::new(0.0, 0.0);
@@ -82,7 +82,7 @@ where
 
 impl<TMaterial> Hittable for BoxObj<TMaterial>
 where
-    TMaterial: Material + Clone + Sync,
+    TMaterial: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.sides.hit(ray, t_min, t_max)

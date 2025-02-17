@@ -19,7 +19,7 @@ where
 
 impl<'a, TMaterial> Hittable for Rectangle<TMaterial>
 where
-    TMaterial: Material + Clone + Sync + 'a,
+    TMaterial: Material + Clone + 'a,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
