@@ -18,11 +18,21 @@ impl BoundingBox {
         // Iterate over 3 dimensions, x, y, and z
         for i in 0..3 {
             let inv_dir = 1.0 / ray.direction.get_axis(i);
-            let mut t0 = (self.min.get_axis(i) - ray.origin.get_axis(i)) * inv_dir;
-            let mut t1 = (self.max.get_axis(i) - ray.origin.get_axis(i)) * inv_dir;
-            if inv_dir < 0.0 {
-                (t0, t1) = (t1, t0); // swap
-            }
+            let ray_origin_i = ray.origin.get_axis(i);
+
+            let (t0, t1) = if inv_dir >= 0.0 {
+                (
+                    (self.min.get_axis(i) - ray_origin_i) * inv_dir,
+                    (self.max.get_axis(i) - ray_origin_i) * inv_dir,
+                )
+            } else {
+                // Swap t0 and t1
+                (
+                    (self.max.get_axis(i) - ray_origin_i) * inv_dir,
+                    (self.min.get_axis(i) - ray_origin_i) * inv_dir,
+                )
+            };
+
             t_min = if t0 > t_min { t0 } else { t_min };
             t_max = if t1 < t_max { t1 } else { t_max };
             if t_max <= t_min {

@@ -5,6 +5,42 @@
 
 ## Performance
 
+### Other optimizations
+
+#### TODO
+
+- Change build function of BVH to better pick an axis
+- Optimize BVH hit function
+- Optimize bounding_box hit function
+- Optimize sphere hit function
+- Optimize triangle hit function
+
+Time to render at different resolutions BEFORE OPTIMIZATIONS,
+generate_final_scene (with pyramid), release mode, no debug.
+
+- Low:
+  - BVH build: 0m 0s (0s)
+  - Render: 0m 26s (26s)
+  - Total: 0m 26s (26s)
+- Med:
+  - BVH build: 0m 0s (0s)
+  - Render: 1m 43s (103s)
+  - Total: 1m 43s (103s)
+- High:
+  - BVH build: 0m 0s (0s)
+  - Render: 68m 35s (4115s)
+  - Total: 68m 35s (4115s)
+
+Time to render at different resolutions with BVH HIT and BOUNDING_BOX HIT OPTIMIZATIONS,
+generate_final_scene (with pyramid), release mode, no debug.
+
+- Low:
+  - BVH build: 0m 0s (0s)
+  - Render: 0m 23s (23s)
+  - Total: 0m 23s (23s)
+
+### BVH
+
 Time to render at different resolutions BEFORE BVH,
 generate_random_complex_scene_moving_spheres, release mode, no debug.
 
