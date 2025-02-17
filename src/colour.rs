@@ -29,6 +29,25 @@ impl RGB {
         let (ir, ig, ib) = self.to_integers(num_samples);
         format!("{ir} {ig} {ib}\n")
     }
+
+    pub fn from_integers(r: usize, g: usize, b: usize) -> Self {
+        if r > 255 || g > 255 || b > 255 {
+            panic!("RGB values out of range, must be less than 256; r: {r}, g: {g}, b: {b}");
+        }
+
+        RGB(r as f64 / 255.0, g as f64 / 255.0, b as f64 / 255.0)
+    }
+
+    pub fn from_hash(hash: &str) -> Self {
+        assert!(hash.starts_with("#"));
+        assert_eq!(hash.len(), 7);
+
+        let r: usize = usize::from_str_radix(&hash[1..3], 16).unwrap();
+        let g: usize = usize::from_str_radix(&hash[3..5], 16).unwrap();
+        let b: usize = usize::from_str_radix(&hash[5..7], 16).unwrap();
+
+        Self::from_integers(r, g, b)
+    }
 }
 
 impl Add for RGB {
