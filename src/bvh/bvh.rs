@@ -2,7 +2,7 @@ use super::bounding_box::BoundingBox;
 use std::cmp::Ordering;
 
 use crate::{
-    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list::HittableList},
+    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list_dyn::HittableListDyn},
     ray::Ray,
     utilities::surrounding_box,
 };
@@ -30,7 +30,7 @@ impl<'a> Bvh<'a> {
     }
 
     /// Builds a BVH from scene data.
-    pub fn build(scene: HittableList<'a>, time0: f64, time1: f64) -> Self {
+    pub fn build(scene: HittableListDyn<'a>, time0: f64, time1: f64) -> Self {
         // Pick the longest axis along which to split the objects
         let axis = scene.bounding_box(time0, time1).unwrap().longest_axis();
         let compare_fn = match axis {
@@ -69,10 +69,10 @@ impl<'a> Bvh<'a> {
                     // Recursively call build function with split parts
                     let mid = num_objects / 2;
                     let (half0, half1) = objects.split_at_mut(mid);
-                    let hit_list0 = HittableList::build(time0, time1, half0.to_vec());
+                    let hit_list0 = HittableListDyn::build(time0, time1, half0.to_vec());
                     let left =
                         Box::new(Self::build(hit_list0, time0, time1)) as Box<dyn Hittable + Sync>;
-                    let hit_list1 = HittableList::build(time0, time1, half1.to_vec());
+                    let hit_list1 = HittableListDyn::build(time0, time1, half1.to_vec());
                     let right =
                         Box::new(Self::build(hit_list1, time0, time1)) as Box<dyn Hittable + Sync>;
                     (left, right)

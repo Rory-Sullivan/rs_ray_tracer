@@ -1,6 +1,8 @@
 use crate::{
     bvh::bounding_box::BoundingBox,
-    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list::HittableList},
+    hittable::{
+        hit_record::HitRecord, hittable::Hittable, hittable_list_triangle::HittableListTriangle,
+    },
     materials::material::Material,
     ray::Ray,
     vec3d::Point3d,
@@ -10,13 +12,19 @@ use super::triangle::Triangle;
 
 /// A triangle object that stores the three vertices of the triangle.
 #[derive(Clone)]
-pub struct Pyramid<'a> {
-    sides: HittableList<'a>,
+pub struct Pyramid<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
+    sides: HittableListTriangle<TMaterial>,
     bounding_box: Option<BoundingBox>,
 }
 
-impl<'a> Pyramid<'a> {
-    pub fn new(sides: HittableList<'a>, bounding_box: Option<BoundingBox>) -> Self {
+impl<TMaterial> Pyramid<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
+    pub fn new(sides: HittableListTriangle<TMaterial>, bounding_box: Option<BoundingBox>) -> Self {
         Self {
             sides,
             bounding_box,
@@ -29,23 +37,20 @@ impl<'a> Pyramid<'a> {
     ///   first value is taken as the external corner of the pyramid
     /// - height: height of the point above the base
     /// - material: the material of the pyramid
-    pub fn build<TMaterial>(
+    pub fn build(
         base_triangle: (Point3d, Point3d, Point3d),
         height: f64,
         material: TMaterial,
-    ) -> Pyramid<'a>
-    where
-        TMaterial: Material + Clone + Sync + 'a,
-    {
+    ) -> Pyramid<TMaterial> {
         let (b0, b1, b2, b3, p) = get_pyramid_vertices(base_triangle, height);
 
-        let mut sides = HittableList::new(0.0, 0.0);
-        sides.add(Box::new(Triangle::new(b0, b1, p, material.clone())));
-        sides.add(Box::new(Triangle::new(b1, b2, p, material.clone())));
-        sides.add(Box::new(Triangle::new(b2, b3, p, material.clone())));
-        sides.add(Box::new(Triangle::new(b3, b0, p, material.clone())));
-        sides.add(Box::new(Triangle::new(b0, b1, b3, material.clone())));
-        sides.add(Box::new(Triangle::new(b2, b3, b1, material.clone())));
+        let mut sides = HittableListTriangle::new(0.0, 0.0);
+        sides.add(Triangle::new(b0, b1, p, material.clone()));
+        sides.add(Triangle::new(b1, b2, p, material.clone()));
+        sides.add(Triangle::new(b2, b3, p, material.clone()));
+        sides.add(Triangle::new(b3, b0, p, material.clone()));
+        sides.add(Triangle::new(b0, b1, b3, material.clone()));
+        sides.add(Triangle::new(b2, b3, b1, material.clone()));
 
         let bounding_box = sides.bounding_box(0.0, 0.0);
 
@@ -53,7 +58,10 @@ impl<'a> Pyramid<'a> {
     }
 }
 
-impl<'a> Hittable for Pyramid<'a> {
+impl<TMaterial> Hittable for Pyramid<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.sides.hit(ray, t_min, t_max)
     }

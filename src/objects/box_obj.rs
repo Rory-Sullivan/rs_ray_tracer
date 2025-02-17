@@ -1,6 +1,6 @@
 use crate::{
     bvh::bounding_box::BoundingBox,
-    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list::HittableList},
+    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list_dyn::HittableListDyn},
     materials::material::Material,
     objects::rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     ray::Ray,
@@ -12,7 +12,7 @@ use crate::{
 pub struct BoxObj<'a> {
     box_min: Point3d,
     box_max: Point3d,
-    sides: HittableList<'a>,
+    sides: HittableListDyn<'a>,
 }
 
 impl<'a> BoxObj<'a> {
@@ -21,7 +21,7 @@ impl<'a> BoxObj<'a> {
         TMaterial: Material + Sync + 'static,
         TMaterial: Clone,
     {
-        let mut sides = HittableList::<'a>::new(0.0, 0.0);
+        let mut sides = HittableListDyn::<'a>::new(0.0, 0.0);
         sides.add(Box::new(RectangleXY::new(
             box_min.x,
             box_max.x,

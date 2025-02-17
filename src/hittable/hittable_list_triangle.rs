@@ -1,19 +1,25 @@
 use crate::{
-    bvh::bounding_box::BoundingBox, hittable::hittable::Hittable, ray::Ray,
-    utilities::surrounding_box,
+    bvh::bounding_box::BoundingBox, hittable::hittable::Hittable, materials::material::Material,
+    objects::triangle::Triangle, ray::Ray, utilities::surrounding_box,
 };
 
 use super::hit_record::HitRecord;
 
 #[derive(Clone)]
-pub struct HittableList<'a> {
+pub struct HittableListTriangle<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
     time0: f64,
     time1: f64,
-    pub items: Vec<Box<dyn Hittable + Sync + 'a>>,
+    pub items: Vec<Triangle<TMaterial>>,
     bounding_box: Option<BoundingBox>,
 }
 
-impl<'a> HittableList<'a> {
+impl<TMaterial> HittableListTriangle<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
     pub fn new(time0: f64, time1: f64) -> Self {
         Self {
             time0,
@@ -23,7 +29,7 @@ impl<'a> HittableList<'a> {
         }
     }
 
-    pub fn add(&mut self, item: Box<dyn Hittable + Sync + 'a>) {
+    pub fn add(&mut self, item: Triangle<TMaterial>) {
         if self.bounding_box.is_none() {
             self.bounding_box = item.bounding_box(self.time0, self.time1);
         } else {
@@ -35,7 +41,7 @@ impl<'a> HittableList<'a> {
         self.items.push(item);
     }
 
-    pub fn build(time0: f64, time1: f64, items: Vec<Box<dyn Hittable + Sync + 'a>>) -> Self {
+    pub fn build(time0: f64, time1: f64, items: Vec<Triangle<TMaterial>>) -> Self {
         let mut result = Self::new(time0, time1);
         for item in items {
             result.add(item);
@@ -48,7 +54,10 @@ impl<'a> HittableList<'a> {
     }
 }
 
-impl Hittable for HittableList<'_> {
+impl<TMaterial> Hittable for HittableListTriangle<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;
