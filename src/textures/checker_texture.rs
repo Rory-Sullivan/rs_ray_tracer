@@ -4,13 +4,24 @@ use super::texture::Texture;
 
 /// A checkered texture, squares alternating between the odd and even colours.
 #[derive(Clone)]
-pub struct CheckerTexture {
-    odd_colour: Box<dyn Texture + Sync>,
-    even_colour: Box<dyn Texture + Sync>,
+pub struct CheckerTexture<TTexture0, TTexture1>
+where
+    TTexture0: Texture + Sync,
+    TTexture1: Texture + Sync,
+{
+    odd_colour: TTexture0,
+    even_colour: TTexture1,
 }
 
-impl CheckerTexture {
-    pub fn new(odd_colour: Box<dyn Texture + Sync>, even_colour: Box<dyn Texture + Sync>) -> Self {
+impl<TTexture0, TTexture1> CheckerTexture<TTexture0, TTexture1>
+where
+    TTexture0: Texture + Sync,
+    TTexture1: Texture + Sync,
+{
+    pub fn new(
+        odd_colour: TTexture0,
+        even_colour: TTexture1,
+    ) -> CheckerTexture<TTexture0, TTexture1> {
         Self {
             odd_colour,
             even_colour,
@@ -18,7 +29,11 @@ impl CheckerTexture {
     }
 }
 
-impl Texture for CheckerTexture {
+impl<TTexture0, TTexture1> Texture for CheckerTexture<TTexture0, TTexture1>
+where
+    TTexture0: Texture + Clone + Sync,
+    TTexture1: Texture + Clone + Sync,
+{
     fn value(&self, u: f64, v: f64, p: &Point3d) -> RGB {
         let sines = (10.0 * p.x).sin() * (10.0 * p.y).sin() * (10.0 * p.z).sin();
         if sines < 0.0 {

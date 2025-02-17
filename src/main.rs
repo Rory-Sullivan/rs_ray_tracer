@@ -316,8 +316,8 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableList<'a>, bool
 
     // Use a checkered texture for the ground
     let checker_texture = CheckerTexture::new(
-        Box::new(SolidColour::new(RGB(0.2, 0.3, 0.1))),
-        Box::new(SolidColour::new(RGB(0.9, 0.9, 0.9))),
+        SolidColour::new(RGB(0.2, 0.3, 0.1)),
+        SolidColour::new(RGB(0.9, 0.9, 0.9)),
     );
     let material_ground = Lambertian::new(Box::new(checker_texture));
     let ground = Sphere::new(
@@ -408,8 +408,8 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableList<'a>, bool
 #[allow(dead_code)]
 fn generate_two_checkered_spheres<'a>() -> (HittableList<'a>, bool) {
     let checker_texture = CheckerTexture::new(
-        Box::new(SolidColour::new(RGB(0.2, 0.3, 0.1))),
-        Box::new(SolidColour::new(RGB(0.9, 0.9, 0.9))),
+        SolidColour::new(RGB(0.2, 0.3, 0.1)),
+        SolidColour::new(RGB(0.9, 0.9, 0.9)),
     );
     let material_checker = Lambertian::new(Box::new(checker_texture));
 
