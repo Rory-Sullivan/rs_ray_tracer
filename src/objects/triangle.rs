@@ -16,6 +16,9 @@ where
     a: Point3d,
     b: Point3d,
     c: Point3d,
+    e1: Vec3d,
+    e2: Vec3d,
+    normal: Vec3d,
     material: TMaterial,
 }
 
@@ -24,7 +27,19 @@ where
     TMaterial: Material + Clone + Sync,
 {
     pub fn new(a: Vec3d, b: Vec3d, c: Vec3d, material: TMaterial) -> Triangle<TMaterial> {
-        Self { a, b, c, material }
+        let e1 = b - a;
+        let e2 = c - a;
+        let normal = e1.cross(&e2).unit_vector();
+
+        Self {
+            a,
+            b,
+            c,
+            e1,
+            e2,
+            normal,
+            material,
+        }
     }
 }
 
@@ -111,11 +126,8 @@ fn moller_trumbore_triangle_intersection<TMaterial>(
 where
     TMaterial: Material + Clone + Sync,
 {
-    let e1 = triangle.b - triangle.a;
-    let e2 = triangle.c - triangle.a;
-
-    let ray_cross_e2 = ray.direction.cross(&e2);
-    let det = e1.dot(&ray_cross_e2);
+    let ray_cross_e2 = ray.direction.cross(&triangle.e2);
+    let det = triangle.e1.dot(&ray_cross_e2);
     if det > -f64::EPSILON && det < f64::EPSILON {
         // The ray is parallel to the triangle and so it will not intersect
         return None;
@@ -129,7 +141,7 @@ where
         return None;
     }
 
-    let s_cross_e1 = s.cross(&e1);
+    let s_cross_e1 = s.cross(&triangle.e1);
     let v = inv_det * ray.direction.dot(&s_cross_e1);
     if v < 0.0 || u + v > 1.0 {
         // Intersection of plane occurs outside triangle
@@ -137,15 +149,14 @@ where
     }
 
     // Now we have a hit on the the line of the ray
-    let t = inv_det * e2.dot(&s_cross_e1);
+    let t = inv_det * triangle.e2.dot(&s_cross_e1);
     if t < t_min || t > t_max {
         // There is a line intersection but not a ray intersection
         return None;
     }
 
     let intersection_point = ray.at(t);
-    let normal = e1.cross(&e2).unit_vector();
-    return Some((t, u, v, intersection_point, normal));
+    return Some((t, u, v, intersection_point, triangle.normal));
 }
 
 #[cfg(test)]

@@ -10,8 +10,6 @@
 #### TODO
 
 - Change build function of BVH to better pick an axis
-- Optimize sphere hit function
-- Optimize triangle hit function
 
 Time to render at different resolutions BEFORE OPTIMIZATIONS,
 generate_final_scene (with pyramid), release mode, no debug.
@@ -44,6 +42,10 @@ generate_final_scene (with pyramid), release mode, no debug.
   - BVH build: 0m 0s (0s)
   - Render: 0m 24s (24s)
   - Total: 0m 24s (24s)
+- Med:
+  - BVH build: 0m 0s (0s)
+  - Render: 1m 41s (101s)
+  - Total: 1m 41s (101s)
 
 ### BVH
 
