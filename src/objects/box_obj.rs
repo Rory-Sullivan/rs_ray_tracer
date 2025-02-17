@@ -21,7 +21,7 @@ impl<'a> BoxObj<'a> {
         TMaterial: Material + Sync + 'static,
         TMaterial: Clone,
     {
-        let mut sides = HittableList::<'a>::new();
+        let mut sides = HittableList::<'a>::new(0.0, 0.0);
         sides.add(Box::new(RectangleXY::new(
             box_min.x,
             box_max.x,

@@ -2,9 +2,9 @@ use super::bounding_box::BoundingBox;
 use std::cmp::Ordering;
 
 use crate::{
-    hittable::{HitRecord, Hittable},
+    hittable::{HitRecord, Hittable, HittableList},
     ray::Ray,
-    utilities::{random_rng_int, surrounding_box},
+    utilities::surrounding_box,
 };
 
 /// Bounding Volume Hierarchy. Used to store hittable objects in a tree like
@@ -30,9 +30,9 @@ impl<'a> Bvh<'a> {
     }
 
     /// Builds a BVH from scene data.
-    pub fn build(mut objects: Vec<Box<dyn Hittable + Sync>>, time0: f64, time1: f64) -> Self {
-        // Pick a random axis along which to split the objects
-        let axis = random_rng_int(0, 3);
+    pub fn build(scene: HittableList<'a>, time0: f64, time1: f64) -> Self {
+        // Pick the longest axis along which to split the objects
+        let axis = scene.bounding_box(time0, time1).unwrap().longest_axis();
         let compare_fn = match axis {
             0 => box_x_compare,
             1 => box_y_compare,
@@ -41,6 +41,7 @@ impl<'a> Bvh<'a> {
         };
 
         // Order and split list of objects based on axis
+        let mut objects = scene.items;
         let num_objects = objects.len();
         let (left, right): (Box<dyn Hittable + Sync + 'a>, Box<dyn Hittable + Sync + 'a>) =
             match num_objects {
@@ -68,10 +69,12 @@ impl<'a> Bvh<'a> {
                     // Recursively call build function with split parts
                     let mid = num_objects / 2;
                     let (half0, half1) = objects.split_at_mut(mid);
-                    let left = Box::new(Self::build(half0.to_vec(), time0, time1))
-                        as Box<dyn Hittable + Sync>;
-                    let right = Box::new(Self::build(half1.to_vec(), time0, time1))
-                        as Box<dyn Hittable + Sync>;
+                    let hit_list0 = HittableList::build(time0, time1, half0.to_vec());
+                    let left =
+                        Box::new(Self::build(hit_list0, time0, time1)) as Box<dyn Hittable + Sync>;
+                    let hit_list1 = HittableList::build(time0, time1, half1.to_vec());
+                    let right =
+                        Box::new(Self::build(hit_list1, time0, time1)) as Box<dyn Hittable + Sync>;
                     (left, right)
                 }
             };
@@ -118,9 +121,9 @@ impl<'a> Hittable for Bvh<'a> {
     }
 }
 
-fn box_compare(
-    a: &Box<dyn Hittable + Sync>,
-    b: &Box<dyn Hittable + Sync>,
+fn box_compare<'a>(
+    a: &Box<dyn Hittable + Sync + 'a>,
+    b: &Box<dyn Hittable + Sync + 'a>,
     axis: usize,
 ) -> Ordering {
     let box_a = a.bounding_box(0.0, 0.0).unwrap();
@@ -132,14 +135,23 @@ fn box_compare(
         .total_cmp(&box_b.min.get_axis(axis))
 }
 
-fn box_x_compare(a: &Box<dyn Hittable + Sync>, b: &Box<dyn Hittable + Sync>) -> Ordering {
+fn box_x_compare<'a>(
+    a: &Box<dyn Hittable + Sync + 'a>,
+    b: &Box<dyn Hittable + Sync + 'a>,
+) -> Ordering {
     box_compare(a, b, 0)
 }
 
-fn box_y_compare(a: &Box<dyn Hittable + Sync>, b: &Box<dyn Hittable + Sync>) -> Ordering {
+fn box_y_compare<'a>(
+    a: &Box<dyn Hittable + Sync + 'a>,
+    b: &Box<dyn Hittable + Sync + 'a>,
+) -> Ordering {
     box_compare(a, b, 1)
 }
 
-fn box_z_compare(a: &Box<dyn Hittable + Sync>, b: &Box<dyn Hittable + Sync>) -> Ordering {
+fn box_z_compare<'a>(
+    a: &Box<dyn Hittable + Sync + 'a>,
+    b: &Box<dyn Hittable + Sync + 'a>,
+) -> Ordering {
     box_compare(a, b, 2)
 }

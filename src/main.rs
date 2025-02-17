@@ -47,7 +47,7 @@ fn main() {
     // Scene
     let (scene, use_sky_background) = generate_final_scene();
     let start_bvh_build_instant = Instant::now();
-    let bvh = Bvh::build(scene.items, t0, t1);
+    let bvh = Bvh::build(scene, t0, t1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
 
     // Render
@@ -232,7 +232,7 @@ fn generate_basic_scene<'a>() -> (HittableList<'a>, bool) {
     let left_inner_sphere = Sphere::new(Vec3d::new(-1.0, 0.0, -1.0), -0.45, material_left);
     let right_sphere = Sphere::new(Vec3d::new(1.0, 0.0, -1.0), 0.5, material_right);
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(0.0, 0.0);
     scene.add(Box::new(ground));
     scene.add(Box::new(centre_sphere));
     scene.add(Box::new(left_sphere));
@@ -246,7 +246,7 @@ fn generate_basic_scene<'a>() -> (HittableList<'a>, bool) {
 
 #[allow(dead_code)]
 fn generate_random_complex_scene<'a>() -> (HittableList<'a>, bool) {
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(0.0, 0.0);
     let material_ground = Diffuse::new(RGB(0.5, 0.5, 0.5));
     let ground = Sphere::new(Point3d::new(0.0, -1000.0, 0.0), 1000.0, material_ground);
     scene.add(Box::new(ground));
@@ -309,7 +309,10 @@ fn generate_random_complex_scene<'a>() -> (HittableList<'a>, bool) {
 
 #[allow(dead_code)]
 fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableList<'a>, bool) {
-    let mut scene = HittableList::new();
+    let time0 = 0.0;
+    let time1 = 1.0;
+
+    let mut scene = HittableList::new(time0, time1);
 
     // Use a checkered texture for the ground
     let checker_texture = CheckerTexture::new(
@@ -360,8 +363,8 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableList<'a>, bool
                         scene.add(Box::new(MovingSphere::new(
                             center0,
                             center1,
-                            0.0,
-                            1.0,
+                            time0,
+                            time1,
                             0.2,
                             sphere_material,
                         )));
@@ -374,8 +377,8 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableList<'a>, bool
                         scene.add(Box::new(MovingSphere::new(
                             center0,
                             center1,
-                            0.0,
-                            1.0,
+                            time0,
+                            time1,
                             0.2,
                             sphere_material,
                         )));
@@ -386,8 +389,8 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableList<'a>, bool
                         scene.add(Box::new(MovingSphere::new(
                             center0,
                             center1,
-                            0.0,
-                            1.0,
+                            time0,
+                            time1,
                             0.2,
                             sphere_material,
                         )));
@@ -413,7 +416,7 @@ fn generate_two_checkered_spheres<'a>() -> (HittableList<'a>, bool) {
     let sphere0 = Sphere::new(Vec3d::new(0.0, -10.0, 0.0), 10.0, material_checker.clone());
     let sphere1 = Sphere::new(Vec3d::new(0.0, 10.0, 0.0), 10.0, material_checker);
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(0.0, 0.0);
     scene.add(Box::new(sphere0));
     scene.add(Box::new(sphere1));
 
@@ -434,7 +437,7 @@ fn generate_two_perlin_noise_spheres<'a>() -> (HittableList<'a>, bool) {
     );
     let sphere1 = Sphere::new(Vec3d::new(0.0, 2.0, 0.0), 2.0, noise_material);
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(0.0, 0.0);
     scene.add(Box::new(sphere0));
     scene.add(Box::new(sphere1));
 
@@ -455,7 +458,7 @@ fn generate_two_perlin_noise_turbulence_spheres<'a>() -> (HittableList<'a>, bool
     );
     let sphere1 = Sphere::new(Vec3d::new(0.0, 2.0, 0.0), 2.0, turbulence_material);
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(0.0, 0.0);
     scene.add(Box::new(sphere0));
     scene.add(Box::new(sphere1));
 
@@ -471,7 +474,7 @@ fn generate_earth_scene<'a>() -> (HittableList<'a>, bool) {
 
     let earth = Sphere::new(Vec3d::new(0.0, 0.0, 0.0), 2.0, earth_material);
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(0.0, 0.0);
     scene.add(Box::new(earth));
 
     let use_sky_background = true;
@@ -497,7 +500,7 @@ fn generate_simple_light<'a>() -> (HittableList<'a>, bool) {
     let light_rect = RectangleXY::new(-5.0, -3.0, -2.0, 1.0, -2.0, diff_light.clone());
     let light_sphere = Sphere::new(Vec3d::new(-8.0, 3.0, 0.0), 1.0, diff_light);
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(0.0, 0.0);
     scene.add(Box::new(sphere0));
     scene.add(Box::new(sphere1));
     scene.add(Box::new(light_rect));
@@ -540,7 +543,7 @@ fn generate_cornell_box<'a>() -> (HittableList<'a>, bool) {
     let box1 = RotateY::new(-18.0, Box::new(box1), time0, time1);
     let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(box1));
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(time0, time1);
     scene.add(Box::new(red_wall));
     scene.add(Box::new(green_wall));
     scene.add(Box::new(light));
@@ -590,7 +593,7 @@ fn generate_cornell_box_with_smoke_boxes<'a>() -> (HittableList<'a>, bool) {
     let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(box1));
     let box1 = ConstantMedium::build_from_colour(box1, RGB(1.0, 1.0, 1.0), 0.01); // dark smoke box
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(time0, time1);
     scene.add(Box::new(red_wall));
     scene.add(Box::new(green_wall));
     scene.add(Box::new(light));
@@ -610,10 +613,10 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
     let time0 = 0.0;
     let time1 = 1.0;
     let use_sky_background = false;
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(time0, time1);
 
     // Make the ground a 20x20 grid of random height boxes
-    let mut ground_boxes = HittableList::new();
+    let mut ground_boxes = HittableList::new(time0, time1);
     let ground = Lambertian::build_from_colour(RGB(0.48, 0.83, 0.53));
     for i in 0..20 {
         for j in 0..20 {
@@ -632,7 +635,7 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
             )));
         }
     }
-    scene.add(Box::new(Bvh::build(ground_boxes.items, time0, time1)));
+    scene.add(Box::new(Bvh::build(ground_boxes, time0, time1)));
 
     // Make a light
     let diffuse_light = DiffuseLight::build_from_colour(RGB(7.0, 7.0, 7.0));
@@ -688,7 +691,7 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
     scene.add(Box::new(perlin_sphere));
 
     // Add a random assortment of white spheres in a translated rotated box
-    let mut spheres = HittableList::new();
+    let mut spheres = HittableList::new(time0, time1);
     let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
     for _ in 0..1000 {
         let sphere = Sphere::new(random_vec_rng(0.0, 165.0), 10.0, white.clone());
@@ -698,7 +701,7 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
         Point3d::new(-100.0, 270.0, 395.0),
         Box::new(RotateY::new(
             15.0,
-            Box::new(Bvh::build(spheres.items, time0, time1)),
+            Box::new(Bvh::build(spheres, time0, time1)),
             time0,
             time1,
         )),
@@ -748,7 +751,7 @@ fn generate_cornell_box_with_pyramids<'a>() -> (HittableList<'a>, bool) {
     let pyr1 = RotateY::new(-18.0, Box::new(pyr1), time0, time1);
     let pyr1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(pyr1));
 
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(time0, time1);
     scene.add(Box::new(red_wall));
     scene.add(Box::new(green_wall));
     scene.add(Box::new(light));
@@ -768,10 +771,10 @@ fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
     let time0 = 0.0;
     let time1 = 1.0;
     let use_sky_background = false;
-    let mut scene = HittableList::new();
+    let mut scene = HittableList::new(time0, time1);
 
     // Make the ground a 20x20 grid of random height boxes
-    let mut ground_boxes = HittableList::new();
+    let mut ground_boxes = HittableList::new(time0, time1);
     let ground = Lambertian::build_from_colour(RGB(0.48, 0.83, 0.53));
     for i in 0..20 {
         for j in 0..20 {
@@ -790,7 +793,7 @@ fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
             )));
         }
     }
-    scene.add(Box::new(Bvh::build(ground_boxes.items, time0, time1)));
+    scene.add(Box::new(Bvh::build(ground_boxes, time0, time1)));
 
     // Make a light
     let diffuse_light = DiffuseLight::build_from_colour(RGB(7.0, 7.0, 7.0));
@@ -846,7 +849,7 @@ fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
     scene.add(Box::new(perlin_sphere));
 
     // Add a random assortment of white spheres in a translated rotated box
-    let mut spheres = HittableList::new();
+    let mut spheres = HittableList::new(time0, time1);
     let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
     for _ in 0..1000 {
         let sphere = Sphere::new(random_vec_rng(0.0, 165.0), 10.0, white.clone());
@@ -856,7 +859,7 @@ fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
         Point3d::new(-100.0, 270.0, 395.0),
         Box::new(RotateY::new(
             15.0,
-            Box::new(Bvh::build(spheres.items, time0, time1)),
+            Box::new(Bvh::build(spheres, time0, time1)),
             time0,
             time1,
         )),

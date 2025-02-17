@@ -5,11 +5,30 @@ use crate::{ray::Ray, vec3d::Point3d};
 pub struct BoundingBox {
     pub min: Point3d,
     pub max: Point3d,
+    longest_axis: usize,
 }
 
 impl BoundingBox {
     pub fn new(min: Point3d, max: Point3d) -> Self {
-        BoundingBox { min, max }
+        if min.x > max.x || min.y > max.y || min.z > max.z {
+            panic!("min must be less than max; min: {min:?}, max: {max:?}")
+        }
+        let len_x = max.x - min.x;
+        let len_y = max.y - min.y;
+        let len_z = max.z - min.z;
+        let longest_axis = if len_x >= len_y && len_x >= len_z {
+            0
+        } else if len_y >= len_z {
+            1
+        } else {
+            2
+        };
+
+        BoundingBox {
+            min,
+            max,
+            longest_axis,
+        }
     }
 
     /// Returns whether or not a ray intersects with a bounding box, see notes
@@ -40,6 +59,10 @@ impl BoundingBox {
             }
         }
         return true;
+    }
+
+    pub fn longest_axis(&self) -> usize {
+        self.longest_axis
     }
 }
 

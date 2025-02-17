@@ -39,7 +39,7 @@ impl<'a> Pyramid<'a> {
     {
         let (b0, b1, b2, b3, p) = get_pyramid_vertices(base_triangle, height);
 
-        let mut sides = HittableList::new();
+        let mut sides = HittableList::new(0.0, 0.0);
         sides.add(Box::new(Triangle::new(b0, b1, p, material.clone())));
         sides.add(Box::new(Triangle::new(b1, b2, p, material.clone())));
         sides.add(Box::new(Triangle::new(b2, b3, p, material.clone())));

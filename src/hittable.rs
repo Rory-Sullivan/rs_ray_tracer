@@ -83,16 +83,40 @@ impl<'a> HitRecord<'a> {
 
 #[derive(Clone)]
 pub struct HittableList<'a> {
+    time0: f64,
+    time1: f64,
     pub items: Vec<Box<dyn Hittable + Sync + 'a>>,
+    bounding_box: Option<BoundingBox>,
 }
 
 impl<'a> HittableList<'a> {
-    pub fn new() -> Self {
-        Self { items: Vec::new() }
+    pub fn new(time0: f64, time1: f64) -> Self {
+        Self {
+            time0,
+            time1,
+            items: Vec::new(),
+            bounding_box: None,
+        }
     }
 
     pub fn add(&mut self, item: Box<dyn Hittable + Sync + 'a>) {
+        if self.bounding_box.is_none() {
+            self.bounding_box = item.bounding_box(self.time0, self.time1);
+        } else {
+            self.bounding_box = Some(surrounding_box(
+                self.bounding_box.unwrap(),
+                item.bounding_box(self.time0, self.time1).unwrap(),
+            ));
+        }
         self.items.push(item);
+    }
+
+    pub fn build(time0: f64, time1: f64, items: Vec<Box<dyn Hittable + Sync + 'a>>) -> Self {
+        let mut result = Self::new(time0, time1);
+        for item in items {
+            result.add(item);
+        }
+        result
     }
 
     pub fn clear(&mut self) {
@@ -118,26 +142,8 @@ impl Hittable for HittableList<'_> {
         hit_record
     }
 
-    fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox> {
-        if self.items.is_empty() {
-            return None;
-        }
-
-        let mut temp_box = self.items[0].bounding_box(time0, time1);
-        let mut output_box = match temp_box {
-            None => return None,
-            Some(x) => x,
-        };
-
-        for object in self.items[1..].iter() {
-            temp_box = object.bounding_box(time0, time1);
-            if temp_box.is_none() {
-                return None;
-            }
-            output_box = surrounding_box(output_box, temp_box.unwrap());
-        }
-
-        Some(output_box)
+    fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<BoundingBox> {
+        self.bounding_box
     }
 }
 
