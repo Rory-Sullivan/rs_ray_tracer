@@ -1,28 +1,34 @@
 use crate::{
     bvh::bounding_box::BoundingBox,
-    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list_dyn::HittableListDyn},
+    hittable::{
+        hit_record::HitRecord, hittable::Hittable, hittable_list_rectangle::HittableListRectangle,
+    },
     materials::material::Material,
     objects::rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     ray::Ray,
     vec3d::Point3d,
 };
 
+use super::rectangle::Rectangle;
+
 /// And axis-aligned box made of 6 rectangles.
 #[derive(Clone)]
-pub struct BoxObj<'a> {
+pub struct BoxObj<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
     box_min: Point3d,
     box_max: Point3d,
-    sides: HittableListDyn<'a>,
+    sides: HittableListRectangle<TMaterial>,
 }
 
-impl<'a> BoxObj<'a> {
-    pub fn new<TMaterial>(box_min: Point3d, box_max: Point3d, material: TMaterial) -> Self
-    where
-        TMaterial: Material + Sync + 'static,
-        TMaterial: Clone,
-    {
-        let mut sides = HittableListDyn::<'a>::new(0.0, 0.0);
-        sides.add(Box::new(RectangleXY::new(
+impl<TMaterial> BoxObj<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
+    pub fn new(box_min: Point3d, box_max: Point3d, material: TMaterial) -> Self {
+        let mut sides = HittableListRectangle::new(0.0, 0.0);
+        sides.add(Rectangle::XY(RectangleXY::new(
             box_min.x,
             box_max.x,
             box_min.y,
@@ -30,7 +36,7 @@ impl<'a> BoxObj<'a> {
             box_min.z,
             material.clone(),
         )));
-        sides.add(Box::new(RectangleXY::new(
+        sides.add(Rectangle::XY(RectangleXY::new(
             box_min.x,
             box_max.x,
             box_min.y,
@@ -38,7 +44,7 @@ impl<'a> BoxObj<'a> {
             box_max.z,
             material.clone(),
         )));
-        sides.add(Box::new(RectangleXZ::new(
+        sides.add(Rectangle::XZ(RectangleXZ::new(
             box_min.x,
             box_max.x,
             box_min.z,
@@ -46,7 +52,7 @@ impl<'a> BoxObj<'a> {
             box_min.y,
             material.clone(),
         )));
-        sides.add(Box::new(RectangleXZ::new(
+        sides.add(Rectangle::XZ(RectangleXZ::new(
             box_min.x,
             box_max.x,
             box_min.z,
@@ -54,7 +60,7 @@ impl<'a> BoxObj<'a> {
             box_max.y,
             material.clone(),
         )));
-        sides.add(Box::new(RectangleYZ::new(
+        sides.add(Rectangle::YZ(RectangleYZ::new(
             box_min.y,
             box_max.y,
             box_min.z,
@@ -62,7 +68,7 @@ impl<'a> BoxObj<'a> {
             box_min.x,
             material.clone(),
         )));
-        sides.add(Box::new(RectangleYZ::new(
+        sides.add(Rectangle::YZ(RectangleYZ::new(
             box_min.y, box_max.y, box_min.z, box_max.z, box_max.x, material,
         )));
 
@@ -74,7 +80,10 @@ impl<'a> BoxObj<'a> {
     }
 }
 
-impl<'a> Hittable for BoxObj<'a> {
+impl<TMaterial> Hittable for BoxObj<TMaterial>
+where
+    TMaterial: Material + Clone + Sync,
+{
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.sides.hit(ray, t_min, t_max)
     }

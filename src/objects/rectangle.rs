@@ -7,6 +7,37 @@ use crate::{
     vec3d::Vec3d,
 };
 
+#[derive(Debug, Clone, Copy)]
+pub enum Rectangle<TMaterial>
+where
+    TMaterial: Material,
+{
+    XY(RectangleXY<TMaterial>),
+    XZ(RectangleXZ<TMaterial>),
+    YZ(RectangleYZ<TMaterial>),
+}
+
+impl<'a, TMaterial> Hittable for Rectangle<TMaterial>
+where
+    TMaterial: Material + Clone + Sync + 'a,
+{
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        match self {
+            Rectangle::XY(rectangle_xy) => rectangle_xy.hit(ray, t_min, t_max),
+            Rectangle::XZ(rectangle_xz) => rectangle_xz.hit(ray, t_min, t_max),
+            Rectangle::YZ(rectangle_yz) => rectangle_yz.hit(ray, t_min, t_max),
+        }
+    }
+
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox> {
+        match self {
+            Rectangle::XY(rectangle_xy) => rectangle_xy.bounding_box(time0, time1),
+            Rectangle::XZ(rectangle_xz) => rectangle_xz.bounding_box(time0, time1),
+            Rectangle::YZ(rectangle_yz) => rectangle_yz.bounding_box(time0, time1),
+        }
+    }
+}
+
 /// Axis-aligned rectangle for X-Y plane
 #[derive(Debug, Clone, Copy)]
 pub struct RectangleXY<TMaterial>
@@ -38,9 +69,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for RectangleXY<TMaterial>
+impl<'a, TMaterial> Hittable for RectangleXY<TMaterial>
 where
-    TMaterial: Material + Sync + 'static,
+    TMaterial: Material + Sync + 'a,
     TMaterial: Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -117,9 +148,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for RectangleXZ<TMaterial>
+impl<'a, TMaterial> Hittable for RectangleXZ<TMaterial>
 where
-    TMaterial: Material + Sync + 'static,
+    TMaterial: Material + Sync + 'a,
     TMaterial: Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -196,9 +227,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for RectangleYZ<TMaterial>
+impl<'a, TMaterial> Hittable for RectangleYZ<TMaterial>
 where
-    TMaterial: Material + Sync + 'static,
+    TMaterial: Material + Sync + 'a,
     TMaterial: Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
