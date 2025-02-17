@@ -9,7 +9,7 @@ use super::hit_record::HitRecord;
 pub struct HittableListDyn<'a> {
     time0: f64,
     time1: f64,
-    pub items: Vec<Box<dyn Hittable + Sync + 'a>>,
+    pub items: Vec<Box<dyn Hittable + 'a>>,
     bounding_box: Option<BoundingBox>,
 }
 
@@ -23,7 +23,7 @@ impl<'a> HittableListDyn<'a> {
         }
     }
 
-    pub fn add(&mut self, item: Box<dyn Hittable + Sync + 'a>) {
+    pub fn add(&mut self, item: Box<dyn Hittable + 'a>) {
         if self.bounding_box.is_none() {
             self.bounding_box = item.bounding_box(self.time0, self.time1);
         } else {
@@ -35,7 +35,7 @@ impl<'a> HittableListDyn<'a> {
         self.items.push(item);
     }
 
-    pub fn build(time0: f64, time1: f64, items: Vec<Box<dyn Hittable + Sync + 'a>>) -> Self {
+    pub fn build(time0: f64, time1: f64, items: Vec<Box<dyn Hittable + 'a>>) -> Self {
         let mut result = Self::new(time0, time1);
         for item in items {
             result.add(item);

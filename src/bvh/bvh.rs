@@ -11,15 +11,15 @@ use crate::{
 /// structure to make finding a hit more efficient.
 #[derive(Clone)]
 pub struct Bvh<'a> {
-    left: Box<dyn Hittable + Sync + 'a>,
-    right: Box<dyn Hittable + Sync + 'a>,
+    left: Box<dyn Hittable + 'a>,
+    right: Box<dyn Hittable + 'a>,
     bounding_box: BoundingBox,
 }
 
 impl<'a> Bvh<'a> {
     pub fn new(
-        left: Box<dyn Hittable + Sync + 'a>,
-        right: Box<dyn Hittable + Sync + 'a>,
+        left: Box<dyn Hittable + 'a>,
+        right: Box<dyn Hittable + 'a>,
         bounding_box: BoundingBox,
     ) -> Self {
         Bvh {
@@ -43,41 +43,38 @@ impl<'a> Bvh<'a> {
         // Order and split list of objects based on axis
         let mut objects = scene.items;
         let num_objects = objects.len();
-        let (left, right): (Box<dyn Hittable + Sync + 'a>, Box<dyn Hittable + Sync + 'a>) =
-            match num_objects {
-                0 => panic!("No objects"),
-                1 => {
+        let (left, right): (Box<dyn Hittable + 'a>, Box<dyn Hittable + 'a>) = match num_objects {
+            0 => panic!("No objects"),
+            1 => {
+                let left = objects[0].clone();
+                let right = objects[0].clone();
+                (left, right)
+            }
+            2 => match compare_fn(&objects[0], &objects[1]) {
+                Ordering::Less | Ordering::Equal => {
                     let left = objects[0].clone();
+                    let right = objects[1].clone();
+                    (left, right)
+                }
+                Ordering::Greater => {
+                    let left = objects[1].clone();
                     let right = objects[0].clone();
                     (left, right)
                 }
-                2 => match compare_fn(&objects[0], &objects[1]) {
-                    Ordering::Less | Ordering::Equal => {
-                        let left = objects[0].clone();
-                        let right = objects[1].clone();
-                        (left, right)
-                    }
-                    Ordering::Greater => {
-                        let left = objects[1].clone();
-                        let right = objects[0].clone();
-                        (left, right)
-                    }
-                },
-                _ => {
-                    objects.sort_by(compare_fn);
+            },
+            _ => {
+                objects.sort_by(compare_fn);
 
-                    // Recursively call build function with split parts
-                    let mid = num_objects / 2;
-                    let (half0, half1) = objects.split_at_mut(mid);
-                    let hit_list0 = HittableListDyn::build(time0, time1, half0.to_vec());
-                    let left =
-                        Box::new(Self::build(hit_list0, time0, time1)) as Box<dyn Hittable + Sync>;
-                    let hit_list1 = HittableListDyn::build(time0, time1, half1.to_vec());
-                    let right =
-                        Box::new(Self::build(hit_list1, time0, time1)) as Box<dyn Hittable + Sync>;
-                    (left, right)
-                }
-            };
+                // Recursively call build function with split parts
+                let mid = num_objects / 2;
+                let (half0, half1) = objects.split_at_mut(mid);
+                let hit_list0 = HittableListDyn::build(time0, time1, half0.to_vec());
+                let left = Box::new(Self::build(hit_list0, time0, time1)) as Box<dyn Hittable>;
+                let hit_list1 = HittableListDyn::build(time0, time1, half1.to_vec());
+                let right = Box::new(Self::build(hit_list1, time0, time1)) as Box<dyn Hittable>;
+                (left, right)
+            }
+        };
 
         let box_left = left.bounding_box(time0, time1).unwrap();
         let box_right = right.bounding_box(time0, time1).unwrap();
@@ -122,8 +119,8 @@ impl<'a> Hittable for Bvh<'a> {
 }
 
 fn box_compare<'a>(
-    a: &Box<dyn Hittable + Sync + 'a>,
-    b: &Box<dyn Hittable + Sync + 'a>,
+    a: &Box<dyn Hittable + 'a>,
+    b: &Box<dyn Hittable + 'a>,
     axis: usize,
 ) -> Ordering {
     let box_a = a.bounding_box(0.0, 0.0).unwrap();
@@ -135,23 +132,14 @@ fn box_compare<'a>(
         .total_cmp(&box_b.min.get_axis(axis))
 }
 
-fn box_x_compare<'a>(
-    a: &Box<dyn Hittable + Sync + 'a>,
-    b: &Box<dyn Hittable + Sync + 'a>,
-) -> Ordering {
+fn box_x_compare<'a>(a: &Box<dyn Hittable + 'a>, b: &Box<dyn Hittable + 'a>) -> Ordering {
     box_compare(a, b, 0)
 }
 
-fn box_y_compare<'a>(
-    a: &Box<dyn Hittable + Sync + 'a>,
-    b: &Box<dyn Hittable + Sync + 'a>,
-) -> Ordering {
+fn box_y_compare<'a>(a: &Box<dyn Hittable + 'a>, b: &Box<dyn Hittable + 'a>) -> Ordering {
     box_compare(a, b, 1)
 }
 
-fn box_z_compare<'a>(
-    a: &Box<dyn Hittable + Sync + 'a>,
-    b: &Box<dyn Hittable + Sync + 'a>,
-) -> Ordering {
+fn box_z_compare<'a>(a: &Box<dyn Hittable + 'a>, b: &Box<dyn Hittable + 'a>) -> Ordering {
     box_compare(a, b, 2)
 }

@@ -11,11 +11,11 @@ use crate::{
 #[derive(Clone)]
 pub struct Translate {
     offset: Vec3d,
-    object: Box<dyn Hittable + Sync>,
+    object: Box<dyn Hittable>,
 }
 
 impl Translate {
-    pub fn new(offset: Vec3d, object: Box<dyn Hittable + Sync>) -> Self {
+    pub fn new(offset: Vec3d, object: Box<dyn Hittable>) -> Self {
         Self { offset, object }
     }
 }

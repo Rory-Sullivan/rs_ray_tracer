@@ -14,11 +14,11 @@ pub struct RotateX {
     sin_theta: f64,
     cos_theta: f64,
     bounding_box: Option<BoundingBox>,
-    object: Box<dyn Hittable + Sync>,
+    object: Box<dyn Hittable>,
 }
 
 impl RotateX {
-    pub fn new(angle: f64, object: Box<dyn Hittable + Sync>, t0: f64, t1: f64) -> Self {
+    pub fn new(angle: f64, object: Box<dyn Hittable>, t0: f64, t1: f64) -> Self {
         let radians = degrees_to_radians(angle);
         let sin_theta = radians.sin();
         let cos_theta = radians.cos();
