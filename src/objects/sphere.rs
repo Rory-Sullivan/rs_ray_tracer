@@ -60,12 +60,7 @@ where
         let point = ray.at(root);
         let outward_normal = (point - self.center) / self.radius;
         let (u, v) = get_sphere_uv(outward_normal);
-        let front_face = ray.direction.dot(&outward_normal) < 0.0;
-        let normal = if front_face {
-            outward_normal
-        } else {
-            -1.0 * outward_normal
-        };
+        let (front_face, normal) = HitRecord::get_face_normal(ray, outward_normal);
 
         Some(HitRecord::new(
             point,

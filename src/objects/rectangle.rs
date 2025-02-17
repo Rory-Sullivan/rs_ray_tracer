@@ -216,12 +216,7 @@ where
         let u = (y - self.y0) / (self.y1 - self.y0);
         let v = (z - self.z0) / (self.z1 - self.z0);
         let outward_normal = Vec3d::new(1.0, 0.0, 0.0);
-        let front_face = ray.direction.dot(&outward_normal) < 0.0;
-        let normal = if front_face {
-            outward_normal
-        } else {
-            -1.0 * outward_normal
-        };
+        let (front_face, normal) = HitRecord::get_face_normal(ray, outward_normal);
 
         return Some(HitRecord::new(
             ray.at(t),
