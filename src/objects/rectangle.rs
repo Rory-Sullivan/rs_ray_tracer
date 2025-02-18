@@ -7,6 +7,7 @@ use crate::{
     vec3d::Vec3d,
 };
 
+/// Enum for the three axis-aligned rectangle structs.
 #[derive(Debug, Clone, Copy)]
 pub enum Rectangle<TMaterial>
 where

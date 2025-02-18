@@ -10,7 +10,7 @@ use crate::{
 
 use super::triangle::Triangle;
 
-/// A triangle object that stores the three vertices of the triangle.
+/// A pyramid with square base and four triangles on top. 6 triangles total.
 #[derive(Clone)]
 pub struct Pyramid<TMaterial>
 where
@@ -33,10 +33,10 @@ where
 
     /// Builds a pyramid object
     ///
-    /// - base_triangle: a tuple representing half the base of the pyramid, the
-    ///   first value is taken as the external corner of the pyramid
-    /// - height: height of the point above the base
-    /// - material: the material of the pyramid
+    /// * `base_triangle`: a tuple representing half the base of the pyramid,
+    ///   the first value is taken as the external corner of the pyramid
+    /// * `height`: height of the point above the base
+    /// * `material`: the material of the pyramid
     pub fn build(
         base_triangle: (Point3d, Point3d, Point3d),
         height: f64,
