@@ -1,5 +1,5 @@
 use crate::{
-    materials::material::Material,
+    materials::Material,
     ray::Ray,
     vec3d::{Point3d, Vec3d},
 };

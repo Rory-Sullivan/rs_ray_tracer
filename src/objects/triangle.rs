@@ -1,7 +1,7 @@
 use crate::{
     bvh::bounding_box::BoundingBox,
     hittable::{hit_record::HitRecord, hittable::Hittable},
-    materials::material::Material,
+    materials::Material,
     ray::Ray,
     utilities::{max, min},
     vec3d::{Point3d, Vec3d},
@@ -161,7 +161,7 @@ where
 
 #[cfg(test)]
 mod moller_trumbore_triangle_intersection_tests {
-    use crate::{colour::RGB, materials::diffuse::Diffuse};
+    use crate::{colour::RGB, materials::Diffuse};
 
     use super::*;
 

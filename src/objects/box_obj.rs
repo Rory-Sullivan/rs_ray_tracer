@@ -3,7 +3,7 @@ use crate::{
     hittable::{
         hit_record::HitRecord, hittable::Hittable, hittable_list_rectangle::HittableListRectangle,
     },
-    materials::material::Material,
+    materials::Material,
     objects::rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
     ray::Ray,
     vec3d::Point3d,

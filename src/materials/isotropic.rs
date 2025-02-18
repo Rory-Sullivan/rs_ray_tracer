@@ -2,7 +2,7 @@ use crate::{
     colour::RGB,
     hittable::hit_record::HitRecord,
     ray::Ray,
-    textures::{solid_colour::SolidColour, texture::Texture},
+    textures::{SolidColour, Texture},
     utilities::random_vec_in_unit_sphere,
 };
 

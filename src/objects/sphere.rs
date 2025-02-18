@@ -1,7 +1,7 @@
 use crate::{
     bvh::bounding_box::BoundingBox,
     hittable::{hit_record::HitRecord, hittable::Hittable},
-    materials::material::Material,
+    materials::Material,
     ray::Ray,
     utilities::get_sphere_uv,
     vec3d::Point3d,

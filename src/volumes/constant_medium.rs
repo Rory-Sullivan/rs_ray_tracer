@@ -4,9 +4,9 @@ use crate::{
     bvh::bounding_box::BoundingBox,
     colour::RGB,
     hittable::{hit_record::HitRecord, hittable::Hittable},
-    materials::isotropic::Isotropic,
+    materials::Isotropic,
     ray::Ray,
-    textures::texture::Texture,
+    textures::Texture,
     utilities::random,
     vec3d::Vec3d,
 };

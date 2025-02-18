@@ -6,7 +6,7 @@ use crate::hittable::hittable_list_dyn::HittableListDyn;
 use crate::hittable::{hit_record::HitRecord, hittable::Hittable};
 use crate::{
     bvh::{bounding_box::BoundingBox, bvh::Bvh},
-    materials::material::Material,
+    materials::Material,
     ray::Ray,
     vec3d::Vec3d,
 };

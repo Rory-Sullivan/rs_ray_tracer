@@ -1,6 +1,6 @@
 use crate::{
-    bvh::bounding_box::BoundingBox, hittable::hittable::Hittable, materials::material::Material,
-    objects::triangle::Triangle, ray::Ray, utilities::surrounding_box,
+    bvh::bounding_box::BoundingBox, hittable::hittable::Hittable, materials::Material,
+    objects::Triangle, ray::Ray, utilities::surrounding_box,
 };
 
 use super::hit_record::HitRecord;
