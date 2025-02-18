@@ -5,6 +5,7 @@ use crate::{
 
 use super::hit_record::HitRecord;
 
+/// Stores a list of triangles.
 #[derive(Clone)]
 pub struct HittableListTriangle<TMaterial>
 where

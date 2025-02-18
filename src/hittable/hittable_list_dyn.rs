@@ -5,6 +5,8 @@ use crate::{
 
 use super::hit_record::HitRecord;
 
+/// Stores a list of hittable objects. Uses dynamic trait objects to allow for
+/// any struct that implements the Hittable trait to be a part of the list.
 #[derive(Clone)]
 pub struct HittableListDyn<'a> {
     time0: f64,

@@ -5,6 +5,7 @@ use crate::{
 
 use super::hit_record::HitRecord;
 
+/// Stores a list of rectangles.
 #[derive(Clone)]
 pub struct HittableListRectangle<TMaterial>
 where
