@@ -1,11 +1,15 @@
 pub struct Resolution {
     pub image_width: usize,
     pub image_height: usize,
+    /// Number of ray samples per pixel.
     pub num_samples: usize,
+    /// Max number of ray bounces.
     pub max_depth: usize,
 }
 
 impl Resolution {
+    /// * `num_samples`: Number of ray samples per pixel.
+    /// * `max_depth`: Max number of ray bounces.
     pub fn new(
         image_width: usize,
         image_height: usize,

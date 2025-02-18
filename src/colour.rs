@@ -31,9 +31,10 @@ impl RGB {
     }
 
     pub fn from_integers(r: usize, g: usize, b: usize) -> Self {
-        if r > 255 || g > 255 || b > 255 {
-            panic!("RGB values out of range, must be less than 256; r: {r}, g: {g}, b: {b}");
-        }
+        assert!(
+            r < 256 || g < 256 || b < 256,
+            "RGB values out of range, must be less than 256; r: {r}, g: {g}, b: {b}"
+        );
 
         RGB(r as f64 / 255.0, g as f64 / 255.0, b as f64 / 255.0)
     }

@@ -1,5 +1,6 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+/// A vector in 3-dimensional space.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Vec3d {
     pub x: f64,
@@ -146,4 +147,5 @@ impl DivAssign<f64> for Vec3d {
     }
 }
 
+/// A point in 3-dimensional space.
 pub type Point3d = Vec3d;

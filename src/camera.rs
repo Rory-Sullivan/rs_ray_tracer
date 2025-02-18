@@ -6,25 +6,36 @@ use crate::{
 };
 
 pub struct Camera {
+    /// Position of the camera.
     origin: Point3d,
+    /// Horizontal relative to camera
     horizontal: Vec3d,
+    /// Vertical relative to camera
     vertical: Vec3d,
     lower_left_corner: Point3d,
+    /// Unit horizontal
     u: Vec3d,
+    /// Unit vertical
     v: Vec3d,
+    /// Unit direction the camera is pointing.
     #[allow(dead_code)]
     w: Vec3d,
     lens_radius: f64,
-    time0: f64, // shutter open time
-    time1: f64, // shutter close time
+    /// Shutter open time.
+    time0: f64,
+    /// Shutter close time.
+    time1: f64,
 }
 
 impl Camera {
-    /// - vertical_fov is the vertical field of view in degrees
-    /// - view_up is the "up" direction for the camera, used to control the
-    ///   roll/sideways tilt of the camera
-    /// - time0 is the shutter open time
-    /// - time1 is the shutter close time
+    /// * `view_up`: The "up" direction for the camera, used to control the
+    ///   roll/sideways tilt of the camera.
+    /// * `vertical_fov`: Vertical field of view in degrees.
+    /// * `aperture`: Diameter of the aperture, controls the depth of the focus
+    ///   plane.
+    /// * `focus_distance`: Distance to plane of focus.
+    /// * `time0`: Shutter open time.
+    /// * `time1`: Shutter close time.
     pub fn new(
         look_from: Point3d,
         look_at: Point3d,

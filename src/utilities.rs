@@ -164,6 +164,7 @@ pub fn read_image_file(file_name: &str) -> (usize, usize, Vec<RGB>) {
     (width, height, pixels)
 }
 
+/// Returns the box surrounding two `BoundingBox`.
 pub fn surrounding_box(box0: BoundingBox, box1: BoundingBox) -> BoundingBox {
     let min = Vec3d::new(
         min(box0.min.x, box1.min.x),
