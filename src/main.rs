@@ -6,13 +6,14 @@ use rs_ray_tracer::{
     camera::Camera,
     colour::RGB,
     hittable::hittable_list_dyn::HittableListDyn,
-    instances::{rotate_y::RotateY, translate::Translate},
+    instances::{rotate_y::RotateY, scale::Scale, translate::Translate},
     materials::{
         dielectric::Dielectric, diffuse::Diffuse, diffuse_light::DiffuseLight,
         lambertian::Lambertian, metal::Metal,
     },
     objects::{
         box_obj::BoxObj,
+        model::Model,
         moving_sphere::MovingSphere,
         pyramid::Pyramid,
         rectangle::{RectangleXY, RectangleXZ, RectangleYZ},
@@ -36,17 +37,18 @@ fn main() {
     let start_instant = Instant::now();
 
     // Resolution
-    let resolution = get_low_resolution();
+    // let resolution = get_low_resolution();
+    let resolution = get_cornell_square_resolution();
     // let resolution = get_medium_resolution();
     // let resolution = get_high_resolution();
 
     // Cameras
     let t0 = 0.0; // Start time
     let t1 = 1.0; // Start time
-    let cameras = get_final_scene_book2_camera(&resolution, t0, t1);
+    let cameras = get_cornell_box_camera(&resolution, t0, t1);
 
     // Scene
-    let (scene, use_sky_background) = generate_final_scene();
+    let (scene, use_sky_background) = generate_cornell_box_with_dragon();
     let start_bvh_build_instant = Instant::now();
     let bvh = Bvh::build(scene, t0, t1);
     print_time_taken("Done building BVH", start_bvh_build_instant);
@@ -103,6 +105,16 @@ fn print_time_taken(message: &str, start_instant: Instant) {
 fn get_low_resolution() -> Resolution {
     Resolution::new(
         600, // Image width
+        400, // Image height
+        500, // Num samples
+        50,  // Max depth
+    )
+}
+
+#[allow(dead_code)]
+fn get_cornell_square_resolution() -> Resolution {
+    Resolution::new(
+        400, // Image width
         400, // Image height
         500, // Num samples
         50,  // Max depth
@@ -902,6 +914,47 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
     //     Diffuse::new(RGB(0.05, 0.73, 0.05)), // green
     // );
     // scene.add(Box::new(sphere_z));
+
+    (scene, use_sky_background)
+}
+
+#[allow(dead_code)]
+fn generate_cornell_box_with_dragon<'a>() -> (HittableListDyn<'a>, bool) {
+    let time0 = 0.0;
+    let time1 = 0.0;
+    let use_sky_background = false;
+    let mut scene = HittableListDyn::new(time0, time1);
+
+    let dragon_material = Metal::new(RGB::from_hash("#ffd700"), 0.8); // #ffd700
+    let dragon = Model::build("assets/stanford_dragon/dragon_vrip.ply", dragon_material);
+    let dragon = Scale::new(2600.0, 2600.0, 2600.0, Box::new(dragon));
+    let dragon = RotateY::new(-167.0, Box::new(dragon), time0, time1);
+    let dragon = Translate::new(Vec3d::new(265.0, -140.0, 295.0), Box::new(dragon));
+    scene.add(Box::new(dragon));
+
+    // Add three white walls (top, back, bottom)
+    let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
+    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
+    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    scene.add(Box::new(white_wall0));
+    scene.add(Box::new(white_wall1));
+    scene.add(Box::new(white_wall2));
+
+    // Add right red wall
+    let red = Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05));
+    let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red.clone());
+    scene.add(Box::new(red_wall));
+
+    // Add left green wall
+    let green = Lambertian::build_from_colour(RGB(0.12, 0.45, 0.15));
+    let green_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 555.0, green);
+    scene.add(Box::new(green_wall));
+
+    // Add light
+    let diffuse_light = DiffuseLight::build_from_colour(RGB(12.0, 12.0, 12.0));
+    let light = RectangleXZ::new(163.0, 393.0, 177.0, 382.0, 554.0, diffuse_light);
+    scene.add(Box::new(light));
 
     (scene, use_sky_background)
 }
