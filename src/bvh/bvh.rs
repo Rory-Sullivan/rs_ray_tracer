@@ -16,6 +16,13 @@ pub struct Bvh<'a> {
     bounding_box: BoundingBox,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct BvhMetrics {
+    min_depth: usize,
+    max_depth: usize,
+    average_depth: f32,
+}
+
 impl<'a> Bvh<'a> {
     pub fn new(
         left: Box<dyn Hittable + 'a>,
@@ -30,7 +37,18 @@ impl<'a> Bvh<'a> {
     }
 
     /// Builds a BVH from scene data.
-    pub fn build(scene: HittableListDyn<'a>, time0: f64, time1: f64) -> Self {
+    pub fn build(scene: HittableListDyn<'a>, time0: f64, time1: f64) -> (Self, BvhMetrics) {
+        Self::build_internal(scene, time0, time1, 0)
+    }
+
+    fn build_internal(
+        scene: HittableListDyn<'a>,
+        time0: f64,
+        time1: f64,
+        mut current_depth: usize,
+    ) -> (Self, BvhMetrics) {
+        current_depth += 1;
+
         // Pick the longest axis along which to split the objects
         let axis = scene.bounding_box(time0, time1).unwrap().longest_axis();
         let compare_fn = match axis {
@@ -43,23 +61,68 @@ impl<'a> Bvh<'a> {
         // Order and split list of objects based on axis
         let mut objects = scene.items;
         let num_objects = objects.len();
-        let (left, right): (Box<dyn Hittable + 'a>, Box<dyn Hittable + 'a>) = match num_objects {
+        let (
+            left,
+            left_min_depth,
+            left_max_depth,
+            left_average_depth,
+            right,
+            right_min_depth,
+            right_max_depth,
+            right_average_depth,
+        ): (
+            Box<dyn Hittable + 'a>,
+            usize,
+            usize,
+            f32,
+            Box<dyn Hittable + 'a>,
+            usize,
+            usize,
+            f32,
+        ) = match num_objects {
             0 => panic!("No objects"),
             1 => {
                 let left = objects[0].clone();
                 let right = objects[0].clone();
-                (left, right)
+                (
+                    left,
+                    current_depth,
+                    current_depth,
+                    current_depth as f32,
+                    right,
+                    current_depth,
+                    current_depth,
+                    current_depth as f32,
+                )
             }
             2 => match compare_fn(&objects[0], &objects[1]) {
                 Ordering::Less | Ordering::Equal => {
                     let left = objects[0].clone();
                     let right = objects[1].clone();
-                    (left, right)
+                    (
+                        left,
+                        current_depth,
+                        current_depth,
+                        current_depth as f32,
+                        right,
+                        current_depth,
+                        current_depth,
+                        current_depth as f32,
+                    )
                 }
                 Ordering::Greater => {
                     let left = objects[1].clone();
                     let right = objects[0].clone();
-                    (left, right)
+                    (
+                        left,
+                        current_depth,
+                        current_depth,
+                        current_depth as f32,
+                        right,
+                        current_depth,
+                        current_depth,
+                        current_depth as f32,
+                    )
                 }
             },
             _ => {
@@ -68,11 +131,25 @@ impl<'a> Bvh<'a> {
                 // Recursively call build function with split parts
                 let mid = num_objects / 2;
                 let (half0, half1) = objects.split_at_mut(mid);
+
                 let hit_list0 = HittableListDyn::build(time0, time1, half0.to_vec());
-                let left = Box::new(Self::build(hit_list0, time0, time1)) as Box<dyn Hittable>;
+                let (left, left_metrics) =
+                    Self::build_internal(hit_list0, time0, time1, current_depth);
+
                 let hit_list1 = HittableListDyn::build(time0, time1, half1.to_vec());
-                let right = Box::new(Self::build(hit_list1, time0, time1)) as Box<dyn Hittable>;
-                (left, right)
+                let (right, right_metrics) =
+                    Self::build_internal(hit_list1, time0, time1, current_depth);
+
+                (
+                    Box::new(left),
+                    left_metrics.min_depth,
+                    left_metrics.max_depth,
+                    left_metrics.average_depth,
+                    Box::new(right),
+                    right_metrics.min_depth,
+                    right_metrics.max_depth,
+                    right_metrics.average_depth,
+                )
             }
         };
 
@@ -80,7 +157,17 @@ impl<'a> Bvh<'a> {
         let box_right = right.bounding_box(time0, time1).unwrap();
         let bounding_box = surrounding_box(box_left, box_right);
 
-        Bvh::new(left, right, bounding_box)
+        let min_depth = left_min_depth.min(right_min_depth);
+        let max_depth = left_max_depth.max(right_max_depth);
+        let average_depth = (left_average_depth + right_average_depth) / 2.0;
+
+        let metrics = BvhMetrics {
+            min_depth,
+            max_depth,
+            average_depth,
+        };
+
+        (Bvh::new(left, right, bounding_box), metrics)
     }
 }
 

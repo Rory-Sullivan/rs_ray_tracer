@@ -35,6 +35,7 @@ fn main() {
     const OUTPUT_FILE_NAME: &str = "result";
 
     let start_instant = Instant::now();
+    let start_scene_build_instant = Instant::now();
 
     // Resolution
     // let resolution = get_low_resolution();
@@ -43,15 +44,15 @@ fn main() {
     // let resolution = get_high_resolution();
 
     // Cameras
-    let t0 = 0.0; // Start time
-    let t1 = 1.0; // Start time
-    let cameras = get_cornell_box_camera(&resolution, t0, t1);
+    let time0 = 0.0; // Start time
+    let time1 = 1.0; // End time
+    let cameras = get_cornell_box_camera(&resolution, time0, time1);
 
     // Scene
     let (scene, use_sky_background) = generate_cornell_box_with_dragon();
-    let start_bvh_build_instant = Instant::now();
-    let bvh = Bvh::build(scene, t0, t1);
-    print_time_taken("Done building BVH", start_bvh_build_instant);
+    let (bvh, bvh_metrics) = Bvh::build(scene, time0, time1);
+    print_time_taken("Done building scene", start_scene_build_instant);
+    println!("Main BVH metrics: {bvh_metrics:?}");
 
     // Render
     let start_render_instant = Instant::now();
@@ -648,7 +649,7 @@ fn generate_final_scene_book2<'a>() -> (HittableListDyn<'a>, bool) {
             )));
         }
     }
-    scene.add(Box::new(Bvh::build(ground_boxes, time0, time1)));
+    scene.add(Box::new(Bvh::build(ground_boxes, time0, time1).0));
 
     // Make a light
     let diffuse_light = DiffuseLight::build_from_colour(RGB(7.0, 7.0, 7.0));
@@ -714,7 +715,7 @@ fn generate_final_scene_book2<'a>() -> (HittableListDyn<'a>, bool) {
         Point3d::new(-100.0, 270.0, 395.0),
         Box::new(RotateY::new(
             15.0,
-            Box::new(Bvh::build(spheres, time0, time1)),
+            Box::new(Bvh::build(spheres, time0, time1).0),
             time0,
             time1,
         )),
@@ -806,7 +807,7 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
             )));
         }
     }
-    scene.add(Box::new(Bvh::build(ground_boxes, time0, time1)));
+    scene.add(Box::new(Bvh::build(ground_boxes, time0, time1).0));
 
     // Make a light
     let diffuse_light = DiffuseLight::build_from_colour(RGB(7.0, 7.0, 7.0));
@@ -872,7 +873,7 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
         Point3d::new(-100.0, 270.0, 395.0),
         Box::new(RotateY::new(
             15.0,
-            Box::new(Bvh::build(spheres, time0, time1)),
+            Box::new(Bvh::build(spheres, time0, time1).0),
             time0,
             time1,
         )),
@@ -926,7 +927,9 @@ fn generate_cornell_box_with_dragon<'a>() -> (HittableListDyn<'a>, bool) {
     let mut scene = HittableListDyn::new(time0, time1);
 
     let dragon_material = Metal::new(RGB::from_hash("#ffd700"), 0.8); // #ffd700
-    let dragon = Model::build("assets/stanford_dragon/dragon_vrip.ply", dragon_material);
+    let (dragon, dragon_metrics) =
+        Model::build("assets/stanford_dragon/dragon_vrip.ply", dragon_material);
+    println!("Dragon metrics: {dragon_metrics:?}");
     let dragon = Scale::new(2600.0, 2600.0, 2600.0, Box::new(dragon));
     let dragon = RotateY::new(-167.0, Box::new(dragon), time0, time1);
     let dragon = Translate::new(Vec3d::new(265.0, -140.0, 295.0), Box::new(dragon));

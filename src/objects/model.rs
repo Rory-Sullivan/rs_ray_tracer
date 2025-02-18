@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 
+use crate::bvh::bvh::BvhMetrics;
 use crate::hittable::hittable_list_dyn::HittableListDyn;
 use crate::hittable::{hit_record::HitRecord, hittable::Hittable};
 use crate::{
@@ -23,7 +24,7 @@ impl<'a> Model<'a> {
         Self { bvh }
     }
 
-    pub fn build<TMaterial>(file_name: &str, material: TMaterial) -> Model<'a>
+    pub fn build<TMaterial>(file_name: &str, material: TMaterial) -> (Model<'a>, BvhMetrics)
     where
         TMaterial: Material + Clone + 'a,
     {
@@ -38,9 +39,9 @@ impl<'a> Model<'a> {
             hittable_triangles.add(Box::new(triangle));
         }
 
-        let bvh = Bvh::build(hittable_triangles, time0, time1);
+        let (bvh, bvh_metrics) = Bvh::build(hittable_triangles, time0, time1);
 
-        Self::new(bvh)
+        (Self::new(bvh), bvh_metrics)
     }
 }
 
