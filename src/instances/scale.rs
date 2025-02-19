@@ -25,7 +25,8 @@ impl Hittable for Scale {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let scaled_ray = Ray::new(
             ray.origin.scale(1.0 / self.x, 1.0 / self.y, 1.0 / self.z),
-            ray.direction,
+            ray.direction
+                .scale(1.0 / self.x, 1.0 / self.y, 1.0 / self.z),
             ray.time,
         );
 
