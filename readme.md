@@ -3,11 +3,11 @@
 ![render 23](historic_results/result_23.png)
 
 I have been interested in the mathematics behind ray tracing ever since I
-studied some of the basic principles in college. A while back when I started
-getting into Rust I was looking for a good project to test my skills. Given
-Rust's excellent performance and zero-cost abstractions building a ray tracing
-engine seemed like a great candidate. This project is the product of that
-curiosity. Above is a look at the latest render from the project.
+studied some of the basic principles in college. When I started learning Rust, I
+was looking for a project to test my skills. Building a ray tracing engine
+seemed like a great candidate, given Rust's excellent performance and zero-cost
+abstractions. This project is the product of that curiosity, and above is a look
+at the latest render from the project.
 
 ## Progression
 Below are some examples of the progression of the ray tracer as features
@@ -76,9 +76,9 @@ determine the colour of each pixel.
 
 Ray tracing typically outperforms more traditional rendering methods on visual
 fidelity. For example, notice the inverted image of the dragon seen through the
-glass ball in the above image, this is something that is very difficult to
+glass ball in the above image; this is something that is very difficult to
 achieve with traditional rendering. The main downside is that ray tracing
-involves a lot more compute so is much slower than traditional methods.
+involves a lot more compute so it's much slower than traditional methods.
 
 ## What is this based on?
 I based my ray tracing implementation on the Book Series "Ray Tracing In One
@@ -91,21 +91,22 @@ I have just finished the second book in this three part series. I hope to move
 onto the third book some time soon.
 
 ## Extras
-The book is quite limited in scope to just the rendering logic involved in ray
-tracing, as such I made several "nice to have" additions to my implementation;
+The book is limited in scope and it only includes the rendering logic involved
+in ray tracing. As such, I made several "nice to have" additions to my
+implementation:
 
 - **Multi-threading:** Ray tracing is inherently suited to parallelisation as
-  each pixel in a render can be computed in parallel, it is also completely CPU
+  each pixel in a render can be computed in parallel. It is also completely CPU
   bound and very compute intensive. I added multi-threading via the
   [Rayon](https://github.com/rayon-rs/rayon) crate. Rayon's [work
   stealing](https://github.com/rayon-rs/rayon/blob/main/FAQ.md#how-does-rayon-balance-work-between-threads)
   technique is particularly well suited to ray tracing as certain groups of
-  pixels tend to involve a lot more computation than others (for example pixels
+  pixels tend to involve a lot more computation than others (for example, pixels
   that involve reflective objects are much more intensive than those just
-  looking at the sky). This was surprisingly easy to implement, it seems Rust
-  really is good at multi-threading. After implementing this the time it took to
-  complete my most intensive render went from a little over 2 hours to about 30
-  mins on my 8 core CPU.
+  looking at the sky). This was surprisingly easy to implement; it seems Rust
+  really is good at multi-threading. After implementing this, the time it took
+  to complete my most intensive render went from a little over 2 hours to about
+  30 mins on my 8 core CPU.
 - **Triangles:** Most 3D models are made up of triangles so implementing the
   code necessary to compute ray intersections with triangles was an obvious
   choice. I used the [Möller–Trumbore intersection
@@ -120,5 +121,5 @@ tracing, as such I made several "nice to have" additions to my implementation;
   a variety of image formats.
 - **Multi-camera support:** I added support for rendering a scene from multiple
   cameras/view points. Not much to say here other than it was something I was
-  curious about, I also found it helpful for playing with the different camera
+  curious about and I found it helpful for playing with the different camera
   parameters to see what they do.
