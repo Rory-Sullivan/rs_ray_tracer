@@ -359,7 +359,7 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableListDyn<'a>, b
         SolidColour::new(RGB(0.2, 0.3, 0.1)),
         SolidColour::new(RGB(0.9, 0.9, 0.9)),
     );
-    let material_ground = Lambertian::new(Box::new(checker_texture));
+    let material_ground = Lambertian::new(checker_texture);
     let ground = Sphere::new(
         Point3d::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -451,7 +451,7 @@ fn generate_two_checkered_spheres<'a>() -> (HittableListDyn<'a>, bool) {
         SolidColour::new(RGB(0.2, 0.3, 0.1)),
         SolidColour::new(RGB(0.9, 0.9, 0.9)),
     );
-    let material_checker = Lambertian::new(Box::new(checker_texture));
+    let material_checker = Lambertian::new(checker_texture);
 
     let sphere0 = Sphere::new(Vec3d::new(0.0, -10.0, 0.0), 10.0, material_checker.clone());
     let sphere1 = Sphere::new(Vec3d::new(0.0, 10.0, 0.0), 10.0, material_checker);
@@ -468,7 +468,7 @@ fn generate_two_checkered_spheres<'a>() -> (HittableListDyn<'a>, bool) {
 #[allow(dead_code)]
 fn generate_two_perlin_noise_spheres<'a>() -> (HittableListDyn<'a>, bool) {
     let noise_texture = NoiseTexture::new(Perlin::build_random(), 4.0);
-    let noise_material = Lambertian::new(Box::new(noise_texture));
+    let noise_material = Lambertian::new(noise_texture);
 
     let sphere0 = Sphere::new(
         Vec3d::new(0.0, -1000.0, 0.0),
@@ -489,7 +489,7 @@ fn generate_two_perlin_noise_spheres<'a>() -> (HittableListDyn<'a>, bool) {
 #[allow(dead_code)]
 fn generate_two_perlin_noise_turbulence_spheres<'a>() -> (HittableListDyn<'a>, bool) {
     let turbulence_texture = TurbulenceTexture::new(Perlin::build_random(), 4.0);
-    let turbulence_material = Lambertian::new(Box::new(turbulence_texture));
+    let turbulence_material = Lambertian::new(turbulence_texture);
 
     let sphere0 = Sphere::new(
         Vec3d::new(0.0, -1000.0, 0.0),
@@ -510,7 +510,7 @@ fn generate_two_perlin_noise_turbulence_spheres<'a>() -> (HittableListDyn<'a>, b
 #[allow(dead_code)]
 fn generate_earth_scene<'a>() -> (HittableListDyn<'a>, bool) {
     let earth_texture = ImageTexture::build("images\\earthmap.jpg");
-    let earth_material = Lambertian::new(Box::new(earth_texture));
+    let earth_material = Lambertian::new(earth_texture);
 
     let earth = Sphere::new(Vec3d::new(0.0, 0.0, 0.0), 2.0, earth_material);
 
@@ -525,7 +525,7 @@ fn generate_earth_scene<'a>() -> (HittableListDyn<'a>, bool) {
 #[allow(dead_code)]
 fn generate_simple_light<'a>() -> (HittableListDyn<'a>, bool) {
     let turbulence_texture = TurbulenceTexture::new(Perlin::build_random(), 4.0);
-    let turbulence_material = Lambertian::new(Box::new(turbulence_texture));
+    let turbulence_material = Lambertian::new(turbulence_texture);
 
     let sphere0 = Sphere::new(
         Vec3d::new(-8.0, -1003.0, 0.0),
@@ -720,13 +720,13 @@ fn generate_final_scene_book2<'a>() -> (HittableListDyn<'a>, bool) {
     scene.add(Box::new(smoke_sphere1));
 
     // Add an Earth sphere
-    let earth_material = Lambertian::new(Box::new(ImageTexture::build("images\\earthmap.jpg")));
+    let earth_material = Lambertian::new(ImageTexture::build("images\\earthmap.jpg"));
     let earth_sphere = Sphere::new(Vec3d::new(400.0, 200.0, 400.0), 100.0, earth_material);
     scene.add(Box::new(earth_sphere));
 
     // Add a perlin noise sphere
     let perlin_texture = TurbulenceTexture::new(Perlin::build_random(), 0.001);
-    let perlin_material = Lambertian::new(Box::new(perlin_texture));
+    let perlin_material = Lambertian::new(perlin_texture);
     let perlin_sphere = Sphere::new(Point3d::new(220.0, 280.0, 300.0), 80.0, perlin_material);
     scene.add(Box::new(perlin_sphere));
 
@@ -953,7 +953,7 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
     scene.add(Box::new(smoke_sphere0));
 
     // Add an Earth sphere
-    let earth_material = Lambertian::new(Box::new(ImageTexture::build("images\\earthmap.jpg")));
+    let earth_material = Lambertian::new(ImageTexture::build("images\\earthmap.jpg"));
     let earth_sphere = Sphere::new(Vec3d::new(0.0, 0.0, 0.0), 100.0, earth_material);
     let earth_sphere = RotateY::new(78.0, Box::new(earth_sphere), time0, time1);
     let earth_sphere = Translate::new(Vec3d::new(500.0, 200.0, 400.0), Box::new(earth_sphere));
@@ -961,7 +961,7 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
 
     // Add a perlin noise sphere
     let perlin_texture = TurbulenceTexture::new(Perlin::build_random(), 2.0);
-    let perlin_material = Lambertian::new(Box::new(perlin_texture));
+    let perlin_material = Lambertian::new(perlin_texture);
     let perlin_sphere = Sphere::new(Point3d::new(82.0, 370.0, 484.0), 80.0, perlin_material);
     scene.add(Box::new(perlin_sphere));
 

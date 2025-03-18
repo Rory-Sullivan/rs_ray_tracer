@@ -6,30 +6,28 @@ use crate::{
     hittable::{hit_record::HitRecord, hittable::Hittable},
     materials::Isotropic,
     ray::Ray,
-    textures::Texture,
+    textures::{SolidColour, Texture},
     utilities::random,
     vec3d::Vec3d,
 };
 
 #[derive(Clone)]
-pub struct ConstantMedium<THittable>
+pub struct ConstantMedium<THittable, TTexture>
 where
     THittable: Hittable,
+    TTexture: Texture + Sync,
 {
     boundary: THittable,
-    phase_function: Isotropic,
+    phase_function: Isotropic<TTexture>,
     neg_inv_density: f64,
 }
 
-impl<THittable> ConstantMedium<THittable>
+impl<THittable, TTexture> ConstantMedium<THittable, TTexture>
 where
     THittable: Hittable,
+    TTexture: Texture + Sync,
 {
-    pub fn new(
-        boundary: THittable,
-        texture: Box<dyn Texture + Sync>,
-        density: f64,
-    ) -> ConstantMedium<THittable> {
+    pub fn new(boundary: THittable, texture: TTexture, density: f64) -> Self {
         let phase_function = Isotropic::new(texture);
         let neg_inv_density = -1.0 / density;
 
@@ -39,12 +37,13 @@ where
             neg_inv_density,
         }
     }
+}
 
-    pub fn build_from_colour(
-        boundary: THittable,
-        colour: RGB,
-        density: f64,
-    ) -> ConstantMedium<THittable> {
+impl<THittable> ConstantMedium<THittable, SolidColour>
+where
+    THittable: Hittable,
+{
+    pub fn build_from_colour(boundary: THittable, colour: RGB, density: f64) -> Self {
         let phase_function = Isotropic::build_from_colour(colour);
         let neg_inv_density = -1.0 / density;
 
@@ -56,7 +55,11 @@ where
     }
 }
 
-impl<THittable: Hittable + Clone + Sync> Hittable for ConstantMedium<THittable> {
+impl<THittable, TTexture> Hittable for ConstantMedium<THittable, TTexture>
+where
+    THittable: Hittable + Clone,
+    TTexture: Texture + Clone + Sync,
+{
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         // Check if the ray hits the boundary anywhere on it's length
         let hr1 = self.boundary.hit(ray, f64::NEG_INFINITY, f64::INFINITY);

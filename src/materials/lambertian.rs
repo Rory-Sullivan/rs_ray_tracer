@@ -13,21 +13,32 @@ use super::material::Material;
 /// material but it allows for generic textures to be passed in instead of a
 /// solid colour.
 #[derive(Clone)]
-pub struct Lambertian {
-    pub albedo: Box<dyn Texture + Sync>,
+pub struct Lambertian<TTexture>
+where
+    TTexture: Texture + Sync,
+{
+    pub albedo: TTexture,
 }
 
-impl Lambertian {
-    pub fn new(albedo: Box<dyn Texture + Sync>) -> Self {
+impl<TTexture> Lambertian<TTexture>
+where
+    TTexture: Texture + Sync,
+{
+    pub fn new(albedo: TTexture) -> Self {
         Lambertian { albedo }
     }
+}
 
+impl Lambertian<SolidColour> {
     pub fn build_from_colour(colour: RGB) -> Self {
-        Lambertian::new(Box::new(SolidColour::new(colour)))
+        Lambertian::new(SolidColour::new(colour))
     }
 }
 
-impl Material for Lambertian {
+impl<TTexture> Material for Lambertian<TTexture>
+where
+    TTexture: Texture + Sync,
+{
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, RGB)> {
         let mut scatter_direction = hit_record.normal + random_unit_vec();
         if scatter_direction.near_zero() {
