@@ -8,19 +8,13 @@ use crate::{
 
 use super::material::Material;
 
-#[derive(Clone)]
-pub struct DiffuseLight<TTexture>
-where
-    TTexture: Texture + Sync,
-{
-    pub emit: TTexture,
+#[derive(Debug, Clone, Copy)]
+pub struct DiffuseLight<Tex: Texture> {
+    pub emit: Tex,
 }
 
-impl<TTexture> DiffuseLight<TTexture>
-where
-    TTexture: Texture + Sync,
-{
-    pub fn new(emit: TTexture) -> Self {
+impl<Tex: Texture> DiffuseLight<Tex> {
+    pub fn new(emit: Tex) -> Self {
         DiffuseLight { emit }
     }
 }
@@ -31,10 +25,7 @@ impl DiffuseLight<SolidColour> {
     }
 }
 
-impl<TTexture> Material for DiffuseLight<TTexture>
-where
-    TTexture: Texture + Sync,
-{
+impl<Tex: Texture> Material for DiffuseLight<Tex> {
     fn scatter(&self, _ray_in: &Ray, _hit_record: &HitRecord) -> Option<(Ray, RGB)> {
         None
     }

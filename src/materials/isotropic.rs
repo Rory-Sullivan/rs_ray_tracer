@@ -10,32 +10,24 @@ use super::material::Material;
 
 /// An isotropic material that scatters rays in a random direction, used for
 /// volumes like fog and smoke.
-#[derive(Clone)]
-pub struct Isotropic<TTexture>
-where
-    TTexture: Texture + Sync,
-{
-    pub albedo: TTexture,
+#[derive(Debug, Clone, Copy)]
+pub struct Isotropic<Tex: Texture> {
+    pub albedo: Tex,
 }
 
-impl<TTexture> Isotropic<TTexture>
-where
-    TTexture: Texture + Sync,
-{
-    pub fn new(albedo: TTexture) -> Self {
+impl<Tex: Texture> Isotropic<Tex> {
+    pub fn new(albedo: Tex) -> Self {
         Isotropic { albedo }
     }
 }
+
 impl Isotropic<SolidColour> {
     pub fn build_from_colour(colour: RGB) -> Self {
         Isotropic::new(SolidColour::new(colour))
     }
 }
 
-impl<TTexture> Material for Isotropic<TTexture>
-where
-    TTexture: Texture + Sync,
-{
+impl<Tex: Texture> Material for Isotropic<Tex> {
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, RGB)> {
         let scattered = Ray::new(hit_record.point, random_vec_in_unit_sphere(), ray_in.time);
         let attenuation = self

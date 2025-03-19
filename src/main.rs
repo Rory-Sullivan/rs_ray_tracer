@@ -537,7 +537,7 @@ fn generate_simple_light<'a>() -> (HittableList<'a>, bool) {
     // Note the light is brighter than (1, 1, 1) this allows it to light other
     // things.
     let diff_light = DiffuseLight::build_from_colour(RGB(4.0, 4.0, 4.0));
-    let light_rect = RectangleXY::new(-5.0, -3.0, -2.0, 1.0, -2.0, diff_light.clone());
+    let light_rect = RectangleXY::new(-5.0, -3.0, -2.0, 1.0, -2.0, diff_light);
     let light_sphere = Sphere::new(Vec3d::new(-8.0, 3.0, 0.0), 1.0, diff_light);
 
     let mut scene = HittableList::new(0.0, 0.0);
@@ -564,14 +564,14 @@ fn generate_cornell_box<'a>() -> (HittableList<'a>, bool) {
     let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red);
     let green_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 555.0, green);
     let light = RectangleXZ::new(213.0, 343.0, 227.0, 332.0, 554.0, diffuse_light);
-    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
-    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
-    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white);
+    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
 
     let box0 = BoxObj::new(
         Point3d::new(0.0, 0.0, 0.0),
         Point3d::new(165.0, 330.0, 165.0),
-        white.clone(),
+        white,
     );
     let box0 = RotateY::new(15.0, box0, time0, time1);
     let box0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), box0);
@@ -610,15 +610,15 @@ fn generate_cornell_box_with_smoke_boxes<'a>() -> (HittableList<'a>, bool) {
 
     let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red);
     let green_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 555.0, green);
-    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
-    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
-    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white);
+    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
     let light = RectangleXZ::new(113.0, 443.0, 127.0, 432.0, 554.0, diffuse_light); // larger dimmer light than standard Cornell
 
     let box0 = BoxObj::new(
         Point3d::new(0.0, 0.0, 0.0),
         Point3d::new(165.0, 330.0, 165.0),
-        white.clone(),
+        white,
     );
     let box0 = RotateY::new(15.0, box0, time0, time1);
     let box0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), box0);
@@ -671,7 +671,7 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
             ground_boxes.add(Box::new(BoxObj::new(
                 Point3d::new(x0, y0, z0),
                 Point3d::new(x1, y1, z1),
-                ground.clone(),
+                ground,
             )));
         }
     }
@@ -734,7 +734,7 @@ fn generate_final_scene_book2<'a>() -> (HittableList<'a>, bool) {
     let mut spheres = HittableList::new(time0, time1);
     let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
     for _ in 0..1000 {
-        let sphere = Sphere::new(random_vec_rng(0.0, 165.0), 10.0, white.clone());
+        let sphere = Sphere::new(random_vec_rng(0.0, 165.0), 10.0, white);
         spheres.add(Box::new(sphere));
     }
     let translated_rotated_bvh_of_spheres = Translate::new(
@@ -759,9 +759,9 @@ fn generate_cornell_box_with_pyramids<'a>() -> (HittableList<'a>, bool) {
     let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red);
     let green_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 555.0, green);
     let light = RectangleXZ::new(163.0, 393.0, 177.0, 382.0, 554.0, diffuse_light);
-    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
-    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
-    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white);
+    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
 
     let pyr0 = Pyramid::build(
         (
@@ -770,7 +770,7 @@ fn generate_cornell_box_with_pyramids<'a>() -> (HittableList<'a>, bool) {
             Point3d::new(0.0, 0.0, 200.0),
         ),
         330.0,
-        white.clone(),
+        white,
     );
     let pyr0 = RotateY::new(15.0, pyr0, time0, time1);
     let pyr0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), pyr0);
@@ -781,7 +781,7 @@ fn generate_cornell_box_with_pyramids<'a>() -> (HittableList<'a>, bool) {
             Point3d::new(0.0, 0.0, 200.0),
         ),
         165.0,
-        white.clone(),
+        white,
     );
     let pyr1 = RotateY::new(-18.0, pyr1, time0, time1);
     let pyr1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), pyr1);
@@ -819,16 +819,16 @@ fn generate_cornell_box_with_dragon<'a>() -> (HittableList<'a>, bool) {
 
     // Add three white walls (top, back, bottom)
     let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
-    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
-    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
-    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let white_wall0 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 0.0, white);
+    let white_wall1 = RectangleXZ::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
+    let white_wall2 = RectangleXY::new(0.0, 555.0, 0.0, 555.0, 555.0, white);
     scene.add(Box::new(white_wall0));
     scene.add(Box::new(white_wall1));
     scene.add(Box::new(white_wall2));
 
     // Add right red wall
     let red = Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05));
-    let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red.clone());
+    let red_wall = RectangleYZ::new(0.0, 555.0, 0.0, 555.0, 0.0, red);
     scene.add(Box::new(red_wall));
 
     // Add left green wall
@@ -873,7 +873,7 @@ fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
             ground_boxes.add(Box::new(BoxObj::new(
                 Point3d::new(x0, y0, z0),
                 Point3d::new(x1, y1, z1),
-                ground.clone(),
+                ground,
             )));
         }
     }
@@ -964,7 +964,7 @@ fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
     let mut spheres = HittableList::new(time0, time1);
     let white = Lambertian::build_from_colour(RGB(0.73, 0.73, 0.73));
     for _ in 0..1000 {
-        let sphere = Sphere::new(random_vec_rng(0.0, 165.0), 10.0, white.clone());
+        let sphere = Sphere::new(random_vec_rng(0.0, 165.0), 10.0, white);
         spheres.add(Box::new(sphere));
     }
     let translated_rotated_bvh_of_spheres = Translate::new(

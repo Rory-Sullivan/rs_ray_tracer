@@ -12,19 +12,13 @@ use super::material::Material;
 /// diffusely reflecting surface. This material is very similar to the Diffuse
 /// material but it allows for generic textures to be passed in instead of a
 /// solid colour.
-#[derive(Clone)]
-pub struct Lambertian<TTexture>
-where
-    TTexture: Texture + Sync,
-{
-    pub albedo: TTexture,
+#[derive(Debug, Clone, Copy)]
+pub struct Lambertian<Tex: Texture> {
+    pub albedo: Tex,
 }
 
-impl<TTexture> Lambertian<TTexture>
-where
-    TTexture: Texture + Sync,
-{
-    pub fn new(albedo: TTexture) -> Self {
+impl<Tex: Texture> Lambertian<Tex> {
+    pub fn new(albedo: Tex) -> Self {
         Lambertian { albedo }
     }
 }
@@ -35,10 +29,7 @@ impl Lambertian<SolidColour> {
     }
 }
 
-impl<TTexture> Material for Lambertian<TTexture>
-where
-    TTexture: Texture + Sync,
-{
+impl<Tex: Texture> Material for Lambertian<Tex> {
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, RGB)> {
         let mut scatter_direction = hit_record.normal + random_unit_vec();
         if scatter_direction.near_zero() {
