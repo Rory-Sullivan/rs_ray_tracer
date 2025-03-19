@@ -573,15 +573,15 @@ fn generate_cornell_box<'a>() -> (HittableListDyn<'a>, bool) {
         Point3d::new(165.0, 330.0, 165.0),
         white.clone(),
     );
-    let box0 = RotateY::new(15.0, Box::new(box0), time0, time1);
-    let box0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), Box::new(box0));
+    let box0 = RotateY::new(15.0, box0, time0, time1);
+    let box0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), box0);
     let box1 = BoxObj::new(
         Point3d::new(0.0, 0.0, 0.0),
         Point3d::new(165.0, 165.0, 165.0),
         white,
     );
-    let box1 = RotateY::new(-18.0, Box::new(box1), time0, time1);
-    let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(box1));
+    let box1 = RotateY::new(-18.0, box1, time0, time1);
+    let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), box1);
 
     let mut scene = HittableListDyn::new(time0, time1);
     scene.add(Box::new(red_wall));
@@ -620,8 +620,8 @@ fn generate_cornell_box_with_smoke_boxes<'a>() -> (HittableListDyn<'a>, bool) {
         Point3d::new(165.0, 330.0, 165.0),
         white.clone(),
     );
-    let box0 = RotateY::new(15.0, Box::new(box0), time0, time1);
-    let box0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), Box::new(box0));
+    let box0 = RotateY::new(15.0, box0, time0, time1);
+    let box0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), box0);
     let box0 = ConstantMedium::build_from_colour(box0, RGB(0.0, 0.0, 0.0), 0.01); // light smoke box
 
     let box1 = BoxObj::new(
@@ -629,8 +629,8 @@ fn generate_cornell_box_with_smoke_boxes<'a>() -> (HittableListDyn<'a>, bool) {
         Point3d::new(165.0, 165.0, 165.0),
         white,
     );
-    let box1 = RotateY::new(-18.0, Box::new(box1), time0, time1);
-    let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(box1));
+    let box1 = RotateY::new(-18.0, box1, time0, time1);
+    let box1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), box1);
     let box1 = ConstantMedium::build_from_colour(box1, RGB(1.0, 1.0, 1.0), 0.01); // dark smoke box
 
     let mut scene = HittableListDyn::new(time0, time1);
@@ -739,12 +739,7 @@ fn generate_final_scene_book2<'a>() -> (HittableListDyn<'a>, bool) {
     }
     let translated_rotated_bvh_of_spheres = Translate::new(
         Point3d::new(-100.0, 270.0, 395.0),
-        Box::new(RotateY::new(
-            15.0,
-            Box::new(Bvh::build(spheres, time0, time1).0),
-            time0,
-            time1,
-        )),
+        RotateY::new(15.0, Bvh::build(spheres, time0, time1).0, time0, time1),
     );
     scene.add(Box::new(translated_rotated_bvh_of_spheres));
 
@@ -777,8 +772,8 @@ fn generate_cornell_box_with_pyramids<'a>() -> (HittableListDyn<'a>, bool) {
         330.0,
         white.clone(),
     );
-    let pyr0 = RotateY::new(15.0, Box::new(pyr0), time0, time1);
-    let pyr0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), Box::new(pyr0));
+    let pyr0 = RotateY::new(15.0, pyr0, time0, time1);
+    let pyr0 = Translate::new(Vec3d::new(265.0, 0.0, 295.0), pyr0);
     let pyr1 = Pyramid::build(
         (
             Point3d::new(0.0, 0.0, 0.0),
@@ -788,8 +783,8 @@ fn generate_cornell_box_with_pyramids<'a>() -> (HittableListDyn<'a>, bool) {
         165.0,
         white.clone(),
     );
-    let pyr1 = RotateY::new(-18.0, Box::new(pyr1), time0, time1);
-    let pyr1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), Box::new(pyr1));
+    let pyr1 = RotateY::new(-18.0, pyr1, time0, time1);
+    let pyr1 = Translate::new(Vec3d::new(130.0, 0.0, 65.0), pyr1);
 
     let mut scene = HittableListDyn::new(time0, time1);
     scene.add(Box::new(red_wall));
@@ -817,9 +812,9 @@ fn generate_cornell_box_with_dragon<'a>() -> (HittableListDyn<'a>, bool) {
     let (dragon, dragon_metrics) =
         Model::build("assets/stanford_dragon/dragon_vrip.ply", dragon_material);
     println!("Dragon metrics: {dragon_metrics:?}");
-    let dragon = Scale::new(2600.0, 2600.0, 2600.0, Box::new(dragon));
-    let dragon = RotateY::new(-167.0, Box::new(dragon), time0, time1);
-    let dragon = Translate::new(Vec3d::new(265.0, -140.0, 295.0), Box::new(dragon));
+    let dragon = Scale::new(2600.0, 2600.0, 2600.0, dragon);
+    let dragon = RotateY::new(-167.0, dragon, time0, time1);
+    let dragon = Translate::new(Vec3d::new(265.0, -140.0, 295.0), dragon);
     scene.add(Box::new(dragon));
 
     // Add three white walls (top, back, bottom)
@@ -902,9 +897,9 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
     let (dragon, dragon_metrics) =
         Model::build("assets/stanford_dragon/dragon_vrip.ply", dragon_material);
     println!("Dragon metrics: {dragon_metrics:?}");
-    let dragon = Scale::new(2000.0, 2000.0, 2000.0, Box::new(dragon));
-    let dragon = RotateY::new(-167.0, Box::new(dragon), time0, time1);
-    let dragon = Translate::new(Vec3d::new(200.0, -10.0, 200.0), Box::new(dragon));
+    let dragon = Scale::new(2000.0, 2000.0, 2000.0, dragon);
+    let dragon = RotateY::new(-167.0, dragon, time0, time1);
+    let dragon = Translate::new(Vec3d::new(200.0, -10.0, 200.0), dragon);
     scene.add(Box::new(dragon));
 
     // Add a moving sphere
@@ -929,8 +924,8 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
         75.0,
         Lambertian::build_from_colour(RGB(0.65, 0.05, 0.05)),
     );
-    let pyr0 = RotateY::new(38.0, Box::new(pyr0), time0, time1);
-    let pyr0 = Translate::new(Vec3d::new(8.0, 100.0, 142.0), Box::new(pyr0)); // Point3d::new(0.0, 150.0, 145.0),
+    let pyr0 = RotateY::new(38.0, pyr0, time0, time1);
+    let pyr0 = Translate::new(Vec3d::new(8.0, 100.0, 142.0), pyr0); // Point3d::new(0.0, 150.0, 145.0),
     scene.add(Box::new(pyr0));
 
     // Add a metal sphere
@@ -955,8 +950,8 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
     // Add an Earth sphere
     let earth_material = Lambertian::new(ImageTexture::build("images\\earthmap.jpg"));
     let earth_sphere = Sphere::new(Vec3d::new(0.0, 0.0, 0.0), 100.0, earth_material);
-    let earth_sphere = RotateY::new(78.0, Box::new(earth_sphere), time0, time1);
-    let earth_sphere = Translate::new(Vec3d::new(500.0, 200.0, 400.0), Box::new(earth_sphere));
+    let earth_sphere = RotateY::new(78.0, earth_sphere, time0, time1);
+    let earth_sphere = Translate::new(Vec3d::new(500.0, 200.0, 400.0), earth_sphere);
     scene.add(Box::new(earth_sphere));
 
     // Add a perlin noise sphere
@@ -974,12 +969,7 @@ fn generate_final_scene<'a>() -> (HittableListDyn<'a>, bool) {
     }
     let translated_rotated_bvh_of_spheres = Translate::new(
         Point3d::new(-250.0, 270.0, 395.0),
-        Box::new(RotateY::new(
-            15.0,
-            Box::new(Bvh::build(spheres, time0, time1).0),
-            time0,
-            time1,
-        )),
+        RotateY::new(15.0, Bvh::build(spheres, time0, time1).0, time0, time1),
     );
     scene.add(Box::new(translated_rotated_bvh_of_spheres));
 

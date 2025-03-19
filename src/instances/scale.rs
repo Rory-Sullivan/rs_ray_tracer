@@ -8,20 +8,20 @@ use crate::{
 /// scale the object but rather updates the hit function to "scale" the ray
 /// before passing it to the objects hit function.
 #[derive(Clone)]
-pub struct Scale {
+pub struct Scale<H: Hittable> {
     x: f64,
     y: f64,
     z: f64,
-    object: Box<dyn Hittable>,
+    object: H,
 }
 
-impl Scale {
-    pub fn new(x: f64, y: f64, z: f64, object: Box<dyn Hittable>) -> Self {
+impl<H: Hittable> Scale<H> {
+    pub fn new(x: f64, y: f64, z: f64, object: H) -> Self {
         Self { x, y, z, object }
     }
 }
 
-impl Hittable for Scale {
+impl<H: Hittable + Clone> Hittable for Scale<H> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let scaled_ray = Ray::new(
             ray.origin.scale(1.0 / self.x, 1.0 / self.y, 1.0 / self.z),

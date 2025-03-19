@@ -9,18 +9,18 @@ use crate::{
 /// move the object but rather updates the hit function to "move" the ray before
 /// passing it to the objects hit function.
 #[derive(Clone)]
-pub struct Translate {
+pub struct Translate<H: Hittable> {
     offset: Vec3d,
-    object: Box<dyn Hittable>,
+    object: H,
 }
 
-impl Translate {
-    pub fn new(offset: Vec3d, object: Box<dyn Hittable>) -> Self {
+impl<H: Hittable> Translate<H> {
+    pub fn new(offset: Vec3d, object: H) -> Self {
         Self { offset, object }
     }
 }
 
-impl Hittable for Translate {
+impl<H: Hittable + Clone> Hittable for Translate<H> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let moved_ray = Ray::new(ray.origin - self.offset, ray.direction, ray.time);
 

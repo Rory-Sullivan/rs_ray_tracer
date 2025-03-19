@@ -10,15 +10,15 @@ use crate::{
 /// z-axis. Does not actually rotate the object but rather updates the hit
 /// function to "rotate" the ray before passing it to the objects hit function.
 #[derive(Clone)]
-pub struct RotateZ {
+pub struct RotateZ<H: Hittable> {
     sin_theta: f64,
     cos_theta: f64,
     bounding_box: Option<BoundingBox>,
-    object: Box<dyn Hittable>,
+    object: H,
 }
 
-impl RotateZ {
-    pub fn new(angle: f64, object: Box<dyn Hittable>, t0: f64, t1: f64) -> Self {
+impl<H: Hittable> RotateZ<H> {
+    pub fn new(angle: f64, object: H, t0: f64, t1: f64) -> Self {
         let radians = degrees_to_radians(angle);
         let sin_theta = radians.sin();
         let cos_theta = radians.cos();
@@ -67,7 +67,7 @@ impl RotateZ {
     }
 }
 
-impl Hittable for RotateZ {
+impl<H: Hittable + Clone> Hittable for RotateZ<H> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let origin = Vec3d::new(
             self.sin_theta * ray.origin.y + self.cos_theta * ray.origin.x,
