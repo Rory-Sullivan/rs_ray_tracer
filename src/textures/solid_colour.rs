@@ -2,7 +2,7 @@ use crate::{colour::RGB, vec3d::Point3d};
 
 use super::texture::Texture;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct SolidColour {
     colour: RGB,
 }

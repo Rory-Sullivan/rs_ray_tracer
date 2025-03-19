@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     colour::RGB,
     utilities::{clamp, read_image_file},
@@ -7,15 +9,15 @@ use crate::{
 use super::texture::Texture;
 
 /// Create a texture from an image file.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ImageTexture {
     width: usize,
     height: usize,
-    pixels: Vec<RGB>,
+    pixels: Arc<[RGB]>,
 }
 
 impl ImageTexture {
-    pub fn new(width: usize, height: usize, pixels: Vec<RGB>) -> Self {
+    pub fn new(width: usize, height: usize, pixels: Arc<[RGB]>) -> Self {
         Self {
             width,
             height,
@@ -46,7 +48,6 @@ impl Texture for ImageTexture {
             j = self.height - 1;
         }
 
-        
         self.pixels[(j * self.width) + i]
     }
 }

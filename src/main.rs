@@ -360,11 +360,7 @@ fn generate_random_complex_scene_moving_spheres<'a>() -> (HittableList<'a>, bool
         SolidColour::new(RGB(0.9, 0.9, 0.9)),
     );
     let material_ground = Lambertian::new(checker_texture);
-    let ground = Sphere::new(
-        Point3d::new(0.0, -1000.0, 0.0),
-        1000.0,
-        material_ground.clone(),
-    );
+    let ground = Sphere::new(Point3d::new(0.0, -1000.0, 0.0), 1000.0, material_ground);
     scene.add(Box::new(ground));
 
     // Add three large spheres
@@ -453,7 +449,7 @@ fn generate_two_checkered_spheres<'a>() -> (HittableList<'a>, bool) {
     );
     let material_checker = Lambertian::new(checker_texture);
 
-    let sphere0 = Sphere::new(Vec3d::new(0.0, -10.0, 0.0), 10.0, material_checker.clone());
+    let sphere0 = Sphere::new(Vec3d::new(0.0, -10.0, 0.0), 10.0, material_checker);
     let sphere1 = Sphere::new(Vec3d::new(0.0, 10.0, 0.0), 10.0, material_checker);
 
     let mut scene = HittableList::new(0.0, 0.0);

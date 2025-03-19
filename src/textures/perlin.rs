@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     utilities::{random_rng_int, random_vec_rng},
     vec3d::Point3d,
@@ -7,20 +9,20 @@ use crate::{
 const POINT_COUNT: usize = 256;
 
 /// Perlin noise
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Perlin {
-    random_vec3d: Vec<Vec3d>,
-    perm_x: Vec<usize>,
-    perm_y: Vec<usize>,
-    perm_z: Vec<usize>,
+    random_vec3d: Arc<[Vec3d]>,
+    perm_x: Arc<[usize]>,
+    perm_y: Arc<[usize]>,
+    perm_z: Arc<[usize]>,
 }
 
 impl Perlin {
     pub fn new(
-        random_vec3d: Vec<Vec3d>,
-        perm_x: Vec<usize>,
-        perm_y: Vec<usize>,
-        perm_z: Vec<usize>,
+        random_vec3d: Arc<[Vec3d]>,
+        perm_x: Arc<[usize]>,
+        perm_y: Arc<[usize]>,
+        perm_z: Arc<[usize]>,
     ) -> Self {
         Self {
             random_vec3d,
@@ -31,10 +33,10 @@ impl Perlin {
     }
 
     pub fn build_random() -> Perlin {
-        let mut random_vec3d = Vec::<Vec3d>::with_capacity(POINT_COUNT);
-        for _ in 0..POINT_COUNT {
-            random_vec3d.push(random_vec_rng(-1.0, 1.0));
-        }
+        let random_vec3d: Arc<[Vec3d]> = (0..POINT_COUNT)
+            .map(|_| random_vec_rng(-1.0, 1.0))
+            .collect();
+
         Perlin {
             random_vec3d,
             perm_x: Self::generate_perm(),
@@ -78,10 +80,10 @@ impl Perlin {
         accumulator.abs()
     }
 
-    fn generate_perm() -> Vec<usize> {
+    fn generate_perm() -> Arc<[usize]> {
         let mut p: Vec<usize> = (0..POINT_COUNT).collect();
         Self::permute(&mut p, POINT_COUNT);
-        p
+        p.into()
     }
 
     fn permute(p: &mut [usize], n: usize) {

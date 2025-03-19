@@ -3,7 +3,7 @@ use crate::{colour::RGB, vec3d::Point3d};
 use super::{perlin::Perlin, texture::Texture};
 
 /// A Perlin noise texture using turbulence. Produces grey noise.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct TurbulenceTexture {
     noise: Perlin,
     scale: f64,

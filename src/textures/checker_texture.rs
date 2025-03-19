@@ -3,25 +3,22 @@ use crate::{colour::RGB, vec3d::Point3d};
 use super::texture::Texture;
 
 /// A checkered texture, squares alternating between the odd and even colours.
-#[derive(Clone)]
-pub struct CheckerTexture<TTexture0, TTexture1>
+#[derive(Debug, Clone, Copy)]
+pub struct CheckerTexture<Tex0, Tex1>
 where
-    TTexture0: Texture + Sync,
-    TTexture1: Texture + Sync,
+    Tex0: Texture,
+    Tex1: Texture,
 {
-    odd_colour: TTexture0,
-    even_colour: TTexture1,
+    odd_colour: Tex0,
+    even_colour: Tex1,
 }
 
-impl<TTexture0, TTexture1> CheckerTexture<TTexture0, TTexture1>
+impl<Tex0, Tex1> CheckerTexture<Tex0, Tex1>
 where
-    TTexture0: Texture + Sync,
-    TTexture1: Texture + Sync,
+    Tex0: Texture,
+    Tex1: Texture,
 {
-    pub fn new(
-        odd_colour: TTexture0,
-        even_colour: TTexture1,
-    ) -> CheckerTexture<TTexture0, TTexture1> {
+    pub fn new(odd_colour: Tex0, even_colour: Tex1) -> CheckerTexture<Tex0, Tex1> {
         Self {
             odd_colour,
             even_colour,
@@ -29,10 +26,10 @@ where
     }
 }
 
-impl<TTexture0, TTexture1> Texture for CheckerTexture<TTexture0, TTexture1>
+impl<Tex0, Tex1> Texture for CheckerTexture<Tex0, Tex1>
 where
-    TTexture0: Texture + Clone + Sync,
-    TTexture1: Texture + Clone + Sync,
+    Tex0: Texture,
+    Tex1: Texture,
 {
     fn value(&self, u: f64, v: f64, p: &Point3d) -> RGB {
         let sines = (10.0 * p.x).sin() * (10.0 * p.y).sin() * (10.0 * p.z).sin();

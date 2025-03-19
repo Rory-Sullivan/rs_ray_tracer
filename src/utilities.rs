@@ -5,6 +5,7 @@ use std::{
     f64::consts::PI,
     fs::File,
     io::Write,
+    sync::Arc,
 };
 
 use crate::{bvh::bounding_box::BoundingBox, colour::RGB, vec3d::Vec3d};
@@ -144,7 +145,7 @@ pub fn save_as_png(
     image_buffer.save(file_name).unwrap();
 }
 
-pub fn read_image_file(file_name: &str) -> (usize, usize, Vec<RGB>) {
+pub fn read_image_file(file_name: &str) -> (usize, usize, Arc<[RGB]>) {
     let img = ImageReader::open(file_name)
         .unwrap()
         .decode()
@@ -152,14 +153,16 @@ pub fn read_image_file(file_name: &str) -> (usize, usize, Vec<RGB>) {
         .into_rgb8();
     let width = img.width() as usize;
     let height = img.height() as usize;
-    let mut pixels = Vec::<RGB>::with_capacity(width * height);
-    for pixel in img.pixels() {
-        pixels.push(RGB(
-            (pixel.0[0] as f64) / 255.0,
-            (pixel.0[1] as f64) / 255.0,
-            (pixel.0[2] as f64) / 255.0,
-        ));
-    }
+    let pixels: Arc<[RGB]> = img
+        .pixels()
+        .map(|pixel| {
+            RGB(
+                (pixel.0[0] as f64) / 255.0,
+                (pixel.0[1] as f64) / 255.0,
+                (pixel.0[2] as f64) / 255.0,
+            )
+        })
+        .collect();
 
     (width, height, pixels)
 }
