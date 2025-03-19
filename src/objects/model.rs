@@ -14,16 +14,16 @@ use super::triangle::Triangle;
 
 /// Struct for storing data related to a 3D model.
 #[derive(Debug, Clone)]
-pub struct Model<'a> {
-    bvh: Bvh<'a>,
+pub struct Model {
+    bvh: Bvh,
 }
 
-impl<'a> Model<'a> {
-    pub fn new(bvh: Bvh<'a>) -> Self {
+impl Model {
+    pub fn new(bvh: Bvh) -> Self {
         Self { bvh }
     }
 
-    pub fn build<TMaterial>(file_name: &str, material: TMaterial) -> (Model<'a>, BvhMetrics)
+    pub fn build<TMaterial>(file_name: &str, material: TMaterial) -> (Model, BvhMetrics)
     where
         TMaterial: Material + Clone + 'static,
     {
@@ -43,7 +43,7 @@ impl<'a> Model<'a> {
     }
 }
 
-impl Hittable for Model<'_> {
+impl Hittable for Model {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.bvh.hit(ray, t_min, t_max)
     }

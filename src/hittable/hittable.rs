@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::{bvh::bounding_box::BoundingBox, ray::Ray};
 
 use super::hit_record::HitRecord;
@@ -31,5 +33,11 @@ impl<T: Clone + Hittable> DynClone for T {
 impl Clone for Box<dyn Hittable + '_> {
     fn clone(&self) -> Self {
         (**self).dyn_clone()
+    }
+}
+
+impl Debug for dyn Hittable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("dyn Hittable").finish()
     }
 }

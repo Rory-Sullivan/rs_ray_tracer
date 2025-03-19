@@ -9,10 +9,8 @@ use super::hit_record::HitRecord;
 
 /// Stores a list of hittable objects. Uses dynamic trait objects to allow for
 /// any struct that implements the Hittable trait to be a part of the list.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct HittableList {
-    time0: f64,
-    time1: f64,
     items: Arc<[Box<dyn Hittable>]>,
     bounding_box: Option<BoundingBox>,
 }
@@ -27,8 +25,6 @@ impl HittableList {
         let items = Arc::from(items);
 
         Self {
-            time0,
-            time1,
             items,
             bounding_box,
         }
@@ -52,19 +48,5 @@ impl Hittable for HittableList {
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<BoundingBox> {
         self.bounding_box
-    }
-}
-
-impl std::fmt::Debug for HittableList {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("HittableList")
-            .field("time0", &self.time0)
-            .field("time1", &self.time1)
-            .field(
-                "items",
-                &format_args!("Arc<[Box<dyn Hittable>]>[{}]", self.items.len()),
-            )
-            .field("bounding_box", &self.bounding_box)
-            .finish()
     }
 }

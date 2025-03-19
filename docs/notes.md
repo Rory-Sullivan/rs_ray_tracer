@@ -31,6 +31,22 @@ generate_final_scene (with dragon), release mode, no debug.
   - Render: 2m 5s (125s)
   - Total: 2m 17s (137s)
 
+Time to render at different resolutions AFTER SWITCH TO ARC,
+generate_final_scene (with dragon), release mode, no debug.
+
+- Low:
+  - Scene build: 0m 9s (9s)
+  - Render: 0m 32s (32s)
+  - Total: 0m 42s (42s)
+
+Time to render at different resolutions AFTER BVHNode,
+generate_final_scene (with dragon), release mode, no debug.
+
+- Low:
+  - Scene build: 0m 9s (9s)
+  - Render: 0m 27s (27s)
+  - Total: 0m 37s (37s)
+
 ### BVH optimizations
 
 Time to render at different resolutions BEFORE OPTIMIZATIONS,

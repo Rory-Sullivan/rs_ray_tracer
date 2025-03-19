@@ -4,15 +4,17 @@ use std::cmp::Ordering;
 use crate::{
     hittable::{hit_record::HitRecord, hittable::Hittable},
     ray::Ray,
-    utilities::{surrounding_box, surrounding_box_option},
+    utilities::surrounding_box_option,
 };
+
+pub type BvhNode = Option<Box<dyn Hittable>>;
 
 /// Bounding Volume Hierarchy. Used to store hittable objects in a tree like
 /// structure to make finding a hit more efficient.
-#[derive(Clone)]
-pub struct Bvh<'a> {
-    left: Box<dyn Hittable + 'a>,
-    right: Box<dyn Hittable + 'a>,
+#[derive(Debug, Clone)]
+pub struct Bvh {
+    left: BvhNode,
+    right: BvhNode,
     bounding_box: BoundingBox,
 }
 
@@ -23,7 +25,7 @@ pub struct BvhMetrics {
     average_depth: f32,
 }
 
-impl<'a> Bvh<'a> {
+impl Bvh {
     /// Builds a BVH from scene data.
     pub fn build(time0: f64, time1: f64, items: &mut [Box<dyn Hittable>]) -> (Self, BvhMetrics) {
         Self::build_internal(time0, time1, items, 0)
@@ -63,26 +65,16 @@ impl<'a> Bvh<'a> {
             right_min_depth,
             right_max_depth,
             right_average_depth,
-        ): (
-            Box<dyn Hittable + 'a>,
-            usize,
-            usize,
-            f32,
-            Box<dyn Hittable + 'a>,
-            usize,
-            usize,
-            f32,
-        ) = match num_objects {
+        ): (BvhNode, usize, usize, f32, BvhNode, usize, usize, f32) = match num_objects {
             0 => panic!("No objects"),
             1 => {
                 let left = items[0].clone();
-                let right = items[0].clone();
                 (
-                    left,
+                    Some(left),
                     current_depth,
                     current_depth,
                     current_depth as f32,
-                    right,
+                    None,
                     current_depth,
                     current_depth,
                     current_depth as f32,
@@ -93,11 +85,11 @@ impl<'a> Bvh<'a> {
                     let left = items[0].clone();
                     let right = items[1].clone();
                     (
-                        left,
+                        Some(left),
                         current_depth,
                         current_depth,
                         current_depth as f32,
-                        right,
+                        Some(right),
                         current_depth,
                         current_depth,
                         current_depth as f32,
@@ -107,11 +99,11 @@ impl<'a> Bvh<'a> {
                     let left = items[1].clone();
                     let right = items[0].clone();
                     (
-                        left,
+                        Some(left),
                         current_depth,
                         current_depth,
                         current_depth as f32,
-                        right,
+                        Some(right),
                         current_depth,
                         current_depth,
                         current_depth as f32,
@@ -131,11 +123,11 @@ impl<'a> Bvh<'a> {
                     Self::build_internal(time0, time1, half1, current_depth);
 
                 (
-                    Box::new(left),
+                    Some(Box::new(left)),
                     left_metrics.min_depth,
                     left_metrics.max_depth,
                     left_metrics.average_depth,
-                    Box::new(right),
+                    Some(Box::new(right)),
                     right_metrics.min_depth,
                     right_metrics.max_depth,
                     right_metrics.average_depth,
@@ -143,9 +135,11 @@ impl<'a> Bvh<'a> {
             }
         };
 
-        let box_left = left.bounding_box(time0, time1).unwrap();
-        let box_right = right.bounding_box(time0, time1).unwrap();
-        let bounding_box = surrounding_box(box_left, box_right);
+        let bounding_box = surrounding_box_option(
+            left.as_ref().and_then(|x| x.bounding_box(time0, time1)),
+            right.as_ref().and_then(|x| x.bounding_box(time0, time1)),
+        )
+        .expect("surrounding box to be valid");
 
         let min_depth = left_min_depth.min(right_min_depth);
         let max_depth = left_max_depth.max(right_max_depth);
@@ -168,7 +162,7 @@ impl<'a> Bvh<'a> {
     }
 }
 
-impl Hittable for Bvh<'_> {
+impl Hittable for Bvh {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         // Check if we hit the bounding box
         if !self.bounding_box.hit(ray, t_min, t_max) {
@@ -179,11 +173,18 @@ impl Hittable for Bvh<'_> {
         // and return the closer of the two
         let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;
-        if let Some(hr) = self.left.hit(ray, t_min, closest_so_far) {
+        if let Some(hr) = self
+            .left
+            .as_ref()
+            .and_then(|x| x.hit(ray, t_min, closest_so_far))
+        {
             closest_so_far = hr.t;
             hit_record = Some(hr);
         }
-        let hit_right = self.right.hit(ray, t_min, closest_so_far);
+        let hit_right = self
+            .right
+            .as_ref()
+            .and_then(|x| x.hit(ray, t_min, closest_so_far));
         if hit_right.is_some() {
             hit_record = hit_right;
         }
@@ -209,16 +210,6 @@ fn box_compare<'a>(
         .min
         .get_axis(axis)
         .total_cmp(&box_b.min.get_axis(axis))
-}
-
-impl std::fmt::Debug for Bvh<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Bvh")
-            .field("left", &"some hittable")
-            .field("right", &"some hittable")
-            .field("bounding_box", &self.bounding_box)
-            .finish()
-    }
 }
 
 #[allow(clippy::borrowed_box)]
