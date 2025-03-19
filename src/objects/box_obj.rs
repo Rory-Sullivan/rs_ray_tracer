@@ -18,7 +18,7 @@ pub struct BoxObj<'a> {
 }
 
 impl<'a> BoxObj<'a> {
-    pub fn new<TMaterial: Material + Clone + Sync + 'a>(
+    pub fn new<TMaterial: Material + Clone + 'a>(
         box_min: Point3d,
         box_max: Point3d,
         material: TMaterial,

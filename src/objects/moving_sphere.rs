@@ -45,7 +45,7 @@ impl<M: Material> MovingSphere<M> {
 
 impl<M> Hittable for MovingSphere<M>
 where
-    M: Material + Clone + Sync,
+    M: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center(ray.time);
