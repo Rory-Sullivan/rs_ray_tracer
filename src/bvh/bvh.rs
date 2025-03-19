@@ -171,25 +171,25 @@ impl Hittable for Bvh {
 
         // If we hit the bounding box check if we hit left or right bounding box
         // and return the closer of the two
-        let mut hit_record: Option<HitRecord> = None;
-        let mut closest_so_far = t_max;
-        if let Some(hr) = self
-            .left
-            .as_ref()
-            .and_then(|x| x.hit(ray, t_min, closest_so_far))
-        {
-            closest_so_far = hr.t;
-            hit_record = Some(hr);
-        }
-        let hit_right = self
-            .right
-            .as_ref()
-            .and_then(|x| x.hit(ray, t_min, closest_so_far));
-        if hit_right.is_some() {
-            hit_record = hit_right;
-        }
+        match (&self.left, &self.right) {
+            (None, None) => None,
+            (Some(left), None) => left.hit(ray, t_min, t_max),
+            (None, Some(right)) => right.hit(ray, t_min, t_max),
+            (Some(left), Some(right)) => {
+                let mut hit_record: Option<HitRecord> = None;
+                let mut closest_so_far = t_max;
+                if let Some(hr) = left.hit(ray, t_min, closest_so_far) {
+                    closest_so_far = hr.t;
+                    hit_record = Some(hr);
+                }
+                let hit_right = right.hit(ray, t_min, closest_so_far);
+                if hit_right.is_some() {
+                    hit_record = hit_right;
+                }
 
-        hit_record
+                hit_record
+            }
+        }
     }
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<BoundingBox> {
