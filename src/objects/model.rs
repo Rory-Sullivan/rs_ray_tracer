@@ -26,7 +26,7 @@ impl<'a> Model<'a> {
 
     pub fn build<TMaterial>(file_name: &str, material: TMaterial) -> (Model<'a>, BvhMetrics)
     where
-        TMaterial: Material + Clone + 'a,
+        TMaterial: Material + Clone + Sync + 'a,
     {
         let time0 = 0.0;
         let time1 = 0.0;

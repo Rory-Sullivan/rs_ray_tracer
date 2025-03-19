@@ -39,7 +39,7 @@ impl<M: Material> Triangle<M> {
 
 impl<M> Hittable for Triangle<M>
 where
-    M: Material + Clone,
+    M: Material + Clone + Sync,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match moller_trumbore_triangle_intersection(ray, self, t_min, t_max) {

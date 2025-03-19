@@ -1,6 +1,6 @@
 use crate::{colour::RGB, hittable::hit_record::HitRecord, ray::Ray, vec3d::Point3d};
 
-pub trait Material: Sync {
+pub trait Material {
     /// Returns scattered ray and an attenuation colour
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, RGB)>;
 

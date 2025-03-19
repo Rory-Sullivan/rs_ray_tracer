@@ -17,7 +17,7 @@ pub enum Rectangle<M: Material> {
 
 impl<M> Hittable for Rectangle<M>
 where
-    M: Material + Clone,
+    M: Material + Clone + Sync,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
@@ -62,7 +62,7 @@ impl<M: Material> RectangleXY<M> {
 
 impl<M> Hittable for RectangleXY<M>
 where
-    M: Material + Clone,
+    M: Material + Clone + Sync,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - ray.origin.z) / ray.direction.z;
@@ -133,7 +133,7 @@ impl<M: Material> RectangleXZ<M> {
 
 impl<M> Hittable for RectangleXZ<M>
 where
-    M: Material + Clone,
+    M: Material + Clone + Sync,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - ray.origin.y) / ray.direction.y;
@@ -204,7 +204,7 @@ impl<M: Material> RectangleYZ<M> {
 
 impl<M> Hittable for RectangleYZ<M>
 where
-    M: Material + Clone,
+    M: Material + Clone + Sync,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - ray.origin.x) / ray.direction.x;

@@ -27,7 +27,7 @@ impl<M: Material> Sphere<M> {
 
 impl<M> Hittable for Sphere<M>
 where
-    M: Material + Clone,
+    M: Material + Clone + Sync,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;

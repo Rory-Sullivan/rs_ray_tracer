@@ -29,7 +29,7 @@ impl<'a> Pyramid<'a> {
     ///   the first value is taken as the external corner of the pyramid
     /// * `height`: height of the point above the base
     /// * `material`: the material of the pyramid
-    pub fn build<M: Material + Clone + 'a>(
+    pub fn build<M: Material + Clone + Sync + 'a>(
         base_triangle: (Point3d, Point3d, Point3d),
         height: f64,
         material: M,
