@@ -2,7 +2,6 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 use crate::bvh::bvh::BvhMetrics;
-use crate::hittable::hittable_list::HittableList;
 use crate::hittable::{hit_record::HitRecord, hittable::Hittable};
 use crate::{
     bvh::{bounding_box::BoundingBox, bvh::Bvh},
@@ -26,20 +25,19 @@ impl<'a> Model<'a> {
 
     pub fn build<TMaterial>(file_name: &str, material: TMaterial) -> (Model<'a>, BvhMetrics)
     where
-        TMaterial: Material + Clone + 'a,
+        TMaterial: Material + Clone + 'static,
     {
         let time0 = 0.0;
         let time1 = 0.0;
 
-        let triangles = read_ply_file(file_name);
+        let mut triangles: Vec<Box<dyn Hittable>> = read_ply_file(file_name)
+            .iter()
+            .map(|tri| {
+                Box::new(Triangle::new(tri.0, tri.1, tri.2, material.clone())) as Box<dyn Hittable>
+            })
+            .collect();
 
-        let mut hittable_triangles = HittableList::new(time0, time1);
-        for tri in triangles {
-            let triangle = Triangle::new(tri.0, tri.1, tri.2, material.clone());
-            hittable_triangles.add(Box::new(triangle));
-        }
-
-        let (bvh, bvh_metrics) = Bvh::build(hittable_triangles, time0, time1);
+        let (bvh, bvh_metrics) = Bvh::build(time0, time1, &mut triangles);
 
         (Self::new(bvh), bvh_metrics)
     }

@@ -1,6 +1,8 @@
+use std::sync::Arc;
+
 use crate::{
     bvh::bounding_box::BoundingBox, hittable::hittable::Hittable, ray::Ray,
-    utilities::surrounding_box,
+    utilities::surrounding_box_option,
 };
 
 use super::hit_record::HitRecord;
@@ -8,49 +10,32 @@ use super::hit_record::HitRecord;
 /// Stores a list of hittable objects. Uses dynamic trait objects to allow for
 /// any struct that implements the Hittable trait to be a part of the list.
 #[derive(Clone)]
-pub struct HittableList<'a> {
+pub struct HittableList {
     time0: f64,
     time1: f64,
-    pub items: Vec<Box<dyn Hittable + 'a>>,
+    items: Arc<[Box<dyn Hittable>]>,
     bounding_box: Option<BoundingBox>,
 }
 
-impl<'a> HittableList<'a> {
-    pub fn new(time0: f64, time1: f64) -> Self {
+impl HittableList {
+    pub fn build(time0: f64, time1: f64, items: &[Box<dyn Hittable>]) -> Self {
+        // Get bounding box of all items and collect items into `Arc<[Box<dyn Hittable>]>`
+        let mut bounding_box: Option<BoundingBox> = None;
+        for item in items.iter() {
+            bounding_box = surrounding_box_option(bounding_box, item.bounding_box(time0, time1))
+        }
+        let items = Arc::from(items);
+
         Self {
             time0,
             time1,
-            items: Vec::new(),
-            bounding_box: None,
+            items,
+            bounding_box,
         }
-    }
-
-    pub fn add(&mut self, item: Box<dyn Hittable + 'a>) {
-        if self.bounding_box.is_none() {
-            self.bounding_box = item.bounding_box(self.time0, self.time1);
-        } else {
-            self.bounding_box = Some(surrounding_box(
-                self.bounding_box.unwrap(),
-                item.bounding_box(self.time0, self.time1).unwrap(),
-            ));
-        }
-        self.items.push(item);
-    }
-
-    pub fn build(time0: f64, time1: f64, items: Vec<Box<dyn Hittable + 'a>>) -> Self {
-        let mut result = Self::new(time0, time1);
-        for item in items {
-            result.add(item);
-        }
-        result
-    }
-
-    pub fn clear(&mut self) {
-        self.items.clear();
     }
 }
 
-impl Hittable for HittableList<'_> {
+impl Hittable for HittableList {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;
@@ -70,12 +55,15 @@ impl Hittable for HittableList<'_> {
     }
 }
 
-impl std::fmt::Debug for HittableList<'_> {
+impl std::fmt::Debug for HittableList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("HittableList")
             .field("time0", &self.time0)
             .field("time1", &self.time1)
-            .field("items", &self.items.len())
+            .field(
+                "items",
+                &format_args!("Arc<[Box<dyn Hittable>]>[{}]", self.items.len()),
+            )
             .field("bounding_box", &self.bounding_box)
             .finish()
     }

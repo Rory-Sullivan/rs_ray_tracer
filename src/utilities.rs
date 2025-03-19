@@ -167,7 +167,7 @@ pub fn read_image_file(file_name: &str) -> (usize, usize, Arc<[RGB]>) {
     (width, height, pixels)
 }
 
-/// Returns the box surrounding two `BoundingBox`.
+/// Returns the box surrounding two `BoundingBox`s.
 pub fn surrounding_box(box0: BoundingBox, box1: BoundingBox) -> BoundingBox {
     let min = Vec3d::new(
         min(box0.min.x, box1.min.x),
@@ -181,6 +181,19 @@ pub fn surrounding_box(box0: BoundingBox, box1: BoundingBox) -> BoundingBox {
     );
 
     BoundingBox::new(min, max)
+}
+
+/// Returns the box surrounding two `Option<BoundingBox>`s.
+pub fn surrounding_box_option(
+    box0: Option<BoundingBox>,
+    box1: Option<BoundingBox>,
+) -> Option<BoundingBox> {
+    match (box0, box1) {
+        (None, None) => None,
+        (Some(_), None) => box0,
+        (None, Some(_)) => box1,
+        (Some(b0), Some(b1)) => Some(surrounding_box(b0, b1)),
+    }
 }
 
 /// Given a point on the unit sphere returns the coordinates of that point in

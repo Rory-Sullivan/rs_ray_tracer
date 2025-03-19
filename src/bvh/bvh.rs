@@ -2,9 +2,9 @@ use super::bounding_box::BoundingBox;
 use std::cmp::Ordering;
 
 use crate::{
-    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list::HittableList},
+    hittable::{hit_record::HitRecord, hittable::Hittable},
     ray::Ray,
-    utilities::surrounding_box,
+    utilities::{surrounding_box, surrounding_box_option},
 };
 
 /// Bounding Volume Hierarchy. Used to store hittable objects in a tree like
@@ -24,33 +24,26 @@ pub struct BvhMetrics {
 }
 
 impl<'a> Bvh<'a> {
-    pub fn new(
-        left: Box<dyn Hittable + 'a>,
-        right: Box<dyn Hittable + 'a>,
-        bounding_box: BoundingBox,
-    ) -> Self {
-        Bvh {
-            left,
-            right,
-            bounding_box,
-        }
-    }
-
     /// Builds a BVH from scene data.
-    pub fn build(scene: HittableList<'a>, time0: f64, time1: f64) -> (Self, BvhMetrics) {
-        Self::build_internal(scene, time0, time1, 0)
+    pub fn build(time0: f64, time1: f64, items: &mut [Box<dyn Hittable>]) -> (Self, BvhMetrics) {
+        Self::build_internal(time0, time1, items, 0)
     }
 
     fn build_internal(
-        scene: HittableList<'a>,
         time0: f64,
         time1: f64,
+        items: &mut [Box<dyn Hittable>],
         mut current_depth: usize,
     ) -> (Self, BvhMetrics) {
         current_depth += 1;
 
         // Pick the longest axis along which to split the objects
-        let axis = scene.bounding_box(time0, time1).unwrap().longest_axis();
+        let items_bounding_box: Option<BoundingBox> = items.iter().fold(None, |bb, item| {
+            surrounding_box_option(bb, item.bounding_box(time0, time1))
+        });
+        let axis = items_bounding_box
+            .expect("Items to have a valid bounding box")
+            .longest_axis();
         let compare_fn = match axis {
             0 => box_x_compare,
             1 => box_y_compare,
@@ -59,8 +52,7 @@ impl<'a> Bvh<'a> {
         };
 
         // Order and split list of objects based on axis
-        let mut objects = scene.items;
-        let num_objects = objects.len();
+        let num_objects = items.len();
         #[allow(clippy::type_complexity)]
         let (
             left,
@@ -83,8 +75,8 @@ impl<'a> Bvh<'a> {
         ) = match num_objects {
             0 => panic!("No objects"),
             1 => {
-                let left = objects[0].clone();
-                let right = objects[0].clone();
+                let left = items[0].clone();
+                let right = items[0].clone();
                 (
                     left,
                     current_depth,
@@ -96,10 +88,10 @@ impl<'a> Bvh<'a> {
                     current_depth as f32,
                 )
             }
-            2 => match compare_fn(&objects[0], &objects[1]) {
+            2 => match compare_fn(&items[0], &items[1]) {
                 Ordering::Less | Ordering::Equal => {
-                    let left = objects[0].clone();
-                    let right = objects[1].clone();
+                    let left = items[0].clone();
+                    let right = items[1].clone();
                     (
                         left,
                         current_depth,
@@ -112,8 +104,8 @@ impl<'a> Bvh<'a> {
                     )
                 }
                 Ordering::Greater => {
-                    let left = objects[1].clone();
-                    let right = objects[0].clone();
+                    let left = items[1].clone();
+                    let right = items[0].clone();
                     (
                         left,
                         current_depth,
@@ -127,19 +119,16 @@ impl<'a> Bvh<'a> {
                 }
             },
             _ => {
-                objects.sort_by(compare_fn);
+                items.sort_by(compare_fn);
 
                 // Recursively call build function with split parts
                 let mid = num_objects / 2;
-                let (half0, half1) = objects.split_at_mut(mid);
+                let (half0, half1) = items.split_at_mut(mid);
 
-                let hit_list0 = HittableList::build(time0, time1, half0.to_vec());
-                let (left, left_metrics) =
-                    Self::build_internal(hit_list0, time0, time1, current_depth);
+                let (left, left_metrics) = Self::build_internal(time0, time1, half0, current_depth);
 
-                let hit_list1 = HittableList::build(time0, time1, half1.to_vec());
                 let (right, right_metrics) =
-                    Self::build_internal(hit_list1, time0, time1, current_depth);
+                    Self::build_internal(time0, time1, half1, current_depth);
 
                 (
                     Box::new(left),
@@ -168,7 +157,14 @@ impl<'a> Bvh<'a> {
             average_depth,
         };
 
-        (Bvh::new(left, right, bounding_box), metrics)
+        (
+            Bvh {
+                left,
+                right,
+                bounding_box,
+            },
+            metrics,
+        )
     }
 }
 
