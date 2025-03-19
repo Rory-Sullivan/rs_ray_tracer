@@ -56,12 +56,9 @@ impl Hittable for HittableList<'_> {
         let mut closest_so_far = t_max;
 
         for item in self.items.iter() {
-            match item.hit(ray, t_min, closest_so_far) {
-                Some(hr) => {
-                    closest_so_far = hr.t;
-                    hit_record = Some(hr);
-                }
-                None => {}
+            if let Some(hr) = item.hit(ray, t_min, closest_so_far) {
+                closest_so_far = hr.t;
+                hit_record = Some(hr);
             }
         }
 

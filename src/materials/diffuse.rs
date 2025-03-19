@@ -20,6 +20,6 @@ impl Material for Diffuse {
             scatter_direction = hit_record.normal
         }
         let ray_out = Ray::new(hit_record.point, scatter_direction, ray_in.time);
-        return Some((ray_out, self.albedo));
+        Some((ray_out, self.albedo))
     }
 }

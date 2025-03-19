@@ -35,7 +35,7 @@ where
 
                 let ray = camera.get_ray(u, v);
 
-                colour = colour + ray_colour(&ray, &bvh, resolution.max_depth, use_sky_background)
+                colour += ray_colour(&ray, bvh, resolution.max_depth, use_sky_background)
             }
 
             if pixel.0 == (resolution.image_width - 1) {
@@ -50,11 +50,11 @@ where
 }
 
 fn ray_colour(ray: &Ray, bvh: &Bvh, max_depth: usize, use_sky_background: bool) -> RGB {
-    if max_depth <= 0 {
+    if max_depth == 0 {
         return RGB(0.0, 0.0, 0.0);
     }
 
-    let hit = bvh.hit(&ray, 0.001, f64::MAX);
+    let hit = bvh.hit(ray, 0.001, f64::MAX);
     match hit {
         Some(hr) => match hr.material.scatter(ray, &hr) {
             Some((ray_out, hit_colour)) => {

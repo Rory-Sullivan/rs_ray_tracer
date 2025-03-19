@@ -48,6 +48,6 @@ where
         let attenuation = self
             .albedo
             .value(hit_record.u, hit_record.v, &hit_record.point);
-        return Some((ray_out, attenuation));
+        Some((ray_out, attenuation))
     }
 }

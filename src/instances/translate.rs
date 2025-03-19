@@ -42,9 +42,6 @@ impl<H: Hittable + Clone> Hittable for Translate<H> {
     }
 
     fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox> {
-        match self.object.bounding_box(time0, time1) {
-            Some(bb) => Some(BoundingBox::new(bb.min + self.offset, bb.max + self.offset)),
-            None => None,
-        }
+        self.object.bounding_box(time0, time1).map(|bb| BoundingBox::new(bb.min + self.offset, bb.max + self.offset))
     }
 }

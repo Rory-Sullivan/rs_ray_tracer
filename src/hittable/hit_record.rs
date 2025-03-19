@@ -53,11 +53,11 @@ impl<'a> HitRecord<'a> {
             const DELTA: f64 = 0.1e-5;
             let normal_len = normal.len();
             assert!(
-                normal_len >= 1.0 - DELTA && normal_len <= 1.0 + DELTA,
+                (1.0 - DELTA..=1.0 + DELTA).contains(&normal_len),
                 "Length of normal is not 1; length: {normal_len}"
             );
-            assert!(u >= 0.0 && u < 1.0, "u is outside range [0, 1); u: {u}");
-            assert!(v >= 0.0 && v < 1.0, "v is outside range [0, 1); u: {v}");
+            assert!((0.0..1.0).contains(&u), "u is outside range [0, 1); u: {u}");
+            assert!((0.0..1.0).contains(&v), "v is outside range [0, 1); u: {v}");
         }
 
         Self {

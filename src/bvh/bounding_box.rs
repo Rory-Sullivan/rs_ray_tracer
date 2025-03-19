@@ -58,7 +58,7 @@ impl BoundingBox {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     pub fn longest_axis(&self) -> usize {
@@ -81,7 +81,7 @@ mod bounding_box_tests {
 
         let result = b_box.hit(&ray, 0.0, f64::MAX);
 
-        assert_eq!(result, true);
+        assert!(result);
     }
 
     #[test]
@@ -91,7 +91,7 @@ mod bounding_box_tests {
 
         let result = b_box.hit(&ray, 0.0, f64::MAX);
 
-        assert_eq!(result, false);
+        assert!(!result);
     }
 
     #[test]
@@ -101,7 +101,7 @@ mod bounding_box_tests {
 
         let result = b_box.hit(&ray, 0.0, f64::MAX);
 
-        assert_eq!(result, false);
+        assert!(!result);
     }
 
     #[test]
@@ -111,7 +111,7 @@ mod bounding_box_tests {
 
         let result = b_box.hit(&ray, 0.0, f64::MAX);
 
-        assert_eq!(result, true);
+        assert!(result);
     }
 
     #[test]
@@ -121,7 +121,7 @@ mod bounding_box_tests {
 
         let result = b_box.hit(&ray, 0.0, f64::MAX);
 
-        assert_eq!(result, false);
+        assert!(!result);
     }
 
     #[test]
@@ -131,7 +131,7 @@ mod bounding_box_tests {
 
         let result = b_box.hit(&ray, 0.0, f64::MAX);
 
-        assert_eq!(result, true);
+        assert!(result);
     }
 
     #[test]
@@ -141,6 +141,6 @@ mod bounding_box_tests {
 
         let result = b_box.hit(&ray, 0.0, f64::MAX);
 
-        assert_eq!(result, true);
+        assert!(result);
     }
 }

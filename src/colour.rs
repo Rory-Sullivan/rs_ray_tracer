@@ -55,11 +55,7 @@ impl Add for RGB {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        RGB {
-            0: self.0 + rhs.0,
-            1: self.1 + rhs.1,
-            2: self.2 + rhs.2,
-        }
+        RGB(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2)
     }
 }
 
@@ -75,11 +71,7 @@ impl Sub for RGB {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
-        RGB {
-            0: self.0 - rhs.0,
-            1: self.1 - rhs.1,
-            2: self.2 - rhs.2,
-        }
+        RGB(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
     }
 }
 
@@ -95,11 +87,7 @@ impl Mul<RGB> for f64 {
     type Output = RGB;
 
     fn mul(self, rhs: RGB) -> Self::Output {
-        RGB {
-            0: self * rhs.0,
-            1: self * rhs.1,
-            2: self * rhs.2,
-        }
+        RGB(self * rhs.0, self * rhs.1, self * rhs.2)
     }
 }
 
@@ -115,11 +103,7 @@ impl Div<f64> for RGB {
     type Output = RGB;
 
     fn div(self, rhs: f64) -> Self::Output {
-        RGB {
-            0: self.0 / rhs,
-            1: self.1 / rhs,
-            2: self.2 / rhs,
-        }
+        RGB(self.0 / rhs, self.1 / rhs, self.2 / rhs)
     }
 }
 
@@ -135,10 +119,6 @@ impl Mul for RGB {
     type Output = RGB;
 
     fn mul(self, rhs: RGB) -> Self::Output {
-        RGB {
-            0: self.0 * rhs.0,
-            1: self.1 * rhs.1,
-            2: self.2 * rhs.2,
-        }
+        RGB(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)
     }
 }

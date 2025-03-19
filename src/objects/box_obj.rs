@@ -76,7 +76,7 @@ impl<'a> BoxObj<'a> {
     }
 }
 
-impl<'a> Hittable for BoxObj<'a> {
+impl Hittable for BoxObj<'_> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.sides.hit(ray, t_min, t_max)
     }

@@ -61,6 +61,7 @@ impl<'a> Bvh<'a> {
         // Order and split list of objects based on axis
         let mut objects = scene.items;
         let num_objects = objects.len();
+        #[allow(clippy::type_complexity)]
         let (
             left,
             left_min_depth,
@@ -171,7 +172,7 @@ impl<'a> Bvh<'a> {
     }
 }
 
-impl<'a> Hittable for Bvh<'a> {
+impl Hittable for Bvh<'_> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         // Check if we hit the bounding box
         if !self.bounding_box.hit(ray, t_min, t_max) {
@@ -182,19 +183,13 @@ impl<'a> Hittable for Bvh<'a> {
         // and return the closer of the two
         let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;
-        match self.left.hit(ray, t_min, closest_so_far) {
-            Some(hr) => {
-                closest_so_far = hr.t;
-                hit_record = Some(hr);
-            }
-            None => {}
+        if let Some(hr) = self.left.hit(ray, t_min, closest_so_far) {
+            closest_so_far = hr.t;
+            hit_record = Some(hr);
         }
         let hit_right = self.right.hit(ray, t_min, closest_so_far);
-        match hit_right {
-            Some(_) => {
-                hit_record = hit_right;
-            }
-            None => {}
+        if hit_right.is_some() {
+            hit_record = hit_right;
         }
 
         hit_record
@@ -205,6 +200,7 @@ impl<'a> Hittable for Bvh<'a> {
     }
 }
 
+#[allow(clippy::borrowed_box)]
 fn box_compare<'a>(
     a: &Box<dyn Hittable + 'a>,
     b: &Box<dyn Hittable + 'a>,
@@ -219,14 +215,17 @@ fn box_compare<'a>(
         .total_cmp(&box_b.min.get_axis(axis))
 }
 
+#[allow(clippy::borrowed_box)]
 fn box_x_compare<'a>(a: &Box<dyn Hittable + 'a>, b: &Box<dyn Hittable + 'a>) -> Ordering {
     box_compare(a, b, 0)
 }
 
+#[allow(clippy::borrowed_box)]
 fn box_y_compare<'a>(a: &Box<dyn Hittable + 'a>, b: &Box<dyn Hittable + 'a>) -> Ordering {
     box_compare(a, b, 1)
 }
 
+#[allow(clippy::borrowed_box)]
 fn box_z_compare<'a>(a: &Box<dyn Hittable + 'a>, b: &Box<dyn Hittable + 'a>) -> Ordering {
     box_compare(a, b, 2)
 }

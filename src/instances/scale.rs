@@ -48,12 +48,9 @@ impl<H: Hittable + Clone> Hittable for Scale<H> {
     }
 
     fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox> {
-        match self.object.bounding_box(time0, time1) {
-            Some(bb) => Some(BoundingBox::new(
+        self.object.bounding_box(time0, time1).map(|bb| BoundingBox::new(
                 bb.min.scale(self.x, self.y, self.z),
                 bb.max.scale(self.x, self.y, self.z),
-            )),
-            None => None,
-        }
+            ))
     }
 }

@@ -18,9 +18,9 @@ where
     YZ(RectangleYZ<TMaterial>),
 }
 
-impl<'a, TMaterial> Hittable for Rectangle<TMaterial>
+impl<TMaterial> Hittable for Rectangle<TMaterial>
 where
-    TMaterial: Material + Clone + 'a,
+    TMaterial: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
@@ -70,9 +70,9 @@ where
     }
 }
 
-impl<'a, TMaterial> Hittable for RectangleXY<TMaterial>
+impl<TMaterial> Hittable for RectangleXY<TMaterial>
 where
-    TMaterial: Material + Sync + 'a,
+    TMaterial: Material + Sync,
     TMaterial: Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -97,7 +97,7 @@ where
             -1.0 * outward_normal
         };
 
-        return Some(HitRecord::new(
+        Some(HitRecord::new(
             ray.at(t),
             normal,
             &self.material,
@@ -105,7 +105,7 @@ where
             u,
             v,
             front_face,
-        ));
+        ))
     }
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<BoundingBox> {
@@ -149,9 +149,9 @@ where
     }
 }
 
-impl<'a, TMaterial> Hittable for RectangleXZ<TMaterial>
+impl<TMaterial> Hittable for RectangleXZ<TMaterial>
 where
-    TMaterial: Material + Sync + 'a,
+    TMaterial: Material + Sync,
     TMaterial: Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -176,7 +176,7 @@ where
             -1.0 * outward_normal
         };
 
-        return Some(HitRecord::new(
+        Some(HitRecord::new(
             ray.at(t),
             normal,
             &self.material,
@@ -184,7 +184,7 @@ where
             u,
             v,
             front_face,
-        ));
+        ))
     }
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<BoundingBox> {
@@ -228,9 +228,9 @@ where
     }
 }
 
-impl<'a, TMaterial> Hittable for RectangleYZ<TMaterial>
+impl<TMaterial> Hittable for RectangleYZ<TMaterial>
 where
-    TMaterial: Material + Sync + 'a,
+    TMaterial: Material + Sync,
     TMaterial: Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -250,7 +250,7 @@ where
         let outward_normal = Vec3d::new(1.0, 0.0, 0.0);
         let (front_face, normal) = HitRecord::get_face_normal(ray, outward_normal);
 
-        return Some(HitRecord::new(
+        Some(HitRecord::new(
             ray.at(t),
             normal,
             &self.material,
@@ -258,7 +258,7 @@ where
             u,
             v,
             front_face,
-        ));
+        ))
     }
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<BoundingBox> {

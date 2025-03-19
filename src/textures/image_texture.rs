@@ -46,7 +46,7 @@ impl Texture for ImageTexture {
             j = self.height - 1;
         }
 
-        let pixel = self.pixels[(j * self.width) + i];
-        pixel
+        
+        self.pixels[(j * self.width) + i]
     }
 }

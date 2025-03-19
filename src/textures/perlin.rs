@@ -43,6 +43,7 @@ impl Perlin {
         }
     }
 
+    #[allow(clippy::needless_range_loop)]
     pub fn noise(&self, p: Point3d) -> f64 {
         let (u, i) = Self::float_to_index(p.x);
         let (v, j) = Self::float_to_index(p.y);
@@ -83,7 +84,7 @@ impl Perlin {
         p
     }
 
-    fn permute(p: &mut Vec<usize>, n: usize) {
+    fn permute(p: &mut [usize], n: usize) {
         for i in (1..n).rev() {
             let target = random_rng_int(0, i + 1);
             p.swap(i, target);
@@ -96,6 +97,7 @@ impl Perlin {
         (u * u * (3.0 - (2.0 * u)), x_pos.floor() as usize)
     }
 
+    #[allow(clippy::needless_range_loop)]
     fn perlin_interpolate(c: &[[[Vec3d; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
         let uu = u * u * (3.0 - (2.0 * u));
         let vv = v * v * (3.0 - (2.0 * v));

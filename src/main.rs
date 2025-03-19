@@ -55,7 +55,7 @@ fn main() {
             }
         };
         let image = render_scene(
-            &camera,
+            camera,
             &bvh,
             &resolution,
             increment_progress_bar,
@@ -63,7 +63,7 @@ fn main() {
         );
 
         progress_bar.finish();
-        print!("\n");
+        println!();
 
         println!("Saving PNG");
         create_dir_all(OUTPUT_FOLDER).unwrap();
@@ -865,7 +865,7 @@ fn generate_final_scene<'a>() -> (HittableList<'a>, bool) {
             let z0 = -1000.0 + (j as f64) * width;
             let x1 = x0 + width;
             let y1 = match (i, j) {
-                (i, j) if (i >= 10 && i < 14) && (j >= 10 && j < 14) => 100.0,
+                (i, j) if (10..14).contains(&i) && (10..14).contains(&j) => 100.0,
                 _ => random_rng(1.0, 96.0),
             };
             let z1 = z0 + width;

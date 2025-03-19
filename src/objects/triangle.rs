@@ -136,7 +136,7 @@ where
     let inv_det = 1.0 / det;
     let s = ray.origin - triangle.a;
     let u = inv_det * s.dot(&ray_cross_e2);
-    if u < 0.0 || u > 1.0 {
+    if !(0.0..=1.0).contains(&u) {
         // Intersection of plane occurs outside triangle
         return None;
     }
@@ -156,7 +156,7 @@ where
     }
 
     let intersection_point = ray.at(t);
-    return Some((t, u, v, intersection_point, triangle.normal));
+    Some((t, u, v, intersection_point, triangle.normal))
 }
 
 #[cfg(test)]

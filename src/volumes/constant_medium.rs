@@ -63,17 +63,13 @@ where
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         // Check if the ray hits the boundary anywhere on it's length
         let hr1 = self.boundary.hit(ray, f64::NEG_INFINITY, f64::INFINITY);
-        if hr1.is_none() {
-            return None;
-        }
+        hr1.as_ref()?;
         let mut hr1 = hr1.unwrap();
 
         // Check that the ray passes through some non trivially small portion of
         // the boundary
         let hr2 = self.boundary.hit(ray, hr1.t + 0.0001, f64::INFINITY);
-        if hr2.is_none() {
-            return None;
-        }
+        hr2.as_ref()?;
         let mut hr2 = hr2.unwrap();
 
         // Set t to min and max values

@@ -131,7 +131,7 @@ pub fn save_as_png(
     file_name: &str,
     image_width: usize,
     image_height: usize,
-    image: &Vec<RGB>,
+    image: &[RGB],
     num_samples: usize,
 ) {
     let mut image_buffer: RgbImage = ImageBuffer::new(image_width as u32, image_height as u32);

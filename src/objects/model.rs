@@ -55,7 +55,7 @@ impl Hittable for Model<'_> {
     }
 }
 
-fn read_ply_file<'a>(file_name: &str) -> Vec<(Vec3d, Vec3d, Vec3d)> {
+fn read_ply_file(file_name: &str) -> Vec<(Vec3d, Vec3d, Vec3d)> {
     let file = File::open(file_name).expect("Error opening file");
     let mut lines = io::BufReader::new(file).lines();
 

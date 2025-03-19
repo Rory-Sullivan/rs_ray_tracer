@@ -50,7 +50,7 @@ impl<'a> Pyramid<'a> {
     }
 }
 
-impl<'a> Hittable for Pyramid<'a> {
+impl Hittable for Pyramid<'_> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.sides.hit(ray, t_min, t_max)
     }
