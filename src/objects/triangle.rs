@@ -9,24 +9,18 @@ use crate::{
 
 /// A triangle object that stores the three vertices of the triangle.
 #[derive(Debug, Clone, Copy)]
-pub struct Triangle<TMaterial>
-where
-    TMaterial: Material + Clone,
-{
+pub struct Triangle<M: Material> {
     a: Point3d,
     b: Point3d,
     c: Point3d,
     e1: Vec3d,
     e2: Vec3d,
     normal: Vec3d,
-    material: TMaterial,
+    material: M,
 }
 
-impl<TMaterial> Triangle<TMaterial>
-where
-    TMaterial: Material + Clone,
-{
-    pub fn new(a: Vec3d, b: Vec3d, c: Vec3d, material: TMaterial) -> Triangle<TMaterial> {
+impl<M: Material> Triangle<M> {
+    pub fn new(a: Vec3d, b: Vec3d, c: Vec3d, material: M) -> Triangle<M> {
         let e1 = b - a;
         let e2 = c - a;
         let normal = e1.cross(&e2).unit_vector();
@@ -43,9 +37,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for Triangle<TMaterial>
+impl<M> Hittable for Triangle<M>
 where
-    TMaterial: Material + Clone,
+    M: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match moller_trumbore_triangle_intersection(ray, self, t_min, t_max) {
@@ -117,15 +111,12 @@ where
 ///
 /// Read more about it here
 /// https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-fn moller_trumbore_triangle_intersection<TMaterial>(
+fn moller_trumbore_triangle_intersection<M: Material>(
     ray: &Ray,
-    triangle: &Triangle<TMaterial>,
+    triangle: &Triangle<M>,
     t_min: f64,
     t_max: f64,
-) -> Option<(f64, f64, f64, Point3d, Vec3d)>
-where
-    TMaterial: Material + Clone,
-{
+) -> Option<(f64, f64, f64, Point3d, Vec3d)> {
     let ray_cross_e2 = ray.direction.cross(&triangle.e2);
     let det = triangle.e1.dot(&ray_cross_e2);
     if det > -f64::EPSILON && det < f64::EPSILON {

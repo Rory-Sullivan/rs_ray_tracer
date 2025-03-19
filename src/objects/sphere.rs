@@ -9,21 +9,14 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy)]
-pub struct Sphere<TMaterial>
-where
-    TMaterial: Material,
-{
+pub struct Sphere<M: Material> {
     center: Point3d,
     radius: f64,
-    material: TMaterial,
+    material: M,
 }
 
-impl<TMaterial> Sphere<TMaterial>
-where
-    TMaterial: Material,
-    TMaterial: Clone,
-{
-    pub fn new(center: Point3d, radius: f64, material: TMaterial) -> Self {
+impl<M: Material> Sphere<M> {
+    pub fn new(center: Point3d, radius: f64, material: M) -> Self {
         Self {
             center,
             radius,
@@ -32,10 +25,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for Sphere<TMaterial>
+impl<M> Hittable for Sphere<M>
 where
-    TMaterial: Material + Sync + 'static,
-    TMaterial: Clone,
+    M: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;

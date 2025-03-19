@@ -9,18 +9,15 @@ use crate::{
 
 /// Enum for the three axis-aligned rectangle structs.
 #[derive(Debug, Clone, Copy)]
-pub enum Rectangle<TMaterial>
-where
-    TMaterial: Material,
-{
-    XY(RectangleXY<TMaterial>),
-    XZ(RectangleXZ<TMaterial>),
-    YZ(RectangleYZ<TMaterial>),
+pub enum Rectangle<M: Material> {
+    XY(RectangleXY<M>),
+    XZ(RectangleXZ<M>),
+    YZ(RectangleYZ<M>),
 }
 
-impl<TMaterial> Hittable for Rectangle<TMaterial>
+impl<M> Hittable for Rectangle<M>
 where
-    TMaterial: Material + Clone,
+    M: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
@@ -41,24 +38,17 @@ where
 
 /// Axis-aligned rectangle for X-Y plane
 #[derive(Debug, Clone, Copy)]
-pub struct RectangleXY<TMaterial>
-where
-    TMaterial: Material,
-{
+pub struct RectangleXY<M: Material> {
     x0: f64,
     x1: f64,
     y0: f64,
     y1: f64,
     k: f64,
-    material: TMaterial,
+    material: M,
 }
 
-impl<TMaterial> RectangleXY<TMaterial>
-where
-    TMaterial: Material,
-    TMaterial: Clone,
-{
-    pub fn new(x0: f64, x1: f64, y0: f64, y1: f64, k: f64, material: TMaterial) -> Self {
+impl<M: Material> RectangleXY<M> {
+    pub fn new(x0: f64, x1: f64, y0: f64, y1: f64, k: f64, material: M) -> Self {
         Self {
             x0,
             x1,
@@ -70,10 +60,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for RectangleXY<TMaterial>
+impl<M> Hittable for RectangleXY<M>
 where
-    TMaterial: Material + Sync,
-    TMaterial: Clone,
+    M: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - ray.origin.z) / ray.direction.z;
@@ -120,24 +109,17 @@ where
 
 /// Axis-aligned rectangle for X-Z plane
 #[derive(Debug, Clone, Copy)]
-pub struct RectangleXZ<TMaterial>
-where
-    TMaterial: Material,
-{
+pub struct RectangleXZ<M: Material> {
     x0: f64,
     x1: f64,
     z0: f64,
     z1: f64,
     k: f64,
-    material: TMaterial,
+    material: M,
 }
 
-impl<TMaterial> RectangleXZ<TMaterial>
-where
-    TMaterial: Material,
-    TMaterial: Clone,
-{
-    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, material: TMaterial) -> Self {
+impl<M: Material> RectangleXZ<M> {
+    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, material: M) -> Self {
         Self {
             x0,
             x1,
@@ -149,10 +131,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for RectangleXZ<TMaterial>
+impl<M> Hittable for RectangleXZ<M>
 where
-    TMaterial: Material + Sync,
-    TMaterial: Clone,
+    M: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - ray.origin.y) / ray.direction.y;
@@ -199,24 +180,17 @@ where
 
 /// Axis-aligned rectangle for Y-Z plane
 #[derive(Debug, Clone, Copy)]
-pub struct RectangleYZ<TMaterial>
-where
-    TMaterial: Material,
-{
+pub struct RectangleYZ<M: Material> {
     y0: f64,
     y1: f64,
     z0: f64,
     z1: f64,
     k: f64,
-    material: TMaterial,
+    material: M,
 }
 
-impl<TMaterial> RectangleYZ<TMaterial>
-where
-    TMaterial: Material,
-    TMaterial: Clone,
-{
-    pub fn new(y0: f64, y1: f64, z0: f64, z1: f64, k: f64, material: TMaterial) -> Self {
+impl<M: Material> RectangleYZ<M> {
+    pub fn new(y0: f64, y1: f64, z0: f64, z1: f64, k: f64, material: M) -> Self {
         Self {
             y0,
             y1,
@@ -228,10 +202,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for RectangleYZ<TMaterial>
+impl<M> Hittable for RectangleYZ<M>
 where
-    TMaterial: Material + Sync,
-    TMaterial: Clone,
+    M: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let t = (self.k - ray.origin.x) / ray.direction.x;

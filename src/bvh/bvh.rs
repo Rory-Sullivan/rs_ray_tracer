@@ -215,6 +215,16 @@ fn box_compare<'a>(
         .total_cmp(&box_b.min.get_axis(axis))
 }
 
+impl std::fmt::Debug for Bvh<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Bvh")
+            .field("left", &"some hittable")
+            .field("right", &"some hittable")
+            .field("bounding_box", &self.bounding_box)
+            .finish()
+    }
+}
+
 #[allow(clippy::borrowed_box)]
 fn box_x_compare<'a>(a: &Box<dyn Hittable + 'a>, b: &Box<dyn Hittable + 'a>) -> Ordering {
     box_compare(a, b, 0)

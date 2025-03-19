@@ -14,7 +14,7 @@ use crate::{
 use super::triangle::Triangle;
 
 /// Struct for storing data related to a 3D model.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Model<'a> {
     bvh: Bvh<'a>,
 }

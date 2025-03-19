@@ -9,30 +9,23 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy)]
-pub struct MovingSphere<TMaterial>
-where
-    TMaterial: Material,
-{
+pub struct MovingSphere<M: Material> {
     center0: Point3d,
     center1: Point3d,
     time0: f64,
     time1: f64,
     radius: f64,
-    material: TMaterial,
+    material: M,
 }
 
-impl<TMaterial> MovingSphere<TMaterial>
-where
-    TMaterial: Material,
-    TMaterial: Clone,
-{
+impl<M: Material> MovingSphere<M> {
     pub fn new(
         center0: Point3d,
         center1: Point3d,
         time0: f64,
         time1: f64,
         radius: f64,
-        material: TMaterial,
+        material: M,
     ) -> Self {
         Self {
             center0,
@@ -50,10 +43,9 @@ where
     }
 }
 
-impl<TMaterial> Hittable for MovingSphere<TMaterial>
+impl<M> Hittable for MovingSphere<M>
 where
-    TMaterial: Material + Sync + 'static,
-    TMaterial: Clone,
+    M: Material + Clone,
 {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center(ray.time);

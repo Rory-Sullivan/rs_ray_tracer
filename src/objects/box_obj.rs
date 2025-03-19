@@ -10,7 +10,7 @@ use crate::{
 use super::rectangle::Rectangle;
 
 /// And axis-aligned box made of 6 rectangles.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct BoxObj<'a> {
     box_min: Point3d,
     box_max: Point3d,

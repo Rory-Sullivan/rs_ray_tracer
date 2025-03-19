@@ -26,8 +26,8 @@ fn main() {
 
     // Resolution
     // let resolution = get_cornell_square_resolution();
-    // let resolution = get_low_resolution();
-    let resolution = get_medium_resolution();
+    let resolution = get_low_resolution();
+    // let resolution = get_medium_resolution();
     // let resolution = get_high_resolution();
 
     // Cameras

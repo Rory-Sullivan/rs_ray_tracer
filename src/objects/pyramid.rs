@@ -9,7 +9,7 @@ use crate::{
 use super::triangle::Triangle;
 
 /// A pyramid with square base and four triangles on top. 6 triangles total.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Pyramid<'a> {
     sides: HittableList<'a>,
     bounding_box: Option<BoundingBox>,
@@ -29,10 +29,10 @@ impl<'a> Pyramid<'a> {
     ///   the first value is taken as the external corner of the pyramid
     /// * `height`: height of the point above the base
     /// * `material`: the material of the pyramid
-    pub fn build<TMaterial: Material + Clone + 'a>(
+    pub fn build<M: Material + Clone + 'a>(
         base_triangle: (Point3d, Point3d, Point3d),
         height: f64,
-        material: TMaterial,
+        material: M,
     ) -> Self {
         let (b0, b1, b2, b3, p) = get_pyramid_vertices(base_triangle, height);
 

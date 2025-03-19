@@ -69,3 +69,14 @@ impl Hittable for HittableList<'_> {
         self.bounding_box
     }
 }
+
+impl std::fmt::Debug for HittableList<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("HittableList")
+            .field("time0", &self.time0)
+            .field("time1", &self.time1)
+            .field("items", &self.items.len())
+            .field("bounding_box", &self.bounding_box)
+            .finish()
+    }
+}
