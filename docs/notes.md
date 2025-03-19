@@ -5,11 +5,33 @@
 
 ## Performance
 
-### Other optimizations
+### Removing dyn traits
 
-#### TODO
+Time to render at different resolutions BEFORE OPTIMIZATIONS,
+generate_final_scene (with dragon), release mode, no debug.
 
-- Change build function of BVH to better pick an axis
+- Low:
+  - Scene build: 0m 11s (11s)
+  - Render: 0m 31s (31s)
+  - Total: 0m 42s (42s)
+- Med:
+  - Scene build: 0m 11s (11s)
+  - Render: 2m 4s (124s)
+  - Total: 2m 16s (136s)
+
+Time to render at different resolutions AFTER REMOVING DYN TRAITS,
+generate_final_scene (with dragon), release mode, no debug.
+
+- Low:
+  - Scene build: 0m 12s (12s)
+  - Render: 0m 30s (30s)
+  - Total: 0m 42s (42s)
+- Med:
+  - Scene build: 0m 11s (11s)
+  - Render: 2m 5s (125s)
+  - Total: 2m 17s (137s)
+
+### BVH optimizations
 
 Time to render at different resolutions BEFORE OPTIMIZATIONS,
 generate_final_scene (with pyramid), release mode, no debug.
