@@ -2,7 +2,7 @@ use super::bounding_box::BoundingBox;
 use std::cmp::Ordering;
 
 use crate::{
-    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list_dyn::HittableListDyn},
+    hittable::{hit_record::HitRecord, hittable::Hittable, hittable_list::HittableList},
     ray::Ray,
     utilities::surrounding_box,
 };
@@ -37,12 +37,12 @@ impl<'a> Bvh<'a> {
     }
 
     /// Builds a BVH from scene data.
-    pub fn build(scene: HittableListDyn<'a>, time0: f64, time1: f64) -> (Self, BvhMetrics) {
+    pub fn build(scene: HittableList<'a>, time0: f64, time1: f64) -> (Self, BvhMetrics) {
         Self::build_internal(scene, time0, time1, 0)
     }
 
     fn build_internal(
-        scene: HittableListDyn<'a>,
+        scene: HittableList<'a>,
         time0: f64,
         time1: f64,
         mut current_depth: usize,
@@ -132,11 +132,11 @@ impl<'a> Bvh<'a> {
                 let mid = num_objects / 2;
                 let (half0, half1) = objects.split_at_mut(mid);
 
-                let hit_list0 = HittableListDyn::build(time0, time1, half0.to_vec());
+                let hit_list0 = HittableList::build(time0, time1, half0.to_vec());
                 let (left, left_metrics) =
                     Self::build_internal(hit_list0, time0, time1, current_depth);
 
-                let hit_list1 = HittableListDyn::build(time0, time1, half1.to_vec());
+                let hit_list1 = HittableList::build(time0, time1, half1.to_vec());
                 let (right, right_metrics) =
                     Self::build_internal(hit_list1, time0, time1, current_depth);
 

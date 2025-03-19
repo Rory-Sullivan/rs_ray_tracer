@@ -8,14 +8,14 @@ use super::hit_record::HitRecord;
 /// Stores a list of hittable objects. Uses dynamic trait objects to allow for
 /// any struct that implements the Hittable trait to be a part of the list.
 #[derive(Clone)]
-pub struct HittableListDyn<'a> {
+pub struct HittableList<'a> {
     time0: f64,
     time1: f64,
     pub items: Vec<Box<dyn Hittable + 'a>>,
     bounding_box: Option<BoundingBox>,
 }
 
-impl<'a> HittableListDyn<'a> {
+impl<'a> HittableList<'a> {
     pub fn new(time0: f64, time1: f64) -> Self {
         Self {
             time0,
@@ -50,7 +50,7 @@ impl<'a> HittableListDyn<'a> {
     }
 }
 
-impl Hittable for HittableListDyn<'_> {
+impl Hittable for HittableList<'_> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;

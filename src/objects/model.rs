@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 use crate::bvh::bvh::BvhMetrics;
-use crate::hittable::hittable_list_dyn::HittableListDyn;
+use crate::hittable::hittable_list::HittableList;
 use crate::hittable::{hit_record::HitRecord, hittable::Hittable};
 use crate::{
     bvh::{bounding_box::BoundingBox, bvh::Bvh},
@@ -33,7 +33,7 @@ impl<'a> Model<'a> {
 
         let triangles = read_ply_file(file_name);
 
-        let mut hittable_triangles = HittableListDyn::new(time0, time1);
+        let mut hittable_triangles = HittableList::new(time0, time1);
         for tri in triangles {
             let triangle = Triangle::new(tri.0, tri.1, tri.2, material.clone());
             hittable_triangles.add(Box::new(triangle));
