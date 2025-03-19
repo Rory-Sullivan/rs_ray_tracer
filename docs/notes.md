@@ -46,6 +46,10 @@ generate_final_scene (with dragon), release mode, no debug.
   - Scene build: 0m 9s (9s)
   - Render: 0m 27s (27s)
   - Total: 0m 37s (37s)
+- Med:
+  - Scene build: 0m 9s (9s)
+  - Render: 1m 51s (111s)
+  - Total: 2m 0s (120s)
 
 ### BVH optimizations
 
