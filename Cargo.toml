@@ -11,6 +11,6 @@ indicatif = "0.17.3"
 rand = "0.8.5"
 rayon = "1.10.0"
 
-[profile.release]
-# Set debug to true when profiling the code
-debug = false
+[profile.profiling]
+inherits = "release"
+debug = true

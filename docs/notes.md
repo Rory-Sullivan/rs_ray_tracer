@@ -3,6 +3,16 @@
 - Finished book 1
 - Finished book 2
 
+## How to profile
+
+- Use [samply](https://github.com/mstange/samply)
+- Run with 'profiling' build
+
+```
+cargo build --profile profiling
+samply record ./target/profiling/rs_ray_tracer.exe
+```
+
 ## Performance
 
 ### Removing dyn traits
