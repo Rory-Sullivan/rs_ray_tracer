@@ -19,7 +19,9 @@ pub struct Bvh {
 }
 
 #[derive(Debug, Clone, Copy)]
+#[allow(dead_code)]
 pub struct BvhMetrics {
+    num_objects: usize,
     min_depth: usize,
     max_depth: usize,
     average_depth: f32,
@@ -146,6 +148,7 @@ impl Bvh {
         let average_depth = (left_average_depth + right_average_depth) / 2.0;
 
         let metrics = BvhMetrics {
+            num_objects: items.len(),
             min_depth,
             max_depth,
             average_depth,
