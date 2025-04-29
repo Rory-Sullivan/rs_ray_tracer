@@ -17,7 +17,7 @@ pub fn degrees_to_radians(degrees: f64) -> f64 {
 /// Returns a random number in [0, 1)
 pub fn random() -> f64 {
     let mut rng = rand::thread_rng();
-    rng.gen::<f64>()
+    rng.r#gen::<f64>()
 }
 
 /// Returns a random number in [min, max)
