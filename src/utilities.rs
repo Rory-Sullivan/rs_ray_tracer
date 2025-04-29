@@ -16,20 +16,20 @@ pub fn degrees_to_radians(degrees: f64) -> f64 {
 
 /// Returns a random number in [0, 1)
 pub fn random() -> f64 {
-    let mut rng = rand::thread_rng();
-    rng.r#gen::<f64>()
+    let mut rng = rand::rng();
+    rng.random::<f64>()
 }
 
 /// Returns a random number in [min, max)
 pub fn random_rng(min: f64, max: f64) -> f64 {
-    let mut rng = rand::thread_rng();
-    rng.gen_range(min..max)
+    let mut rng = rand::rng();
+    rng.random_range(min..max)
 }
 
 /// Returns a random integer in [min, max)
 pub fn random_rng_int(min: usize, max: usize) -> usize {
-    let mut rng = rand::thread_rng();
-    rng.gen_range(min..max)
+    let mut rng = rand::rng();
+    rng.random_range(min..max)
 }
 
 /// Returns a random vector where x, y, and z are all in [0, 1)
