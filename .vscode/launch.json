@@ -5,35 +5,41 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "run debug",
-            "type": "cppvsdbg",
+            "type": "lldb",
             "request": "launch",
-            "program": "${workspaceRoot}/target/debug/rs_ray_tracer.exe",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
-            "environment": [
-                {
-                    "name": "RUST_BACKTRACE",
-                    "value": "1"
+            "name": "Unit tests",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=rs_ray_tracer"
+                ],
+                "filter": {
+                    "name": "rs_ray_tracer",
+                    "kind": "lib"
                 }
-            ],
-            "console": "integratedTerminal",
-            "preLaunchTask": "cargo build",
-            "postDebugTask": "open result",
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
         },
         {
-            "name": "run release",
-            "type": "cppvsdbg",
+            "type": "lldb",
             "request": "launch",
-            "program": "${workspaceRoot}/target/release/rs_ray_tracer.exe",
+            "name": "Run",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=rs_ray_tracer",
+                    "--package=rs_ray_tracer"
+                ],
+                "filter": {
+                    "name": "rs_ray_tracer",
+                    "kind": "bin"
+                }
+            },
             "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
-            "environment": [],
-            "console": "integratedTerminal",
-            "preLaunchTask": "cargo build release",
-            "postDebugTask": "open result",
-        },
+            "cwd": "${workspaceFolder}"
+        }
     ]
 }

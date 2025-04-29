@@ -5,7 +5,10 @@
             "label": "cargo build",
             "type": "shell",
             "command": "cargo build",
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [
                 "$rustc"
             ]
@@ -23,7 +26,16 @@
             "label": "open result",
             "type": "shell",
             "command": "start ./results/result_1.png",
-            "group": "build",
+            "group": "build"
         },
+        {
+            "label": "run release",
+            "type": "shell",
+            "command": "cargo run --release",
+            "group": "none",
+            "problemMatcher": [
+                "$rustc"
+            ]
+        }
     ]
 }
