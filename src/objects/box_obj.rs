@@ -68,7 +68,7 @@ impl BoxObj {
                 box_min.y, box_max.y, box_min.z, box_max.z, box_max.x, material,
             ))),
         ];
-        let sides = HittableList::build(0.0, 0.0, &sides);
+        let sides = HittableList::build(0.0, 0.0, Box::new(sides));
 
         Self {
             box_min,

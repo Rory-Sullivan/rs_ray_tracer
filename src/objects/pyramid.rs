@@ -44,7 +44,7 @@ impl Pyramid {
             Box::new(Triangle::new(b0, b1, b3, material.clone())),
             Box::new(Triangle::new(b2, b3, b1, material.clone())),
         ];
-        let sides = HittableList::build(0.0, 0.0, &sides);
+        let sides = HittableList::build(0.0, 0.0, Box::new(sides));
 
         let bounding_box = sides.bounding_box(0.0, 0.0);
 

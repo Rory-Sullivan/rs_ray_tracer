@@ -20,7 +20,7 @@ impl<H: Hittable> Translate<H> {
     }
 }
 
-impl<H: Hittable + Clone> Hittable for Translate<H> {
+impl<H: Hittable> Hittable for Translate<H> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let moved_ray = Ray::new(ray.origin - self.offset, ray.direction, ray.time);
 
@@ -42,6 +42,8 @@ impl<H: Hittable + Clone> Hittable for Translate<H> {
     }
 
     fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox> {
-        self.object.bounding_box(time0, time1).map(|bb| BoundingBox::new(bb.min + self.offset, bb.max + self.offset))
+        self.object
+            .bounding_box(time0, time1)
+            .map(|bb| BoundingBox::new(bb.min + self.offset, bb.max + self.offset))
     }
 }

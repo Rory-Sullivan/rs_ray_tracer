@@ -36,8 +36,8 @@ fn main() {
     let cameras = get_final_scene_cameras(&resolution, time0, time1);
 
     // Scene
-    let (mut scene, use_sky_background) = generate_final_scene();
-    let (bvh, bvh_metrics) = Bvh::build(time0, time1, &mut scene);
+    let (scene, use_sky_background) = generate_final_scene();
+    let (bvh, bvh_metrics) = Bvh::build(time0, time1, scene);
     print_time_taken("Done building scene", start_scene_build_instant);
     println!("Main BVH metrics: {bvh_metrics:?}");
 
@@ -675,7 +675,7 @@ fn generate_final_scene_book2() -> (Vec<Box<dyn Hittable>>, bool) {
             )));
         }
     }
-    scene.push(Box::new(Bvh::build(time0, time1, &mut ground_boxes).0));
+    scene.push(Box::new(Bvh::build(time0, time1, ground_boxes).0));
 
     // Make a light
     let diffuse_light = DiffuseLight::build_from_colour(RGB(7.0, 7.0, 7.0));
@@ -739,7 +739,7 @@ fn generate_final_scene_book2() -> (Vec<Box<dyn Hittable>>, bool) {
     }
     let translated_rotated_bvh_of_spheres = Translate::new(
         Point3d::new(-100.0, 270.0, 395.0),
-        RotateY::new(15.0, Bvh::build(time0, time1, &mut spheres).0, time0, time1),
+        RotateY::new(15.0, Bvh::build(time0, time1, spheres).0, time0, time1),
     );
     scene.push(Box::new(translated_rotated_bvh_of_spheres));
 
@@ -877,7 +877,7 @@ fn generate_final_scene() -> (Vec<Box<dyn Hittable>>, bool) {
             )));
         }
     }
-    scene.push(Box::new(Bvh::build(time0, time1, &mut ground_boxes).0));
+    scene.push(Box::new(Bvh::build(time0, time1, ground_boxes).0));
 
     // Make a light
     // Center: (200.0, 554.0, 280.0)
@@ -969,7 +969,7 @@ fn generate_final_scene() -> (Vec<Box<dyn Hittable>>, bool) {
     }
     let translated_rotated_bvh_of_spheres = Translate::new(
         Point3d::new(-250.0, 270.0, 395.0),
-        RotateY::new(15.0, Bvh::build(time0, time1, &mut spheres).0, time0, time1),
+        RotateY::new(15.0, Bvh::build(time0, time1, spheres).0, time0, time1),
     );
     scene.push(Box::new(translated_rotated_bvh_of_spheres));
 

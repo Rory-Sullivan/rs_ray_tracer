@@ -15,6 +15,13 @@ samply record ./target/profiling/rs_ray_tracer.exe
 
 ## Performance
 
+### Removing necessity for hittables to be clone-able
+
+- Low:
+  - Scene build:  0m 10s (10s)
+  - Render: 0m 26s (26s)
+  - Total: 0m 37s (37s)
+
 ### Removing dyn traits
 
 Time to render at different resolutions BEFORE OPTIMIZATIONS,

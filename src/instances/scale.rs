@@ -21,7 +21,7 @@ impl<H: Hittable> Scale<H> {
     }
 }
 
-impl<H: Hittable + Clone> Hittable for Scale<H> {
+impl<H: Hittable> Hittable for Scale<H> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let scaled_ray = Ray::new(
             ray.origin.scale(1.0 / self.x, 1.0 / self.y, 1.0 / self.z),
@@ -48,9 +48,11 @@ impl<H: Hittable + Clone> Hittable for Scale<H> {
     }
 
     fn bounding_box(&self, time0: f64, time1: f64) -> Option<BoundingBox> {
-        self.object.bounding_box(time0, time1).map(|bb| BoundingBox::new(
+        self.object.bounding_box(time0, time1).map(|bb| {
+            BoundingBox::new(
                 bb.min.scale(self.x, self.y, self.z),
                 bb.max.scale(self.x, self.y, self.z),
-            ))
+            )
+        })
     }
 }

@@ -11,7 +11,7 @@ pub type BvhNode = Option<Box<dyn Hittable>>;
 
 /// Bounding Volume Hierarchy. Used to store hittable objects in a tree like
 /// structure to make finding a hit more efficient.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Bvh {
     left: BvhNode,
     right: BvhNode,
@@ -29,14 +29,14 @@ pub struct BvhMetrics {
 
 impl Bvh {
     /// Builds a BVH from scene data.
-    pub fn build(time0: f64, time1: f64, items: &mut [Box<dyn Hittable>]) -> (Self, BvhMetrics) {
+    pub fn build(time0: f64, time1: f64, items: Vec<Box<dyn Hittable>>) -> (Self, BvhMetrics) {
         Self::build_internal(time0, time1, items, 0)
     }
 
     fn build_internal(
         time0: f64,
         time1: f64,
-        items: &mut [Box<dyn Hittable>],
+        mut items: Vec<Box<dyn Hittable>>,
         mut current_depth: usize,
     ) -> (Self, BvhMetrics) {
         current_depth += 1;
@@ -70,7 +70,7 @@ impl Bvh {
         ): (BvhNode, usize, usize, f32, BvhNode, usize, usize, f32) = match num_objects {
             0 => panic!("No objects"),
             1 => {
-                let left = items[0].clone();
+                let left = items.pop().unwrap();
                 (
                     Some(left),
                     current_depth,
@@ -84,8 +84,8 @@ impl Bvh {
             }
             2 => match compare_fn(&items[0], &items[1]) {
                 Ordering::Less | Ordering::Equal => {
-                    let left = items[0].clone();
-                    let right = items[1].clone();
+                    let right = items.pop().unwrap();
+                    let left = items.pop().unwrap();
                     (
                         Some(left),
                         current_depth,
@@ -98,8 +98,8 @@ impl Bvh {
                     )
                 }
                 Ordering::Greater => {
-                    let left = items[1].clone();
-                    let right = items[0].clone();
+                    let left = items.pop().unwrap();
+                    let right = items.pop().unwrap();
                     (
                         Some(left),
                         current_depth,
@@ -117,7 +117,8 @@ impl Bvh {
 
                 // Recursively call build function with split parts
                 let mid = num_objects / 2;
-                let (half0, half1) = items.split_at_mut(mid);
+                let half1 = items.split_off(mid);
+                let half0 = items;
 
                 let (left, left_metrics) = Self::build_internal(time0, time1, half0, current_depth);
 
@@ -148,7 +149,7 @@ impl Bvh {
         let average_depth = (left_average_depth + right_average_depth) / 2.0;
 
         let metrics = BvhMetrics {
-            num_objects: items.len(),
+            num_objects,
             min_depth,
             max_depth,
             average_depth,

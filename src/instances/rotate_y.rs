@@ -67,7 +67,7 @@ impl<H: Hittable> RotateY<H> {
     }
 }
 
-impl<H: Hittable + Clone> Hittable for RotateY<H> {
+impl<H: Hittable> Hittable for RotateY<H> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let origin = Vec3d::new(
             self.cos_theta * ray.origin.x - self.sin_theta * ray.origin.z,

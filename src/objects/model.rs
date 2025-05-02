@@ -13,7 +13,7 @@ use crate::{
 use super::triangle::Triangle;
 
 /// Struct for storing data related to a 3D model.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Model {
     bvh: Bvh,
 }
@@ -30,14 +30,14 @@ impl Model {
         let time0 = 0.0;
         let time1 = 0.0;
 
-        let mut triangles: Vec<Box<dyn Hittable>> = read_ply_file(file_name)
+        let triangles: Vec<Box<dyn Hittable>> = read_ply_file(file_name)
             .iter()
             .map(|tri| {
                 Box::new(Triangle::new(tri.0, tri.1, tri.2, material.clone())) as Box<dyn Hittable>
             })
             .collect();
 
-        let (bvh, bvh_metrics) = Bvh::build(time0, time1, &mut triangles);
+        let (bvh, bvh_metrics) = Bvh::build(time0, time1, triangles);
 
         (Self::new(bvh), bvh_metrics)
     }

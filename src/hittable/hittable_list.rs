@@ -16,13 +16,13 @@ pub struct HittableList {
 }
 
 impl HittableList {
-    pub fn build(time0: f64, time1: f64, items: &[Box<dyn Hittable>]) -> Self {
+    pub fn build(time0: f64, time1: f64, items: Box<[Box<dyn Hittable>]>) -> Self {
         // Get bounding box of all items and collect items into `Arc<[Box<dyn Hittable>]>`
         let mut bounding_box: Option<BoundingBox> = None;
         for item in items.iter() {
             bounding_box = surrounding_box_option(bounding_box, item.bounding_box(time0, time1))
         }
-        let items = Arc::from(items);
+        let items: Arc<[Box<dyn Hittable>]> = Arc::from(items);
 
         Self {
             items,
